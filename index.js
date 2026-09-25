@@ -942,6 +942,18 @@ async function handleApiRequest(request, env) {
     return new Response(JSON.stringify({ rooms: [] }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
   if (path === "/api/online") {
+    try {
+      if (env.CHESS_DB) {
+        await env.CHESS_DB.exec("CREATE TABLE IF NOT EXISTS online_now (cid TEXT PRIMARY KEY, ts INTEGER)");
+        try {
+          await env.CHESS_DB.prepare("DELETE FROM online_now WHERE ts < ?1").bind(Date.now() - 3e5).run();
+        } catch (e2) {
+        }
+        const r = await env.CHESS_DB.prepare("SELECT COUNT(*) AS n FROM online_now WHERE ts > ?1").bind(Date.now() - 25e3).first();
+        return new Response(JSON.stringify({ count: r && typeof r.n === "number" ? r.n : 0 }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    } catch (e) {
+    }
     return new Response(JSON.stringify({ count: onlineCount }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
   if (path === "/api/create-room") {
@@ -992,10 +1004,34 @@ var index_default = {
   }
 };
 async function handleWebSocket(ws, env) {
+  const cid = "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  let dbTouched = 0;
   onlineCount++;
   activeConnections.add(ws);
-  ws.send(JSON.stringify({ event: "online_count", data: onlineCount }));
-  broadcastOnlineCount();
+  ws._xqCounted = true;
+  try {
+    if (env.CHESS_DB) {
+      await env.CHESS_DB.exec("CREATE TABLE IF NOT EXISTS online_now (cid TEXT PRIMARY KEY, ts INTEGER)");
+      await env.CHESS_DB.prepare("INSERT OR REPLACE INTO online_now (cid, ts) VALUES (?1, ?2)").bind(cid, Date.now()).run();
+      dbTouched = Date.now();
+    }
+  } catch (e) {
+  }
+  const sendRealCount = async () => {
+    let n = onlineCount;
+    try {
+      if (env.CHESS_DB) {
+        const r = await env.CHESS_DB.prepare("SELECT COUNT(*) AS n FROM online_now WHERE ts > ?1").bind(Date.now() - 25e3).first();
+        if (r && typeof r.n === "number") n = r.n;
+      }
+    } catch (e) {
+    }
+    const msg = JSON.stringify({ event: "online_count", data: n });
+    for (const c of activeConnections) {
+      try { c.send(msg); } catch (e) {}
+    }
+  };
+  await sendRealCount();
   let socketData = { roomId: null, color: null, spectator: false };
   ws.onmessage = async (event) => {
     try {
@@ -1018,6 +1054,13 @@ async function handleWebSocket(ws, env) {
           ws.send(JSON.stringify({ event: "pong" }));
         } catch (e) {
         }
+        if (env.CHESS_DB && Date.now() - dbTouched > 15e3) {
+          dbTouched = Date.now();
+          try {
+            await env.CHESS_DB.prepare("UPDATE online_now SET ts = ?1 WHERE cid = ?2").bind(Date.now(), cid).run();
+          } catch (e) {
+          }
+        }
       } else if (eventName === "join_room") {
         const roomId = payload;
         ws.send(JSON.stringify({ event: "redirect_room", data: { roomId, action: "join" } }));
@@ -1030,15 +1073,22 @@ async function handleWebSocket(ws, env) {
       console.error("WebSocket message error:", e);
     }
   };
-  ws.onclose = () => {
+  const _dropConn = () => {
+    if (!ws._xqCounted) return;
+    ws._xqCounted = false;
     onlineCount--;
     activeConnections.delete(ws);
-    broadcastOnlineCount();
+    try {
+      if (env.CHESS_DB) env.CHESS_DB.prepare("DELETE FROM online_now WHERE cid = ?1").bind(cid).run().catch(() => {});
+    } catch (e) {
+    }
+    sendRealCount();
+  };
+  ws.onclose = () => {
+    _dropConn();
   };
   ws.onerror = () => {
-    onlineCount--;
-    activeConnections.delete(ws);
-    broadcastOnlineCount();
+    _dropConn();
   };
 }
 __name(handleWebSocket, "handleWebSocket");
