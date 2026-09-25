@@ -6387,7 +6387,7 @@ function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){r
 window._xqLoadRooms=function(){try{
 var lobby=document.getElementById('lobby');if(!lobby||lobby.classList.contains('hide'))return;
 var panel=document.getElementById('roomListPanel'),list=document.getElementById('roomList');if(!panel||!list)return;
-fetch('/api/rooms').then(function(r){return r.json();}).then(function(j){
+var _xqRenderRooms=function(j){
 var rooms=(j&&j.rooms)||[];panel.style.display=rooms.length?'':'none';
 var cnt=document.getElementById('roomListCount');if(cnt)cnt.textContent=rooms.length?('共 '+rooms.length+' 间'):'';
 if(!rooms.length){list.innerHTML='<div style="font-size:12px;color:#8a7a68">暂无对局房间 · 创建或加入房间后这里实时显示对战双方</div>';return;}
@@ -6399,8 +6399,10 @@ var names='<span style="color:#ff9a8d">'+redTxt+'</span> <span style="color:#6b5
 var btns=playing
 ?'<button class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:11px" onclick="watchRoom(\''+escHtml(rm.id)+'\')">观战</button>'
 :'<button class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:11px" onclick="joinRoomById(\''+escHtml(rm.id)+'\')">加入</button>';
-return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#241409;border:1px solid #3d2117;border-radius:8px;padding:7px 10px;flex-wrap:wrap"><span style="font-size:12px;color:#f0c674;font-weight:700">#'+escHtml(rm.id)+'</span><span style="font-size:12px;flex:1;min-width:130px">'+stTxt+' '+names+'</span><span>'+btns+'</span></div>';}).join('');
-}).catch(function(e){});
+return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#241409;border:1px solid #3d2117;border-radius:8px;padding:7px 10px;flex-wrap:wrap"><span style="font-size:12px;color:#f0c674;font-weight:700">#'+escHtml(rm.id)+'</span><span style="font-size:12px;flex:1;min-width:130px">'+stTxt+' '+names+'</span><span>'+btns+'</span></div>';}).join('');};
+var _xqFetchRooms=function(base,fallback){
+fetch(base+'/api/rooms',{signal:(function(){try{return AbortSignal.timeout(8000);}catch(e){return undefined;}})()}).then(function(r){return r.json();}).then(function(j){_xqRenderRooms(j);}).catch(function(e){if(fallback)fallback();});};
+_xqFetchRooms(window._xqGameOrigin?window._xqGameOrigin():window.location.origin,function(){_xqFetchRooms(window._xqAltOrigin?window._xqAltOrigin():window.location.origin,null);});
 }catch(e){}};
 window.joinRoomById=function(rid){try{
 if(!sockOk||!socket||!socket.connected){toast('服务器未连接，请稍候',2000);return;}
@@ -6473,6 +6475,38 @@ _SC.prototype._xqPidPatched=true;
 }catch(e){}}
 try{_xqAttachRoomListListeners();}catch(e){}
 try{var _olg=window.leaveGame;if(typeof _olg==='function'){window.leaveGame=function(){try{document.body.removeAttribute('data-xq-spec');}catch(e){}return _olg.apply(this,arguments);};}}catch(e){}
+/* --- 线路自动回退: WS连续失败时静默切换到备用域名(页面地址不变,两端同一后端) --- */
+try{(function(){
+if(window._xqFailoverInstalled)return;window._xqFailoverInstalled=true;
+var primary=window.location.host;
+var alt=primary==='x.meaigo.eu.org'?'x.696919.xyz':'x.meaigo.eu.org';
+var cur=primary;
+window._xqGameOrigin=function(){return window.location.protocol+'//'+cur;};
+window._xqAltOrigin=function(){return window.location.protocol+'//'+(cur===primary?alt:primary);};
+var _SCP=window.SocketClient&&window.SocketClient.prototype;
+if(_SCP&&!_SCP._xqFailoverPatched){
+_SCP._xqFailoverPatched=true;
+var _oc=_SCP.connect;
+_SCP.connect=function(){
+try{
+if(cur&&this.url&&this.url.indexOf('//'+cur+'/')<0){this.url=this.url.replace(/^(wss?:\/\/)[^\/]+/,'$1'+cur);}
+if(cur&&this.baseUrl&&this.baseUrl.indexOf('//'+cur+'/')<0){this.baseUrl=this.baseUrl.replace(/^(wss?:\/\/)[^\/]+/,'$1'+cur);}
+}catch(e){}
+return _oc.apply(this,arguments);
+};
+var _ot=_SCP._trigger;
+_SCP._trigger=function(ev,data){
+try{
+if(ev==='connect'){this._xqFails=0;}
+else if(ev==='disconnect'){
+this._xqFails=(this._xqFails||0)+1;
+if(this._xqFails>=2&&cur!==alt){cur=alt;this._xqFails=0;console.warn('[xq-failover] WS switch to '+alt);try{if(typeof toast==='function')toast('主线路不稳,已切换备用线路',2000);}catch(e){}}
+}
+}catch(e){}
+return _ot.apply(this,arguments);
+};
+}
+})();}catch(e){}
 try{var _ofe=window.forceExitGame;if(typeof _ofe==='function'){window.forceExitGame=function(){try{document.body.removeAttribute('data-xq-spec');}catch(e){}return _ofe.apply(this,arguments);};}}catch(e){}
 try{var _xqOrigConnectSocket=window.connectSocket;if(typeof _xqOrigConnectSocket==='function'){window.connectSocket=function(){try{_xqOrigConnectSocket();}catch(e){}try{_xqAttachRoomListListeners();}catch(e){}};}}catch(e){}
 try{setTimeout(function(){_xqLoadRooms();},800);}catch(e){}
