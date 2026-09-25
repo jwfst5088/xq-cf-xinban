@@ -260,6 +260,15 @@ body[data-skin="zhu"] .lobby-cols .btns>.divider{color:#c08a6a!important}
 .skinOpt .sd{font-size:11px;color:#8b7355;margin-top:2px}
 .skinOpt .ck{margin-left:auto;color:#f5c542;font-size:15px;font-weight:900;visibility:hidden}
 .skinOpt.cur .ck{visibility:visible}
+/* --- 修复: 默认皮肤聊天框背景=左侧面板底色(桌面端 .left-panel .chat-display 同口径压制) --- */
+body:not([data-skin]) .chat-display{background:#2c1810!important;border-color:#3d2117!important}
+body:not([data-skin]) .left-panel .chat-display{background:#2c1810!important;border-color:#3d2117!important}
+/* --- 修复: 默认皮肤 更换皮肤/人机对弈/Pikafish深度AI 统一为创建按钮配色 --- */
+body:not([data-skin]) #skinBtn{background:#3d2117;color:#f0e6d3;border:2px solid #5a3a28}
+body:not([data-skin]) .lobby-cols .btn-green,
+body:not([data-skin]) .lobby-cols .btn-blue{background:#3d2117;color:#f0e6d3;border:2px solid #5a3a28}
+/* --- 修复: 观战模式求和/认输/悔棋保留可见但不可点击; 返回与全屏可点 --- */
+body[data-xq-spec] .right-panel .actions button:not([onclick*="leaveGame"]):not([onclick*="toggleFullscreen"]){opacity:.45;pointer-events:none}
 </style>
 </head>
 <body>
@@ -6387,8 +6396,9 @@ var redTxt=rm.red?('红方'+escHtml(rm.red)):'红方待入座';
 var blkTxt=rm.black?('黑方'+escHtml(rm.black)):'黑方待入座';
 var stTxt=playing?'<span style="color:#2ecc71">● 对战中</span>':'<span style="color:#f0c674">○ 等待中</span>';
 var names='<span style="color:#ff9a8d">'+redTxt+'</span> <span style="color:#6b5340">vs</span> <span style="color:#c4a882">'+blkTxt+'</span>';
-var btns='<button class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:11px" onclick="joinRoomById(\''+escHtml(rm.id)+'\')">加入</button>';
-if(playing)btns+=' <button class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:11px" onclick="watchRoom(\''+escHtml(rm.id)+'\')">观战</button>';
+var btns=playing
+?'<button class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:11px" onclick="watchRoom(\''+escHtml(rm.id)+'\')">观战</button>'
+:'<button class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:11px" onclick="joinRoomById(\''+escHtml(rm.id)+'\')">加入</button>';
 return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#241409;border:1px solid #3d2117;border-radius:8px;padding:7px 10px;flex-wrap:wrap"><span style="font-size:12px;color:#f0c674;font-weight:700">#'+escHtml(rm.id)+'</span><span style="font-size:12px;flex:1;min-width:130px">'+stTxt+' '+names+'</span><span>'+btns+'</span></div>';}).join('');
 }).catch(function(e){});
 }catch(e){}};
@@ -6405,10 +6415,11 @@ socket.emit('join_room',rid);
 function _xqEnterSpectator(d){
 try{
 myRm=d.roomId;myCl=null;gm='online';window._xqSpectator=true;
+document.body.setAttribute('data-xq-spec','1');
 D('lobby').classList.add('hide');D('game').classList.add('show');
 D('modeBadge').textContent='观战: '+d.roomId;
 D('redName').textContent='红方';D('blackName').textContent='黑方';
-D('drawBtn').style.display='none';
+D('drawBtn').style.display='inline-flex';
 boardFlip=false;gameStarted=true;
 engine.initBoard();engine.currentTurn='red';engine.gameOver=false;engine.winner=null;engine.moveHistory=[];capRed=[];capBlk=[];lastMove=null;selected=null;validMoves=[];clickCount=0;
 var mh=(d&&d.moveHistory)||[];
@@ -6423,9 +6434,10 @@ toast('已进入观战模式',1500);
 function _xqFixSpectatorUI(d){
 try{
 myCl=null;window._xqSpectator=true;
+document.body.setAttribute('data-xq-spec','1');
 D('modeBadge').textContent='观战: '+(d&&d.roomId?d.roomId:(myRm||''));
 D('redName').textContent='红方';D('blackName').textContent='黑方';
-D('drawBtn').style.display='none';
+D('drawBtn').style.display='inline-flex';
 boardFlip=false;
 if(gameStarted)D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
 }catch(e){}}
@@ -6435,8 +6447,8 @@ try{
 if(!socket||typeof socket.on!=='function'||socket._xqRoomListHooked)return;
 socket._xqRoomListHooked=true;
 socket.on('connect',function(){window._xqSpectator=false;try{_xqLoadRooms();}catch(e){}});
-socket.on('room_created',function(d){window._xqSpectator=false;_xqRememberPid(d);});
-socket.on('room_joined',function(d){window._xqSpectator=false;_xqRememberPid(d);});
+socket.on('room_created',function(d){window._xqSpectator=false;_xqRememberPid(d);try{document.body.removeAttribute('data-xq-spec');}catch(e){}});
+socket.on('room_joined',function(d){window._xqSpectator=false;_xqRememberPid(d);try{document.body.removeAttribute('data-xq-spec');}catch(e){}});
 socket.on('spectator_joined',function(d){try{_xqEnterSpectator(d);}catch(e){}});
 socket.on('room_state',function(d){try{if(window._xqSpectator){_xqFixSpectatorUI(d);}_xqRememberPid(d);}catch(e){}});
 // 刷新秒接管：给 SocketClient 原型加透传包装，仅在 reconnect_room 载荷中注入 pid，
@@ -6460,6 +6472,8 @@ _SC.prototype._xqPidPatched=true;
 }catch(e){}
 }catch(e){}}
 try{_xqAttachRoomListListeners();}catch(e){}
+try{var _olg=window.leaveGame;if(typeof _olg==='function'){window.leaveGame=function(){try{document.body.removeAttribute('data-xq-spec');}catch(e){}return _olg.apply(this,arguments);};}}catch(e){}
+try{var _ofe=window.forceExitGame;if(typeof _ofe==='function'){window.forceExitGame=function(){try{document.body.removeAttribute('data-xq-spec');}catch(e){}return _ofe.apply(this,arguments);};}}catch(e){}
 try{var _xqOrigConnectSocket=window.connectSocket;if(typeof _xqOrigConnectSocket==='function'){window.connectSocket=function(){try{_xqOrigConnectSocket();}catch(e){}try{_xqAttachRoomListListeners();}catch(e){}};}}catch(e){}
 try{setTimeout(function(){_xqLoadRooms();},800);}catch(e){}
 try{setInterval(function(){try{if(socket&&socket.connected)_xqLoadRooms();}catch(e){}},15000);}catch(e){}
