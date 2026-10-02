@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html lang="zh-CN" data-version="v8">
-<head>
+<head><script>
+/* --- 入口竞速(层1): 探测同后端入口, 当前入口差则整页跳最优; 每会话仅一次 --- */
+try{(function(){
+if(location.protocol!=='https:')return;
+try{if(sessionStorage.getItem('_xqRaceDone'))return;}catch(e){}
+var CAND=['x.696919.xyz','x.meaigo.eu.org'];
+var host=location.hostname;
+var list=CAND.filter(function(h){return h!==host;});
+if(!list.length)return;
+function probe(h){return new Promise(function(res){var t0=Date.now(),fin=false;var t=setTimeout(function(){if(!fin){fin=true;res(9e9);}},1600);fetch('https://'+h+'/?__race='+t0,{method:'HEAD',mode:'no-cors',cache:'no-store'}).then(function(){if(!fin){fin=true;clearTimeout(t);res(Date.now()-t0);}}).catch(function(){if(!fin){fin=true;clearTimeout(t);res(9e9);}});});}
+var ps=[probe(host)];for(var i=0;i<list.length;i++)ps.push(probe(list[i]));
+Promise.all(ps).then(function(rs){try{
+var curMs=rs[0],best=null;
+for(var j=0;j<list.length;j++){if(rs[j+1]<9e9&&(!best||rs[j+1]<best.ms))best={h:list[j],ms:rs[j+1]};}
+try{sessionStorage.setItem('_xqRaceDone','1');}catch(e){}
+var bad=curMs>=9e9;
+var muchBetter=best&&best.ms<700&&curMs>best.ms*2;
+if(best&&(bad||muchBetter)){location.replace('https://'+best.h+location.pathname+location.search+location.hash);}
+}catch(e){}});
+})();}catch(e){}
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
 <title>中国象棋</title>
