@@ -1,8 +1,9 @@
-
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
-// src/index.js
+// index.js
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
 var activeConnections = /* @__PURE__ */ new Set();
 var onlineCount = 0;
 var aiWeights = {
@@ -35,9 +36,13 @@ function broadcastOnlineCount() {
   }
 }
 __name(broadcastOnlineCount, "broadcastOnlineCount");
+__name2(broadcastOnlineCount, "broadcastOnlineCount");
 var ChessRoom = class {
   static {
     __name(this, "ChessRoom");
+  }
+  static {
+    __name2(this, "ChessRoom");
   }
   constructor(ctx, env) {
     this.ctx = ctx;
@@ -122,8 +127,8 @@ var ChessRoom = class {
     if (!rid) return;
     const hasRed = [...this.room.players.values()].some((p) => p.color === "red");
     const hasBlack = [...this.room.players.values()].some((p) => p.color === "black");
-    const rn = hasRed ? "已入座" : "";
-    const bn = hasBlack ? "已入座" : "";
+    const rn = hasRed ? "\u5DF2\u5165\u5EA7" : "";
+    const bn = hasBlack ? "\u5DF2\u5165\u5EA7" : "";
     const watchers = this.room.spectators ? this.room.spectators.size : 0;
     try {
       await this.env.CHESS_DB.exec("CREATE TABLE IF NOT EXISTS rooms_registry (id TEXT PRIMARY KEY, red TEXT, black TEXT, status TEXT, watchers INTEGER, updated_at INTEGER)");
@@ -179,7 +184,7 @@ var ChessRoom = class {
     ws._lastSeen = Date.now();
     let heartbeatTimer = null;
     let heartbeatTimeout = null;
-    const startHeartbeat = /* @__PURE__ */ __name(() => {
+    const startHeartbeat = /* @__PURE__ */ __name2(() => {
       stopHeartbeat();
       heartbeatTimer = setInterval(() => {
         if (heartbeatTimeout) {
@@ -198,7 +203,7 @@ var ChessRoom = class {
         }, 6e4);
       }, 3e4);
     }, "startHeartbeat");
-    const stopHeartbeat = /* @__PURE__ */ __name(() => {
+    const stopHeartbeat = /* @__PURE__ */ __name2(() => {
       if (heartbeatTimer) {
         clearInterval(heartbeatTimer);
         heartbeatTimer = null;
@@ -230,8 +235,6 @@ var ChessRoom = class {
             clearTimeout(this._cleanupTimer);
             this._cleanupTimer = null;
           }
-          // 清扫僵尸座位：已关闭/半关闭/已被替换的旧连接不再占用颜色，
-          // 防止"离开后同房间号重进"产生同色双座位（卡死根源）
           for (const [pws, p] of [...this.room.players]) {
             const st = pws.readyState;
             const rep = pws._socketData && pws._socketData.replaced;
@@ -244,7 +247,6 @@ var ChessRoom = class {
           if (this.room.players.size > 0) {
             let existingColor = [...this.room.players.values()][0].color;
             let myColor = existingColor === "red" ? "black" : "red";
-            // 最终保险：若目标颜色仍被其他存活连接占用（半开僵尸未被清扫），则取反色；双方都被占则拒绝
             const takenByLive = [...this.room.players.entries()].some(([pws2, p2]) => p2.color === myColor && pws2 !== ws && !(pws2._socketData && pws2._socketData.replaced));
             if (takenByLive) myColor = myColor === "red" ? "black" : "red";
             const stillTaken = [...this.room.players.values()].some((p2) => p2.color === myColor);
@@ -281,7 +283,6 @@ var ChessRoom = class {
             clearTimeout(this._cleanupTimer);
             this._cleanupTimer = null;
           }
-          // 同上：先清扫僵尸座位再判断房间是否满员
           for (const [pws, p] of [...this.room.players]) {
             const st = pws.readyState;
             const rep = pws._socketData && pws._socketData.replaced;
@@ -464,14 +465,16 @@ var ChessRoom = class {
           if (!this.room) return;
           this.broadcastToOpponent(ws, JSON.stringify({ event: "undo_rejected", data: {} }));
         } else if (eventName === "reconnect_room") {
-          // 自愈：房间对象已被销毁（如对手离开重建）时，从D1或全新状态恢复，避免静默失败
           if (!this.room) {
-            try { await this.initRoom(this.room.id); } catch (e2) {}
+            try {
+              await this.initRoom(this.room.id);
+            } catch (e2) {
+            }
           }
           if (!this.room) return;
           const otherEntries = [...this.room.players.entries()].filter(([pws]) => pws !== ws);
-          const isReplaceable = /* @__PURE__ */ __name((c) => otherEntries.some(([pws, p]) => p.color === c && (pws.readyState === WebSocket.CLOSED || pws.readyState === WebSocket.CLOSING || pws.readyState === WebSocket.CONNECTING || this.disconnected && this.disconnected[c])), "isReplaceable");
-          const isFree = /* @__PURE__ */ __name((c) => !otherEntries.some(([, p]) => p.color === c), "isFree");
+          const isReplaceable = /* @__PURE__ */ __name2((c) => otherEntries.some(([pws, p]) => p.color === c && (pws.readyState === WebSocket.CLOSED || pws.readyState === WebSocket.CLOSING || pws.readyState === WebSocket.CONNECTING || this.disconnected && this.disconnected[c])), "isReplaceable");
+          const isFree = /* @__PURE__ */ __name2((c) => !otherEntries.some(([, p]) => p.color === c), "isFree");
           if (payload && payload.pid && this.room.playerTokens) {
             const tokColor = this.room.playerTokens.red === payload.pid ? "red" : this.room.playerTokens.black === payload.pid ? "black" : null;
             if (tokColor) {
@@ -484,21 +487,21 @@ var ChessRoom = class {
             } else {
               const sameColorEntry = otherEntries.find(([, p]) => p.color === color);
               if (sameColorEntry) {
-                // 同色座位占用裁决：
-                //  允许接管 = pid匹配(本人) | 持有者已死/被替换 | 持有者闲置>25s(僵尸) | 座位早于该色离开标记(旧主人回归)
-                //  其余（离开重建后新客人合法占座）→ 不抢，改反色或拒绝
                 const [hws, seat] = sameColorEntry;
-                const pidMatches = !!(payload.pid && this.room.playerTokens && this.room.playerTokens[color] === payload.pid);
-                const holderDead = hws.readyState !== 1 || (hws._socketData && hws._socketData.replaced);
+                const pidMatches2 = !!(payload.pid && this.room.playerTokens && this.room.playerTokens[color] === payload.pid);
+                const holderDead = hws.readyState !== 1 || hws._socketData && hws._socketData.replaced;
                 const holderIdle = !hws._lastSeen || Date.now() - hws._lastSeen > 25e3;
                 const preDiscSeat = !!(this.disconnected && this.disconnected[color] && seat.assignedAt && this.disconnected[color] > seat.assignedAt);
-                if (!pidMatches && !holderDead && !holderIdle && !preDiscSeat) {
+                if (!pidMatches2 && !holderDead && !holderIdle && !preDiscSeat) {
                   const alt2 = color === "red" ? "black" : "red";
                   if (isFree(alt2) || isReplaceable(alt2)) {
                     color = alt2;
                   } else {
                     ws.send(JSON.stringify({ event: "error", data: "\u623F\u95F4\u5DF2\u6EE1\uFF0C\u65E0\u6CD5\u91CD\u8FDE" }));
-                    try { ws.close(); } catch (e2) {}
+                    try {
+                      ws.close();
+                    } catch (e2) {
+                    }
                     return;
                   }
                 }
@@ -533,8 +536,6 @@ var ChessRoom = class {
             clearTimeout(this.room._disconnectTimer);
             this.room._disconnectTimer = null;
           }
-          // 身份自愈：若来者 pid 与该座位令牌不符（换先后本地过期），接管座位时轮换令牌，
-          // 并在 room_state 中下发新 pid（附加字段，旧前端忽略，无兼容性影响）
           let rotatedPid = null;
           const pidMatches = !!(payload.pid && this.room.playerTokens && this.room.playerTokens[color] === payload.pid);
           if (!pidMatches) {
@@ -566,7 +567,7 @@ var ChessRoom = class {
               capturedRed: this.room.capturedRed,
               capturedBlack: this.room.capturedBlack,
               gameStarted: true,
-              pid: rotatedPid || payload.pid || undefined
+              pid: rotatedPid || payload.pid || void 0
             } }));
           } catch (e) {
           }
@@ -768,7 +769,6 @@ var ChessRoom = class {
         this.room._timer = null;
         return;
       }
-      // 每秒推送极小的 time_update：持续冲刷边缘TCP发送缓冲，走子消息不再等客户端ping才送达（前端安全忽略未知事件）
       this.broadcastToRoom(JSON.stringify({ event: "time_update", data: { redTime: this.room.redTime, blkTime: this.room.blkTime, currentTurn: this.room.currentTurn } }));
       const now = Date.now();
       const elapsed = Math.max(1, Math.round((now - this.room._timerLastTick) / 1e3));
@@ -809,6 +809,7 @@ async function initAiDb(db) {
   }
 }
 __name(initAiDb, "initAiDb");
+__name2(initAiDb, "initAiDb");
 async function loadAiFromDb(db) {
   try {
     const result = await db.prepare("SELECT weights, stats FROM ai_weights WHERE id = 1").first();
@@ -840,6 +841,7 @@ async function loadAiFromDb(db) {
   }
 }
 __name(loadAiFromDb, "loadAiFromDb");
+__name2(loadAiFromDb, "loadAiFromDb");
 async function saveAiToDb(db) {
   try {
     await db.exec(`CREATE TABLE IF NOT EXISTS ai_weights (id INTEGER PRIMARY KEY, weights TEXT, stats TEXT, updated_at INTEGER)`);
@@ -851,6 +853,7 @@ async function saveAiToDb(db) {
   }
 }
 __name(saveAiToDb, "saveAiToDb");
+__name2(saveAiToDb, "saveAiToDb");
 async function handleApiRequest(request, env) {
   const url = new URL(request.url);
   const path = url.pathname;
@@ -964,6 +967,7 @@ async function handleApiRequest(request, env) {
   return new Response(JSON.stringify({ error: "Not found" }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 404 });
 }
 __name(handleApiRequest, "handleApiRequest");
+__name2(handleApiRequest, "handleApiRequest");
 var index_default = {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -1017,7 +1021,7 @@ async function handleWebSocket(ws, env) {
     }
   } catch (e) {
   }
-  const sendRealCount = async () => {
+  const sendRealCount = /* @__PURE__ */ __name(async () => {
     let n = onlineCount;
     try {
       if (env.CHESS_DB) {
@@ -1028,9 +1032,12 @@ async function handleWebSocket(ws, env) {
     }
     const msg = JSON.stringify({ event: "online_count", data: n });
     for (const c of activeConnections) {
-      try { c.send(msg); } catch (e) {}
+      try {
+        c.send(msg);
+      } catch (e) {
+      }
     }
-  };
+  }, "sendRealCount");
   await sendRealCount();
   let socketData = { roomId: null, color: null, spectator: false };
   ws.onmessage = async (event) => {
@@ -1073,17 +1080,18 @@ async function handleWebSocket(ws, env) {
       console.error("WebSocket message error:", e);
     }
   };
-  const _dropConn = () => {
+  const _dropConn = /* @__PURE__ */ __name(() => {
     if (!ws._xqCounted) return;
     ws._xqCounted = false;
     onlineCount--;
     activeConnections.delete(ws);
     try {
-      if (env.CHESS_DB) env.CHESS_DB.prepare("DELETE FROM online_now WHERE cid = ?1").bind(cid).run().catch(() => {});
+      if (env.CHESS_DB) env.CHESS_DB.prepare("DELETE FROM online_now WHERE cid = ?1").bind(cid).run().catch(() => {
+      });
     } catch (e) {
     }
     sendRealCount();
-  };
+  }, "_dropConn");
   ws.onclose = () => {
     _dropConn();
   };
@@ -1092,9 +1100,9 @@ async function handleWebSocket(ws, env) {
   };
 }
 __name(handleWebSocket, "handleWebSocket");
+__name2(handleWebSocket, "handleWebSocket");
 export {
   ChessRoom,
   index_default as default
 };
 //# sourceMappingURL=index.js.map
-
