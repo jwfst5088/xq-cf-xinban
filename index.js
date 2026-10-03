@@ -972,6 +972,17 @@ var index_default = {
   async fetch(request, env) {
     const url = new URL(request.url);
     const path = url.pathname;
+    if (path === "/api/race-report" && request.method === "POST") {
+      try {
+        const cf = request.cf || {};
+        const b = await request.json().catch(() => ({}));
+        await env.CHESS_DB.prepare(
+          "INSERT INTO race_report (ts,asn,city,entry,t_self,t_alt,t_p1,t_p2,t_p3) VALUES (?,?,?,?,?,?,?,?,?)"
+        ).bind(Date.now(), cf.asn || 0, String(cf.city || cf.region || "").slice(0, 40), String(b.entry || "").slice(0, 64), b.t_self | 0, b.t_alt | 0, b.t_p1 | 0, b.t_p2 | 0, b.t_p3 | 0).run();
+      } catch (e) {
+      }
+      return new Response("ok");
+    }
     if (path.startsWith("/api/")) {
       return await handleApiRequest(request, env);
     }
