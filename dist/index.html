@@ -6,7 +6,7 @@ try{(function(){
 if(location.protocol!=='https:')return;
 try{if(sessionStorage.getItem('_xqRaceDone'))return;}catch(e){}
 var CAND=['x.696919.xyz','x.meaigo.eu.org'];
-var P=['pc1.696919.xyz','pc2.696919.xyz','pc3.696919.xyz'];
+var P=["pc1.696919.xyz","pc2.696919.xyz","pc3.696919.xyz","pc4.696919.xyz","pc5.696919.xyz","pc6.696919.xyz","pc7.696919.xyz","pc8.696919.xyz","pc9.696919.xyz"];
 var host=location.hostname;
 var list=CAND.filter(function(h){return h!==host;});
 function probe(h){return new Promise(function(res){var t0=Date.now(),fin=false;var t=setTimeout(function(){if(!fin){fin=true;res(9e9);}},1600);fetch('https://'+h+'/favicon.ico?__race='+t0,{method:'HEAD',mode:'no-cors',cache:'no-store'}).then(function(){if(!fin){fin=true;clearTimeout(t);res(Date.now()-t0);}}).catch(function(){if(!fin){fin=true;clearTimeout(t);res(9e9);}});});}
@@ -20,7 +20,7 @@ try{sessionStorage.setItem('_xqRaceDone','1');}catch(e){}
 var bad=curMs>=9e9;
 var muchBetter=best&&best.ms<700&&curMs>best.ms*2;
 if(best&&(bad||muchBetter)){location.replace('https://'+best.h+location.pathname+location.search+location.hash);return;}
-if(Math.random()<0.25){var o=alts.length,rep={entry:host,t_self:Math.min(curMs,32000)|0,t_alt:best?Math.min(best.ms,32000)|0:0,t_p1:Math.min(rs[o+1]|0,32000),t_p2:Math.min(rs[o+2]|0,32000),t_p3:Math.min(rs[o+3]|0,32000)};
+if(Math.random()<0.25){var o=alts.length,rep={entry:host,t_self:Math.min(curMs,32000)|0,t_alt:best?Math.min(best.ms,32000)|0:0,t_p1:Math.min(rs[o+1]|0,32000),t_p2:Math.min(rs[o+2]|0,32000),t_p3:Math.min(rs[o+3]|0,32000),t_p4:Math.min(rs[o+4]|0,32000),t_p5:Math.min(rs[o+5]|0,32000),t_p6:Math.min(rs[o+6]|0,32000),t_p7:Math.min(rs[o+7]|0,32000),t_p8:Math.min(rs[o+8]|0,32000),t_p9:Math.min(rs[o+9]|0,32000)};
 try{navigator.sendBeacon('/api/race-report',new Blob([JSON.stringify(rep)],{type:'application/json'}));}catch(e){}
 }
 }catch(e){}});
