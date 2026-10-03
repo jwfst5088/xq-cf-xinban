@@ -977,8 +977,8 @@ var index_default = {
         const cf = request.cf || {};
         const b = await request.json().catch(() => ({}));
         await env.CHESS_DB.prepare(
-          "INSERT INTO race_report (ts,asn,city,entry,t_self,t_alt,t_p1,t_p2,t_p3) VALUES (?,?,?,?,?,?,?,?,?)"
-        ).bind(Date.now(), cf.asn || 0, String(cf.city || cf.region || "").slice(0, 40), String(b.entry || "").slice(0, 64), b.t_self | 0, b.t_alt | 0, b.t_p1 | 0, b.t_p2 | 0, b.t_p3 | 0).run();
+          "INSERT INTO race_report (ts,asn,city,entry,t_self,t_alt,t_p1,t_p2,t_p3,t_p4,t_p5,t_p6,t_p7,t_p8,t_p9) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+        ).bind(Date.now(), cf.asn || 0, String(cf.city || cf.region || "").slice(0, 40), String(b.entry || "").slice(0, 64), b.t_self | 0, b.t_alt | 0, b.t_p1 | 0, b.t_p2 | 0, b.t_p3 | 0, b.t_p4 | 0, b.t_p5 | 0, b.t_p6 | 0, b.t_p7 | 0, b.t_p8 | 0, b.t_p9 | 0).run();
       } catch (e) {
       }
       return new Response("ok");
