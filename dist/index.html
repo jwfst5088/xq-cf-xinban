@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN" data-version="v8">
 <head><script>
-/* --- 入口竞速(层1)+真实测量(RUM): 择优跳转+匿名上报(每会话一次) --- */
+/* --- 鍏ュ彛绔為€?灞?)+鐪熷疄娴嬮噺(RUM): 鎷╀紭璺宠浆+鍖垮悕涓婃姤(姣忎細璇濅竴娆? --- */
 try{(function(){
 if(location.protocol!=='https:')return;
 try{if(sessionStorage.getItem('_xqRaceDone'))return;}catch(e){}
@@ -28,10 +28,10 @@ try{navigator.sendBeacon('/api/race-report',new Blob([JSON.stringify(rep)],{type
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
-<title>中国象棋</title>
+<title>涓浗璞℃</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;overflow:hidden;font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#1a0f0a;color:#f0e6d3;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#3a2a18;color:#f0e6d3;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
 #app{position:fixed;inset:0;display:flex;flex-direction:column}
 
 #lobby{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px}
@@ -99,7 +99,7 @@ html,body{height:100%;overflow:hidden;font-family:'PingFang SC','Microsoft YaHei
 .overlay h2{font-size:20px;color:#d4a843;margin-bottom:4px}
 .overlay p{font-size:13px;color:#c4a882;margin-bottom:14px}
 .overlay .btns2{display:flex;gap:8px;justify-content:center}
-.chat-display{height:24px;line-height:24px;padding:0 10px;text-align:center;background:#1a0f0a;border-bottom:1px solid #3d2117;color:#d4a843;font-size:13px;font-family:system-ui,-apple-system,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.chat-display{height:24px;line-height:24px;padding:0 10px;text-align:center;background:#3a2a18;border-bottom:1px solid #3d2117;color:#d4a843;font-size:13px;font-family:system-ui,-apple-system,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
 .chat-area{display:flex;gap:8px;padding:8px;background:#2c1810;border-top:1px solid #5a3a28;flex-shrink:0}
 .chat-input{flex:1;padding:6px 10px;border:1px solid #5a3a28;border-radius:8px;background:#3d2117;color:#f0e6d3;font-size:13px;outline:none}
 .chat-input:focus{border-color:#d4a843}
@@ -113,17 +113,17 @@ html,body{height:100%;overflow:hidden;font-family:'PingFang SC','Microsoft YaHei
 .fs-btn{background:transparent;border:1px solid #5a3a28;color:#c4a882;border-radius:6px;padding:2px 8px;font-size:16px;cursor:pointer;line-height:1;flex-shrink:0}
 .fs-btn:active{background:#3d2117}
 
-/* 桌面端三栏布局：仅影响@media(min-width:769px) */
+/* 妗岄潰绔笁鏍忓竷灞€锛氫粎褰卞搷@media(min-width:769px) */
 @media(min-width:769px){
   #game.show{flex-direction:row}
   .side-panel{display:flex;flex-direction:column;justify-content:center;width:240px;flex-shrink:0;background:#2c1810;overflow:hidden;padding:12px;gap:10px}
   .left-panel{border-right:1px solid #5a3a28}
   .right-panel{border-left:1px solid #5a3a28;align-items:center}
-  /* 展开header/mid/timer-row，让子元素成为left-panel的直接flex项 */
+  /* 灞曞紑header/mid/timer-row锛岃瀛愬厓绱犳垚涓簂eft-panel鐨勭洿鎺lex椤?*/
   .left-panel .header{display:contents}
   .left-panel .mid{display:contents}
   .left-panel .timer-row{display:contents}
-  /* 左侧垂直排列：黑方→黑时间→提示→模式→红时间→红方 */
+  /* 宸︿晶鍨傜洿鎺掑垪锛氶粦鏂光啋榛戞椂闂粹啋鎻愮ず鈫掓ā寮忊啋绾㈡椂闂粹啋绾㈡柟 */
   .left-panel .header>.pinfo:first-child{order:1;justify-content:center;padding:10px;border:1px solid #5a3a28;border-radius:8px}
   .left-panel .header>.pinfo:first-child .pname{font-size:16px}
   .left-panel .header>.pinfo:first-child .avatar{width:36px;height:36px;font-size:16px}
@@ -134,13 +134,13 @@ html,body{height:100%;overflow:hidden;font-family:'PingFang SC','Microsoft YaHei
   .left-panel .header>.pinfo:last-child{order:6;justify-content:center;padding:10px;border:1px solid #5a3a28;border-radius:8px}
   .left-panel .header>.pinfo:last-child .pname{font-size:16px}
   .left-panel .header>.pinfo:last-child .avatar{width:36px;height:36px;font-size:16px}
-  /* 聊天显示 */
-  .left-panel .chat-display{order:7;flex:0 0 auto;max-height:200px;min-height:50px;padding:10px 12px;overflow-y:auto;white-space:normal;word-break:break-all;line-height:1.5;font-size:13px;color:#d4a843;background:#1a0f0a;text-align:left;border:1px solid #3d2117;border-radius:8px}
-  .left-panel .chat-display:empty::after{content:'暂无消息';color:#5a4a3a;font-size:11px}
-  /* 棋盘：去掉padding和overflow限制，让棋子刚好到浏览器边界 */
+  /* 鑱婂ぉ鏄剧ず */
+  .left-panel .chat-display{order:7;flex:0 0 auto;max-height:200px;min-height:50px;padding:10px 12px;overflow-y:auto;white-space:normal;word-break:break-all;line-height:1.5;font-size:13px;color:#d4a843;background:#3a2a18;text-align:left;border:1px solid #3d2117;border-radius:8px}
+  .left-panel .chat-display:empty::after{content:'鏆傛棤娑堟伅';color:#5a4a3a;font-size:11px}
+  /* 妫嬬洏锛氬幓鎺塸adding鍜宱verflow闄愬埗锛岃妫嬪瓙鍒氬ソ鍒版祻瑙堝櫒杈圭晫 */
   .board-wrap{flex:1;padding:0;min-height:0;min-width:0;overflow:visible}
   .board{width:auto!important;max-width:none!important}
-  /* 右侧面板 */
+  /* 鍙充晶闈㈡澘 */
   .right-panel .chat-area{display:flex;flex-direction:column;gap:8px;width:100%;flex-shrink:0}
   .right-panel .chat-input{width:100%;font-size:13px;padding:8px 10px}
   .right-panel .chat-send{width:100%;text-align:center;padding:8px;font-size:13px}
@@ -149,8 +149,8 @@ html,body{height:100%;overflow:hidden;font-family:'PingFang SC','Microsoft YaHei
   .right-panel .fs-btn{font-size:16px;padding:6px 16px;flex-shrink:0}
 }
 
-/* ===== 皮肤层（移植自 xq-x-meaigo，默认皮肤不受影响） ===== */
-/* --- 青花瓷 --- */
+/* ===== 鐨偆灞傦紙绉绘鑷?xq-x-meaigo锛岄粯璁ょ毊鑲や笉鍙楀奖鍝嶏級 ===== */
+/* --- 闈掕姳鐡?--- */
 body[data-skin="qing"]{background:linear-gradient(160deg,#0e1a20,#122a34 55%,#081114)!important}
 body[data-skin="qing"] .title{color:#d7e3e8!important}
 body[data-skin="qing"] .sub,body[data-skin="qing"] .divider{color:#7fa8b8!important}
@@ -174,7 +174,7 @@ body[data-skin="qing"] .toast{background:#13232b!important;border-color:#2e4a56!
 body[data-skin="qing"] .overlay .box{background:#0d1b21!important;border-color:#2e4a56!important}
 body[data-skin="qing"] #trainPanel{background:#0d1b21!important;border-color:#2e4a56!important}
 body[data-skin="qing"] .footer,body[data-skin="qing"] .status,body[data-skin="qing"] .online-count{color:#7fa8b8!important}
-/* --- 竹青（浅绿） --- */
+/* --- 绔归潚锛堟祬缁匡級 --- */
 body[data-skin="zq"]{background:linear-gradient(160deg,#e8f5ea,#d5ecda 55%,#c8e4cf)!important;color:#1f3d2a!important}
 body[data-skin="zq"] .title{color:#1f4d2e!important}
 body[data-skin="zq"] .sub,body[data-skin="zq"] .divider{color:#4a7a58!important}
@@ -199,7 +199,7 @@ body[data-skin="zq"] .overlay .box{background:#f6fbf7!important;border-color:#9c
 body[data-skin="zq"] .overlay .box h2,body[data-skin="zq"] .overlay .box p{color:#1f3d2a!important}
 body[data-skin="zq"] #trainPanel{background:#eef8f0!important;border-color:#9cc9a8!important}
 body[data-skin="zq"] .footer,body[data-skin="zq"] .status,body[data-skin="zq"] .online-count{color:#4a7a58!important}
-/* --- 朱砂宫墙 --- */
+/* --- 鏈辩爞瀹 --- */
 body[data-skin="zhu"]{background:linear-gradient(160deg,#1c0b0b,#2a1010 55%,#120808)!important}
 body[data-skin="zhu"] .title{color:#f0e0c8!important}
 body[data-skin="zhu"] .sub,body[data-skin="zhu"] .divider{color:#c08a6a!important}
@@ -223,12 +223,12 @@ body[data-skin="zhu"] .toast{background:#2a1010!important;border-color:#5a2a22!i
 body[data-skin="zhu"] .overlay .box{background:#1a0909!important;border-color:#5a2a22!important}
 body[data-skin="zhu"] #trainPanel{background:#1a0909!important;border-color:#5a2a22!important}
 body[data-skin="zhu"] .footer,body[data-skin="zhu"] .status,body[data-skin="zhu"] .online-count{color:#c08a6a!important}
-/* --- 大厅左右分栏（左：AI模式 / 右：在线对战+房间列表） --- */
+/* --- 澶у巺宸﹀彸鍒嗘爮锛堝乏锛欰I妯″紡 / 鍙筹細鍦ㄧ嚎瀵规垬+鎴块棿鍒楄〃锛?--- */
 #lobby{overflow-y:auto;-webkit-overflow-scrolling:touch;justify-content:safe center}
 .lobby-cols{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;margin:8px 0 4px;flex-wrap:wrap}
 @media(min-width:860px){.lobby-cols{flex-direction:row;align-items:flex-start;justify-content:center;gap:48px;margin:30px 0 38px;flex-wrap:nowrap}}
 @media(min-width:1100px){.lobby-cols{gap:96px}}
-/* --- 手机端自适应（内容压缩 + 可滚动，杜绝截断） --- */
+/* --- 鎵嬫満绔嚜閫傚簲锛堝唴瀹瑰帇缂?+ 鍙粴鍔紝鏉滅粷鎴柇锛?--- */
 @media(max-width:859px){
 #lobby{justify-content:flex-start;gap:12px;padding-top:16px;padding-bottom:16px}
 .logo{font-size:40px}
@@ -236,7 +236,7 @@ body[data-skin="zhu"] .footer,body[data-skin="zhu"] .status,body[data-skin="zhu"
 .sub{font-size:12px}
 .online-count{font-size:12px}
 }
-/* --- 对局房间列表 --- */
+/* --- 瀵瑰眬鎴块棿鍒楄〃 --- */
 #roomListPanel{flex-shrink:0}
 body[data-skin="qing"] #roomListPanel{background:#0d1b21!important;border-color:#2e4a56!important}
 body[data-skin="qing"] #roomList>div{background:#10242c!important;border-color:#2e4a56!important}
@@ -245,9 +245,9 @@ body[data-skin="zq"] #roomListPanel>div>span,body[data-skin="zq"] #roomListCount
 body[data-skin="zq"] #roomList>div{background:#ffffff!important;border-color:#bfdcc7!important}
 body[data-skin="zhu"] #roomListPanel{background:#1a0909!important;border-color:#5a2a22!important}
 body[data-skin="zhu"] #roomList>div{background:#240d0d!important;border-color:#5a2a22!important}
-/* --- 大厅卡片化美化 --- */
+/* --- 澶у巺鍗＄墖鍖栫編鍖?--- */
 .lobby-cols .btns{width:100%;max-width:420px;gap:11px;background:#241409;border:1px solid #3d2117;border-radius:16px;padding:14px 14px 12px;box-shadow:0 10px 28px rgba(0,0,0,.35)}
-.lobby-cols .btns:first-child::before{content:'⚔ 对弈模式';display:block;font-size:13px;font-weight:800;letter-spacing:4px;color:#d4a843;text-align:center;margin:0 0 10px}
+.lobby-cols .btns:first-child::before{content:'鈿?瀵瑰紙妯″紡';display:block;font-size:13px;font-weight:800;letter-spacing:4px;color:#d4a843;text-align:center;margin:0 0 10px}
 .lobby-cols .btns>.divider{color:#d4a843;font-size:13px;font-weight:800;letter-spacing:4px;margin:2px 0 4px}
 .lobby-cols .btn{box-shadow:0 2px 10px rgba(0,0,0,.28)}
 .lobby-cols .btn:hover{filter:brightness(1.08)}
@@ -261,7 +261,7 @@ body[data-skin="zhu"] #roomList>div{background:#240d0d!important;border-color:#5
 }
 @media(min-width:1100px){.lobby-cols .btns{max-width:420px}}
 @media(max-width:500px){.lobby-cols .btns{padding:12px 10px 10px;border-radius:13px}}
-/* --- 大厅卡片皮肤适配 --- */
+/* --- 澶у巺鍗＄墖鐨偆閫傞厤 --- */
 body[data-skin="qing"] .lobby-cols .btns{background:#0d1b21!important;border-color:#2e4a56!important}
 body[data-skin="qing"] .lobby-cols .btns:first-child::before{color:#9fd3ea!important}
 body[data-skin="qing"] .lobby-cols .btns>.divider{color:#7fa8b8!important}
@@ -271,7 +271,7 @@ body[data-skin="zq"] .lobby-cols .btns>.divider{color:#4a7a58!important}
 body[data-skin="zhu"] .lobby-cols .btns{background:#1a0909!important;border-color:#5a2a22!important}
 body[data-skin="zhu"] .lobby-cols .btns:first-child::before{color:#f0c674!important}
 body[data-skin="zhu"] .lobby-cols .btns>.divider{color:#c08a6a!important}
-/* --- 皮肤按钮 / 皮肤弹窗 --- */
+/* --- 鐨偆鎸夐挳 / 鐨偆寮圭獥 --- */
 #skinBtn{background:linear-gradient(135deg,#d4a843,#b8860b);color:#241610;border:none;border-radius:20px;padding:8px 20px;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:1px;font-family:inherit}
 #skinBtn:active{transform:scale(.96)}
 #skinOverlay{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:400;display:none;align-items:center;justify-content:center}
@@ -285,14 +285,14 @@ body[data-skin="zhu"] .lobby-cols .btns>.divider{color:#c08a6a!important}
 .skinOpt .sd{font-size:11px;color:#8b7355;margin-top:2px}
 .skinOpt .ck{margin-left:auto;color:#f5c542;font-size:15px;font-weight:900;visibility:hidden}
 .skinOpt.cur .ck{visibility:visible}
-/* --- 修复: 默认皮肤聊天框背景=左侧面板底色(桌面端 .left-panel .chat-display 同口径压制) --- */
+/* --- 淇: 榛樿鐨偆鑱婂ぉ妗嗚儗鏅?宸︿晶闈㈡澘搴曡壊(妗岄潰绔?.left-panel .chat-display 鍚屽彛寰勫帇鍒? --- */
 body:not([data-skin]) .chat-display{background:#2c1810!important;border-color:#3d2117!important}
 body:not([data-skin]) .left-panel .chat-display{background:#2c1810!important;border-color:#3d2117!important}
-/* --- 修复: 默认皮肤 更换皮肤/人机对弈/Pikafish深度AI 统一为创建按钮配色 --- */
+/* --- 淇: 榛樿鐨偆 鏇存崲鐨偆/浜烘満瀵瑰紙/Pikafish娣卞害AI 缁熶竴涓哄垱寤烘寜閽厤鑹?--- */
 body:not([data-skin]) #skinBtn{background:#3d2117;color:#f0e6d3;border:2px solid #5a3a28}
 body:not([data-skin]) .lobby-cols .btn-green,
 body:not([data-skin]) .lobby-cols .btn-blue{background:#3d2117;color:#f0e6d3;border:2px solid #5a3a28}
-/* --- 修复: 观战模式求和/认输/悔棋保留可见但不可点击; 返回与全屏可点 --- */
+/* --- 淇: 瑙傛垬妯″紡姹傚拰/璁よ緭/鎮旀淇濈暀鍙浣嗕笉鍙偣鍑? 杩斿洖涓庡叏灞忓彲鐐?--- */
 body[data-xq-spec] .right-panel .actions button:not([onclick*="leaveGame"]):not([onclick*="toggleFullscreen"]){opacity:.45;pointer-events:none}
 </style>
 </head>
@@ -300,60 +300,60 @@ body[data-xq-spec] .right-panel .actions button:not([onclick*="leaveGame"]):not(
 <script>try{var _xqSkinSaved=localStorage.getItem('xq_skin');if(_xqSkinSaved)document.body.setAttribute('data-skin',_xqSkinSaved);}catch(e){}</script>
 <div id="app">
 <div id="lobby">
-<div class="logo">♚</div>
-<div class="title">中国象棋</div>
-<div class="sub">在线对弈平台</div>
-<div style="position:absolute;top:14px;right:16px;z-index:5"><button id="skinBtn" onclick="openSkinModal()">🎨 更换皮肤</button></div>
+<div class="logo">鈾?/div>
+<div class="title">涓浗璞℃</div>
+<div class="sub">鍦ㄧ嚎瀵瑰紙骞冲彴</div>
+<div style="position:absolute;top:14px;right:16px;z-index:5"><button id="skinBtn" onclick="openSkinModal()">馃帹 鏇存崲鐨偆</button></div>
 <div class="lobby-cols">
 <div class="btns">
-<button class="btn btn-green" onclick="startAiGame()">  人机对弈</button>
-<button class="btn btn-blue" onclick="startPikafishGame()">🤖 Pikafish深度AI</button>
+<button class="btn btn-green" onclick="startAiGame()">  浜烘満瀵瑰紙</button>
+<button class="btn btn-blue" onclick="startPikafishGame()">馃 Pikafish娣卞害AI</button>
 
-		<div id="trainPanel" style="background:#1a0f0a;border-radius:8px;padding:10px 14px;margin:0 0 8px 0;border:1px solid #3d2117;text-align:left">
+		<div id="trainPanel" style="background:#3a2a18;border-radius:8px;padding:10px 14px;margin:0 0 8px 0;border:1px solid #3d2117;text-align:left">
 		<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-		<span style="color:#2ecc71;font-size:13px;font-weight:700">⚡ AI快速训练</span>
-		<button id="trainStartBtn" class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:11px;background:#2ecc71;color:#fff;border-color:#27ae60" onclick="startAiTraining()">开始训练</button>
-		<button id="trainStopBtn" class="btn btn-red" style="width:auto;padding:3px 10px;font-size:11px;display:none" onclick="stopAiTraining()">停止训练</button>
+		<span style="color:#2ecc71;font-size:13px;font-weight:700">鈿?AI蹇€熻缁?/span>
+		<button id="trainStartBtn" class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:11px;background:#2ecc71;color:#fff;border-color:#27ae60" onclick="startAiTraining()">寮€濮嬭缁?/button>
+		<button id="trainStopBtn" class="btn btn-red" style="width:auto;padding:3px 10px;font-size:11px;display:none" onclick="stopAiTraining()">鍋滄璁粌</button>
 		</div>
-		<div style="font-size:11px;color:#8b7355;line-height:1.6" id="trainStats">累计训练：0局 | 红胜0 黑胜0 和棋0</div>
+		<div style="font-size:11px;color:#8b7355;line-height:1.6" id="trainStats">绱璁粌锛?灞€ | 绾㈣儨0 榛戣儨0 鍜屾0</div>
 		<div id="trainSessionStats" style="display:none;font-size:12px;color:#c4a882;line-height:1.6;margin-top:2px">
-		本局 <b style="color:#2ecc71" id="trainGames">0</b> 局 |
-		红胜 <b style="color:#e74c3c" id="trainRedWins">0</b> |
-		黑胜 <b id="trainBlkWins" style="color:#aaa">0</b> |
-		和棋 <b style="color:#f39c12" id="trainDraws">0</b>
+		鏈眬 <b style="color:#2ecc71" id="trainGames">0</b> 灞€ |
+		绾㈣儨 <b style="color:#e74c3c" id="trainRedWins">0</b> |
+		榛戣儨 <b id="trainBlkWins" style="color:#aaa">0</b> |
+		鍜屾 <b style="color:#f39c12" id="trainDraws">0</b>
 		</div>
 		</div>
 </div>
 <div class="btns">
-	<div class="divider">在线对战</div>
+	<div class="divider">鍦ㄧ嚎瀵规垬</div>
 <div class="join">
-<input id="createInput" placeholder="留空自动生成房间号" maxlength="6" autocomplete="off" onkeydown="if(event.key==='Enter')createRoom()">
-<button class="btn btn-outline" style="width:auto;flex-shrink:0" onclick="createRoom()">创建</button>
+<input id="createInput" placeholder="鐣欑┖鑷姩鐢熸垚鎴块棿鍙? maxlength="6" autocomplete="off" onkeydown="if(event.key==='Enter')createRoom()">
+<button class="btn btn-outline" style="width:auto;flex-shrink:0" onclick="createRoom()">鍒涘缓</button>
 </div>
 <div class="join">
-<input id="roomInput" placeholder="输入房间号加入" maxlength="6" autocomplete="off" onkeydown="if(event.key==='Enter')joinRoom()">
-<button class="btn btn-outline" style="width:auto;flex-shrink:0" onclick="joinRoom()">加入</button>
+<input id="roomInput" placeholder="杈撳叆鎴块棿鍙峰姞鍏? maxlength="6" autocomplete="off" onkeydown="if(event.key==='Enter')joinRoom()">
+<button class="btn btn-outline" style="width:auto;flex-shrink:0" onclick="joinRoom()">鍔犲叆</button>
 </div>
-<div id="roomListPanel" style="display:none;background:#1a0f0a;border-radius:10px;padding:10px 14px;border:1px solid #3d2117;text-align:left;width:100%;box-sizing:border-box">
-<div style="display:flex;align-items:center;justify-content:space-between"><span style="color:#f0c674;font-size:13px;font-weight:700">🎮 对局房间</span><span id="roomListCount" style="font-size:11px;color:#8a7a68"></span></div>
+<div id="roomListPanel" style="display:none;background:#3a2a18;border-radius:10px;padding:10px 14px;border:1px solid #3d2117;text-align:left;width:100%;box-sizing:border-box">
+<div style="display:flex;align-items:center;justify-content:space-between"><span style="color:#f0c674;font-size:13px;font-weight:700">馃幃 瀵瑰眬鎴块棿</span><span id="roomListCount" style="font-size:11px;color:#8a7a68"></span></div>
 <div id="roomList" style="margin-top:6px;display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto"></div>
 </div>
 </div>
 </div>
 <div class="status" id="lobbyStatus"></div>
-<div class="online-count" id="onlineCount">当前在线: - 人</div>
-<div class="footer" id="footerText">人机对弈需联网 | 在线模式两人对战</div>
+<div class="online-count" id="onlineCount">褰撳墠鍦ㄧ嚎: - 浜?/div>
+<div class="footer" id="footerText">浜烘満瀵瑰紙闇€鑱旂綉 | 鍦ㄧ嚎妯″紡涓や汉瀵规垬</div>
 </div>
 
 <div id="game">
 <div class="side-panel left-panel">
 <div class="header">
-<div class="pinfo"><div class="avatar av-blk">将</div><span class="pname" id="blackName" style="color:#aaa">黑方</span></div>
+<div class="pinfo"><div class="avatar av-blk">灏?/div><span class="pname" id="blackName" style="color:#aaa">榛戞柟</span></div>
 <div class="mid">
-<div class="mode-badge" id="modeBadge">人机对弈</div>
-<div class="timer-row"><span class="timer-side" id="redTimer">红:15:00</span><span class="timer-center" id="turnText" style="margin:0 12px">红方走棋</span><span class="timer-side" id="blkTimer">黑:15:00</span></div>
+<div class="mode-badge" id="modeBadge">浜烘満瀵瑰紙</div>
+<div class="timer-row"><span class="timer-side" id="redTimer">绾?15:00</span><span class="timer-center" id="turnText" style="margin:0 12px">绾㈡柟璧版</span><span class="timer-side" id="blkTimer">榛?15:00</span></div>
 </div>
-<div class="pinfo"><div class="avatar av-red">帅</div><span class="pname" id="redName" style="color:#e74c3c">红方</span></div>
+<div class="pinfo"><div class="avatar av-red">甯?/div><span class="pname" id="redName" style="color:#e74c3c">绾㈡柟</span></div>
 </div>
 <div class="chat-display" id="chatDisplay"></div>
 </div>
@@ -364,13 +364,13 @@ body[data-xq-spec] .right-panel .actions button:not([onclick*="leaveGame"]):not(
 </div>
 </div>
 <div class="side-panel right-panel">
-<div class="chat-area"><input class="chat-input" id="chatInput" placeholder="说点什么..." maxlength="50" onkeydown="if(event.key==='Enter')sendChat()"><button class="chat-send" onclick="sendChat()">发送</button></div>
+<div class="chat-area"><input class="chat-input" id="chatInput" placeholder="璇寸偣浠€涔?.." maxlength="50" onkeydown="if(event.key==='Enter')sendChat()"><button class="chat-send" onclick="sendChat()">鍙戦€?/button></div>
 <div class="actions">
-<button class="btn btn-red" onclick="doResign()">认输</button>
-<button class="btn btn-outline" style="padding:8px 14px;font-size:13px;width:auto;display:none" id="drawBtn" onclick="doDrawReq()">求和</button>
-<button class="btn btn-outline" style="padding:8px 14px;font-size:13px;width:auto" onclick="doUndo()">悔棋</button>
-<button class="btn btn-outline" style="padding:8px 14px;font-size:13px;width:auto" onclick="leaveGame()">返回</button>
-<button class="fs-btn" id="fsBtn" onclick="toggleFullscreen()" title="全屏">⛶</button>
+<button class="btn btn-red" onclick="doResign()">璁よ緭</button>
+<button class="btn btn-outline" style="padding:8px 14px;font-size:13px;width:auto;display:none" id="drawBtn" onclick="doDrawReq()">姹傚拰</button>
+<button class="btn btn-outline" style="padding:8px 14px;font-size:13px;width:auto" onclick="doUndo()">鎮旀</button>
+<button class="btn btn-outline" style="padding:8px 14px;font-size:13px;width:auto" onclick="leaveGame()">杩斿洖</button>
+<button class="fs-btn" id="fsBtn" onclick="toggleFullscreen()" title="鍏ㄥ睆">鉀?/button>
 </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -383,7 +383,7 @@ body[data-xq-spec] .right-panel .actions button:not([onclick*="leaveGame"]):not(
 	<script src="/js/pikafish-engine.js?v=1787540000002"></script>
 <script src="/js/socket-client.js"></script>
 <script>
-// ========== Pikafish WASM 加载 (IndexedDB 缓存 + 分片顺序加载) ==========
+// ========== Pikafish WASM 鍔犺浇 (IndexedDB 缂撳瓨 + 鍒嗙墖椤哄簭鍔犺浇) ==========
 var WASM_DB = 'pikafish_wasm_cache';
 var WASM_KEY = 'pikafish_wasm_v2';
 var WASM_SHARD_TIMEOUT = 180000;
@@ -498,14 +498,14 @@ async function loadPikafishWasm() {
   console.log('[Pikafish] WASM merged, total size:', merged.byteLength);
 }
 
-// 异步加载 WASM
+// 寮傛鍔犺浇 WASM
 loadPikafishWasm().then(function() {
   console.log('[Pikafish] WASM ready');
 }).catch(function(e) {
   console.error('[Pikafish] WASM loading failed:', e.message);
 });
 
-// ========== NNUE 加载 (IndexedDB 缓存 + 分片加载) ==========
+// ========== NNUE 鍔犺浇 (IndexedDB 缂撳瓨 + 鍒嗙墖鍔犺浇) ==========
 var NNUE_DB = 'pikafish_nnue_cache';
 // v162: v10 cache holds official Pikafish 2026-01-02 NNUE (53212941 bytes ZSTD).
 // Downloaded directly from https://github.com/official-pikafish/Pikafish/releases
@@ -545,20 +545,19 @@ function saveCachedNnue(buffer) {
   } catch (e) {}
 }
 
-// v100: 加载 gzip 压缩的 NNUE 分片并解压
-// 之前 loadWasmShard 不解压 gzip, 导致 NNUE 只有 51MB (压缩后) 而非 66MB (原始)
+// v100: 鍔犺浇 gzip 鍘嬬缉鐨?NNUE 鍒嗙墖骞惰В鍘?// 涔嬪墠 loadWasmShard 涓嶈В鍘?gzip, 瀵艰嚧 NNUE 鍙湁 51MB (鍘嬬缉鍚? 鑰岄潪 66MB (鍘熷)
 async function loadGzipShard(url) {
   var resp = await fetch(url);
   if (!resp.ok) throw new Error('HTTP ' + resp.status + ' loading ' + url);
   var compressed = await resp.arrayBuffer();
-  // 使用浏览器原生 DecompressionStream 解压 gzip
+  // 浣跨敤娴忚鍣ㄥ師鐢?DecompressionStream 瑙ｅ帇 gzip
   if (typeof DecompressionStream !== 'undefined') {
     var ds = new DecompressionStream('gzip');
     var stream = new Blob([compressed]).stream().pipeThrough(ds);
     var decompressed = await new Response(stream).arrayBuffer();
     return new Uint8Array(decompressed);
   }
-  // fallback: 如果不支持 DecompressionStream, 返回原始数据 (可能不正确)
+  // fallback: 濡傛灉涓嶆敮鎸?DecompressionStream, 杩斿洖鍘熷鏁版嵁 (鍙兘涓嶆纭?
   console.warn('[Pikafish] DecompressionStream not available, returning compressed data for', url);
   return new Uint8Array(compressed);
 }
@@ -620,20 +619,19 @@ async function loadPikafishNnue() {
   console.log('[Pikafish] NNUE merged, total size:', merged.byteLength);
 }
 
-// 异步加载 NNUE (与 WASM 并行)
+// 寮傛鍔犺浇 NNUE (涓?WASM 骞惰)
 loadPikafishNnue().then(function() {
   console.log('[Pikafish] NNUE ready');
 }).catch(function(e) {
   console.error('[Pikafish] NNUE loading failed:', e.message);
 });
 
-// pikafish-engine.js 加载完成后标记
-window._pikafishScriptsResolve();
+// pikafish-engine.js 鍔犺浇瀹屾垚鍚庢爣璁?window._pikafishScriptsResolve();
 window._pikafishScriptsReady = true;
 console.log('[Pikafish] Engine script loaded (Worker mode)');
-var PN={king:{red:'帅',black:'将'},advisor:{red:'仕',black:'士'},elephant:{red:'相',black:'象'},horse:{red:'馬',black:'馬'},rook:{red:'車',black:'車'},cannon:{red:'炮',black:'砲'},pawn:{red:'兵',black:'卒'}};
+var PN={king:{red:'甯?,black:'灏?},advisor:{red:'浠?,black:'澹?},elephant:{red:'鐩?,black:'璞?},horse:{red:'棣?,black:'棣?},rook:{red:'杌?,black:'杌?},cannon:{red:'鐐?,black:'鐮?},pawn:{red:'鍏?,black:'鍗?}};
 var PV={king:10000,rook:1150,cannon:530,horse:430,elephant:140,advisor:140,pawn:48};
-// 变更日志：AI学习功能 - 可调整的评估函数权重（方案B：根据对弈结果自动调整）
+// 鍙樻洿鏃ュ織锛欰I瀛︿範鍔熻兘 - 鍙皟鏁寸殑璇勪及鍑芥暟鏉冮噸锛堟柟妗圔锛氭牴鎹寮堢粨鏋滆嚜鍔ㄨ皟鏁达級
 var aiWeights={
 attackKing:111.45,limitKingMob:34.44,approach:37.18,mobility:4.92,
 rookNotMoved:11.17,rookCrossed:85.47,rookDeveloped:60.06,
@@ -770,8 +768,7 @@ fetch(aiServerUrl,{headers:{Authorization:aiServerAuth}})
 if(data&&data.history&&Array.isArray(data.history)){
 localStorage.setItem('aiGameHistory',JSON.stringify(data.history));
 }
-// v2: 合并服务端训练权重（跨设备继承快速训练成果）——每次页面加载仅执行一次
-if(data&&data.weights&&!fetchAiDataFromServer._wMerged){
+// v2: 鍚堝苟鏈嶅姟绔缁冩潈閲嶏紙璺ㄨ澶囩户鎵垮揩閫熻缁冩垚鏋滐級鈥斺€旀瘡娆￠〉闈㈠姞杞戒粎鎵ц涓€娆?if(data&&data.weights&&!fetchAiDataFromServer._wMerged){
 fetchAiDataFromServer._wMerged=true;
 var changed=false;
 for(var k in data.weights){
@@ -782,7 +779,7 @@ changed=true;
 }
 if(changed){
 saveAiWeights();
-console.log('AI训练权重已从服务器合并继承');
+console.log('AI璁粌鏉冮噸宸蹭粠鏈嶅姟鍣ㄥ悎骞剁户鎵?);
 }
 }
 })
@@ -852,17 +849,17 @@ saveAiWeights();
 if(data.history&&Array.isArray(data.history)){
 localStorage.setItem('aiGameHistory',JSON.stringify(data.history));
 }
-alert('学习数据导入成功！');
-}catch(err){alert('导入失败：无效的文件格式');}
+alert('瀛︿範鏁版嵁瀵煎叆鎴愬姛锛?);
+}catch(err){alert('瀵煎叆澶辫触锛氭棤鏁堢殑鏂囦欢鏍煎紡');}
 };
 reader.readAsText(file);
 }
 function clearAiData(){
-if(confirm('确定要清除所有学习数据吗？AI将恢复到初始状态。')){
+if(confirm('纭畾瑕佹竻闄ゆ墍鏈夊涔犳暟鎹悧锛烝I灏嗘仮澶嶅埌鍒濆鐘舵€併€?)){
 localStorage.removeItem('aiWeights');
 localStorage.removeItem('aiGameHistory');
 for(var k in aiWeights){aiWeights[k]=aiDefaultWeights[k];}
-alert('学习数据已清除，AI已恢复初始状态');
+alert('瀛︿範鏁版嵁宸叉竻闄わ紝AI宸叉仮澶嶅垵濮嬬姸鎬?);
 }
 }
 var aiDefaultWeights={attackKing:60,limitKingMob:35,approach:25,mobility:5,rookNotMoved:5,rookCrossed:80,rookDeveloped:60,horseDeveloped:25,cannonDeveloped:15};
@@ -873,7 +870,7 @@ try{localStorage.setItem('aiTrainStats',JSON.stringify(aiTrainStats));}catch(e){
 }
 function updateTrainStatsUI(){
 var el=D('trainStats');
-if(el)el.textContent='累计训练：'+aiTrainStats.games+'局 | 红胜'+aiTrainStats.redWins+' 黑胜'+aiTrainStats.blkWins+' 和棋'+aiTrainStats.draws;
+if(el)el.textContent='绱璁粌锛?+aiTrainStats.games+'灞€ | 绾㈣儨'+aiTrainStats.redWins+' 榛戣儨'+aiTrainStats.blkWins+' 鍜屾'+aiTrainStats.draws;
 }
 function saveAiTrainStats(){
 try{localStorage.setItem('aiTrainStats',JSON.stringify(aiTrainStats));}catch(e){}
@@ -882,11 +879,11 @@ var trainPollTimer=null;
 var aiTrainingStop=false;
 function startAiTraining(){
 	if(aiTraining)return;
-	if(gameStarted){toast('请先结束当前对局',1500);return;}
+	if(gameStarted){toast('璇峰厛缁撴潫褰撳墠瀵瑰眬',1500);return;}
 	aiTraining=true;aiTrainingStop=false;aiTrainingGames=0;aiTrainingRedWins=0;aiTrainingBlkWins=0;aiTrainingDraws=0;
 	D('trainGames').textContent='0';D('trainRedWins').textContent='0';D('trainBlkWins').textContent='0';D('trainDraws').textContent='0';
 	D('trainStartBtn').style.display='none';D('trainStopBtn').style.display='';
-	D('trainStopBtn').disabled=false;D('trainStopBtn').textContent='停止训练';
+	D('trainStopBtn').disabled=false;D('trainStopBtn').textContent='鍋滄璁粌';
 	D('trainSessionStats').style.display='';
 	aiOrigMaxTime=aiMaxTime;
 	aiMaxTime=5000;
@@ -961,13 +958,13 @@ function stopAiTraining(){
 	if(!aiTraining)return;
 	aiTrainingStop=true;
 	D('trainStopBtn').disabled=true;
-	D('trainStopBtn').textContent='停止中...';
+	D('trainStopBtn').textContent='鍋滄涓?..';
 	setTimeout(function(){
 		aiTraining=false;
 		D('trainStartBtn').style.display='';D('trainStopBtn').style.display='none';
-		D('trainStopBtn').disabled=false;D('trainStopBtn').textContent='停止训练';
+		D('trainStopBtn').disabled=false;D('trainStopBtn').textContent='鍋滄璁粌';
 		D('trainSessionStats').style.display='none';
-		toast('训练已停止',1500);
+		toast('璁粌宸插仠姝?,1500);
 		saveAiWeights();
 		saveAiTrainStats();
 		syncAiToServer();
@@ -1104,12 +1101,9 @@ var gameStarted=false,selected=null,validMoves=[],capRed=[],capBlk=[],undoUsed=f
 var timerId=null,secs=0;
 var clickCount=0;
 var socket=null,sockOk=false,gm='local',myCl=null,myRm=null;
-var pendingMove=null,pendingRetryTimer=null; // 本地已走、待服务端确认的走棋（用于防止 room_state 全量同步覆盖）
-var aiThinking=false,aiTimeout=null,aiWorker=null;
-var aiCl='black'; // AI执棋颜色：'black'或'red'，与myCl相反
-var checkStreak=0,lastCheckColor=null; // 长将追踪：连续将军次数
-// 长将：撤销最后一步走棋（用于违规时回退）
-function undoLastMoveHelper(){
+var pendingMove=null,pendingRetryTimer=null; // 鏈湴宸茶蛋銆佸緟鏈嶅姟绔‘璁ょ殑璧版锛堢敤浜庨槻姝?room_state 鍏ㄩ噺鍚屾瑕嗙洊锛?var aiThinking=false,aiTimeout=null,aiWorker=null;
+var aiCl='black'; // AI鎵ф棰滆壊锛?black'鎴?red'锛屼笌myCl鐩稿弽
+var checkStreak=0,lastCheckColor=null; // 闀垮皢杩借釜锛氳繛缁皢鍐涙鏁?// 闀垮皢锛氭挙閿€鏈€鍚庝竴姝ヨ蛋妫嬶紙鐢ㄤ簬杩濊鏃跺洖閫€锛?function undoLastMoveHelper(){
 	if(engine.moveHistory.length===0)return;
 	var last=engine.moveHistory.pop();
 	engine.board[last.fromRow][last.fromCol]=last.piece;
@@ -1145,13 +1139,13 @@ var D=function(id){return document.getElementById(id);};
 			D('trainStartBtn').style.display='none';
 			D('trainStopBtn').style.display='';
 			D('trainStopBtn').disabled=false;
-			D('trainStopBtn').textContent='停止训练';
+			D('trainStopBtn').textContent='鍋滄璁粌';
 			D('trainSessionStats').style.display='';
 			startTrainPolling();
 		}
 	}).catch(function(e){console.error('initTrainStats fetch error:',e);});
 })();
-// 启动时恢复训练权重：先读回本机localStorage，再由fetchAiDataFromServer合并服务端全局成果
+// 鍚姩鏃舵仮澶嶈缁冩潈閲嶏細鍏堣鍥炴湰鏈簂ocalStorage锛屽啀鐢眆etchAiDataFromServer鍚堝苟鏈嶅姟绔叏灞€鎴愭灉
 loadAiWeights();
 
 var soundEnabled=true,gameOverSoundPlayed=false;
@@ -1189,8 +1183,8 @@ function hideOverlay(){D('overlay').style.display='none';}
 var cs=0,bx=0,by=0,boardFlip=false;
 var redLeft=900,blkLeft=900,timerId=null;
 function fmtTime(s){var m=Math.floor(s/60),sec=s%60;return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');}
-function startTimer(){stopTimer();redLeft=900;blkLeft=900;updateTimers();timerId=setInterval(function(){if(engine.gameOver){stopTimer();return;}if(engine.currentTurn==='red'){redLeft=Math.max(0,redLeft-1);}else{blkLeft=Math.max(0,blkLeft-1);}updateTimers();if(redLeft<=0){stopTimer();engine.gameOver=true;engine.winner='black';sndGameOver();showGameOver('黑方');clearGameState();}else if(blkLeft<=0){stopTimer();engine.gameOver=true;engine.winner='red';sndGameOver();showGameOver('红方');clearGameState();}},1000);}
-function updateTimers(){if(D('redTimer')){D('redTimer').textContent='红:'+fmtTime(redLeft);D('redTimer').style.color='#e74c3c';}if(D('blkTimer')){D('blkTimer').textContent='黑:'+fmtTime(blkLeft);D('blkTimer').style.color='#888';}}
+function startTimer(){stopTimer();redLeft=900;blkLeft=900;updateTimers();timerId=setInterval(function(){if(engine.gameOver){stopTimer();return;}if(engine.currentTurn==='red'){redLeft=Math.max(0,redLeft-1);}else{blkLeft=Math.max(0,blkLeft-1);}updateTimers();if(redLeft<=0){stopTimer();engine.gameOver=true;engine.winner='black';sndGameOver();showGameOver('榛戞柟');clearGameState();}else if(blkLeft<=0){stopTimer();engine.gameOver=true;engine.winner='red';sndGameOver();showGameOver('绾㈡柟');clearGameState();}},1000);}
+function updateTimers(){if(D('redTimer')){D('redTimer').textContent='绾?'+fmtTime(redLeft);D('redTimer').style.color='#e74c3c';}if(D('blkTimer')){D('blkTimer').textContent='榛?'+fmtTime(blkLeft);D('blkTimer').style.color='#888';}}
 function stopTimer(){if(timerId){clearInterval(timerId);timerId=null;}}
 
 function drawBoardBg(){
@@ -1215,11 +1209,11 @@ for(var c=0;c<9;c++){var x=ps+c*(bw/8);ctx.beginPath();ctx.moveTo(x,ps);if(c===0
 ctx.strokeStyle=_sk.line;ctx.lineWidth=1.5;
 ctx.beginPath();ctx.moveTo(ps+bw*3/8,ps);ctx.lineTo(ps+bw*5/8,ps+bh*2/9);ctx.moveTo(ps+bw*5/8,ps);ctx.lineTo(ps+bw*3/8,ps+bh*2/9);ctx.stroke();
 ctx.beginPath();ctx.moveTo(ps+bw*3/8,ps+bh*7/9);ctx.lineTo(ps+bw*5/8,ps+bh);ctx.moveTo(ps+bw*5/8,ps+bh*7/9);ctx.lineTo(ps+bw*3/8,ps+bh);ctx.stroke();
-var _fs2=cs*0.42;ctx.font='700 '+_fs2+'px "STXingkai","华文行楷","STKaiti","KaiTi","DFKai-SB","BiauKai",serif';ctx.textAlign='center';ctx.textBaseline='middle';
+var _fs2=cs*0.42;ctx.font='700 '+_fs2+'px "STXingkai","鍗庢枃琛屾シ","STKaiti","KaiTi","DFKai-SB","BiauKai",serif';ctx.textAlign='center';ctx.textBaseline='middle';
 var _grd=ctx.createLinearGradient(0,ps+bh/2-_fs2*0.6,0,ps+bh/2+_fs2*0.6);_grd.addColorStop(0,_sk.t1);_grd.addColorStop(0.45,_sk.t2);_grd.addColorStop(0.55,_sk.t3);_grd.addColorStop(1,_sk.t4);
 ctx.save();ctx.shadowColor=_sk.tsh;ctx.shadowBlur=_fs2*0.16;ctx.shadowOffsetY=_fs2*0.05;
-ctx.fillStyle=_grd;ctx.fillText('楚 河',ps+bw*0.25,ps+bh*0.5);ctx.fillText('汉 界',ps+bw*0.75,ps+bh*0.5);
-ctx.shadowColor='transparent';ctx.lineWidth=Math.max(1,_fs2*0.035);ctx.strokeStyle=_sk.tst;ctx.strokeText('楚 河',ps+bw*0.25,ps+bh*0.5);ctx.strokeText('汉 界',ps+bw*0.75,ps+bh*0.5);ctx.restore();
+ctx.fillStyle=_grd;ctx.fillText('妤?娌?,ps+bw*0.25,ps+bh*0.5);ctx.fillText('姹?鐣?,ps+bw*0.75,ps+bh*0.5);
+ctx.shadowColor='transparent';ctx.lineWidth=Math.max(1,_fs2*0.035);ctx.strokeStyle=_sk.tst;ctx.strokeText('妤?娌?,ps+bw*0.25,ps+bh*0.5);ctx.strokeText('姹?鐣?,ps+bw*0.75,ps+bh*0.5);ctx.restore();
 ctx.fillStyle=_sk.line;
 ctx.strokeStyle=_sk.line;ctx.lineWidth=1.2;
 var stL=cs*0.16;
@@ -1278,7 +1272,7 @@ function enterGameUI(){
 D('lobby').classList.add('hide');D('game').classList.add('show');
 engine.currentTurn='red';engine.gameOver=false;engine.winner=null;engine.moveHistory=[];
 capRed=[];capBlk=[];lastMove=null;selected=null;validMoves=[];gameStarted=true;clickCount=0;
-D('turnText').textContent='红方走棋';
+D('turnText').textContent='绾㈡柟璧版';
 updateBoardSize();
 requestAnimationFrame(function(){drawBoardBg();render();startTimer();});
 sndStart();
@@ -1291,15 +1285,15 @@ soundEnabled=true;gameOverSoundPlayed=false;undoUsed=false;aiThinking=false;
 gm='ai';myCl=userColor;myRm=null;boardFlip=(userColor==='black');
 aiCl=(userColor==='red')?'black':'red';
 D('drawBtn').style.display='none';
-D('redName').textContent=(userColor==='red')?'我（红方）':'AI（红方）';
-D('blackName').textContent=(userColor==='black')?'我（黑方）':'AI（黑方）';
-D('modeBadge').textContent='人机对弈';
+D('redName').textContent=(userColor==='red')?'鎴戯紙绾㈡柟锛?:'AI锛堢孩鏂癸級';
+D('blackName').textContent=(userColor==='black')?'鎴戯紙榛戞柟锛?:'AI锛堥粦鏂癸級';
+D('modeBadge').textContent='浜烘満瀵瑰紙';
 engine.initBoard();engine.currentTurn='red';engine.gameOver=false;engine.winner=null;engine.moveHistory=[];
 capRed=[];capBlk=[];lastMove=null;selected=null;validMoves=[];gameStarted=true;clickCount=0;
 checkStreak=0;lastCheckColor=null;
 enterGameUI();
 saveGameState();
-// AI执红时先走棋
+// AI鎵х孩鏃跺厛璧版
 if(aiCl==='red'&&!engine.gameOver){startAiThink();}
 }
 
@@ -1307,19 +1301,19 @@ function retryAiGame(){
 hideOverlay();
 stopAi();
 soundEnabled=true;gameOverSoundPlayed=false;undoUsed=false;aiThinking=false;
-// 变更日志：重试时也随机分配红黑方（原硬编码用户执红）
+// 鍙樻洿鏃ュ織锛氶噸璇曟椂涔熼殢鏈哄垎閰嶇孩榛戞柟锛堝師纭紪鐮佺敤鎴锋墽绾級
 gm='ai';
 var uc=Math.random()<0.5?'red':'black';
 myCl=uc;boardFlip=(uc==='black');aiCl=(uc==='red')?'black':'red';
-D('redName').textContent=(uc==='red')?'我（红方）':'AI（红方）';
-D('blackName').textContent=(uc==='black')?'我（黑方）':'AI（黑方）';
-D('modeBadge').textContent='人机对弈';
+D('redName').textContent=(uc==='red')?'鎴戯紙绾㈡柟锛?:'AI锛堢孩鏂癸級';
+D('blackName').textContent=(uc==='black')?'鎴戯紙榛戞柟锛?:'AI锛堥粦鏂癸級';
+D('modeBadge').textContent='浜烘満瀵瑰紙';
 engine.initBoard();engine.currentTurn='red';engine.gameOver=false;engine.winner=null;engine.moveHistory=[];
 capRed=[];capBlk=[];lastMove=null;selected=null;validMoves=[];gameStarted=true;clickCount=0;checkStreak=0;lastCheckColor=null;
-D('turnText').textContent='红方走棋';
+D('turnText').textContent='绾㈡柟璧版';
 drawBoardBg();render();startTimer();sndStart();
 saveGameState();
-// AI执红时先走棋
+// AI鎵х孩鏃跺厛璧版
 if(aiCl==='red'&&!engine.gameOver){startAiThink();}
 }
 
@@ -1328,11 +1322,9 @@ var rs=engine.move(fr,fc,tr,tc);
 if(!rs)return;
 var mc=engine.moveHistory[engine.moveHistory.length-1].piece.color;
 
-// 长将违规：连续将军6次后，同方第7次不允许继续将军（不判负）
-// 首着吃子不计算在内
-if(rs.check&&checkStreak>=6&&lastCheckColor===mc&&!(checkStreak===0&&rs.captured)){
+// 闀垮皢杩濊锛氳繛缁皢鍐?娆″悗锛屽悓鏂圭7娆′笉鍏佽缁х画灏嗗啗锛堜笉鍒よ礋锛?// 棣栫潃鍚冨瓙涓嶈绠楀湪鍐?if(rs.check&&checkStreak>=6&&lastCheckColor===mc&&!(checkStreak===0&&rs.captured)){
 	undoLastMoveHelper();
-	toast('长将违规！连续将军6次，请走其他棋子',2500);
+	toast('闀垮皢杩濊锛佽繛缁皢鍐?娆★紝璇疯蛋鍏朵粬妫嬪瓙',2500);
 	return;
 }
 
@@ -1340,12 +1332,12 @@ undoUsed=false;
 if(rs.captured){sndCapture();if(rs.captured.color==='red')capRed.push(rs.captured);else capBlk.push(rs.captured);}
 else{sndMove();}
 selected=null;validMoves=[];lastMove={row:tr,col:tc};render();
-D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
+D('turnText').textContent=engine.currentTurn==='red'?'绾㈡柟璧版':'榛戞柟璧版';
 if(gm==='online'&&sockOk){
 pendingMove={fromRow:fr,fromCol:fc,toRow:tr,toCol:tc,captured:rs.captured,pieceColor:mc,currentTurn:engine.currentTurn,gameOver:engine.gameOver,winner:engine.winner,redLeft:redLeft,blkLeft:blkLeft};
 socket.emit('make_move',pendingMove);
 saveGameState();
-// 3秒内未收到 move_ack 则自动补发（防消息丢失导致回退），服务端有幂等判断不会重复走棋
+// 3绉掑唴鏈敹鍒?move_ack 鍒欒嚜鍔ㄨˉ鍙戯紙闃叉秷鎭涪澶卞鑷村洖閫€锛夛紝鏈嶅姟绔湁骞傜瓑鍒ゆ柇涓嶄細閲嶅璧版
 if(pendingRetryTimer)clearTimeout(pendingRetryTimer);
 pendingRetryTimer=setTimeout(function(){
 var pm=pendingMove;
@@ -1357,7 +1349,7 @@ socket.emit('make_move',{fromRow:pm.fromRow,fromCol:pm.fromCol,toRow:pm.toRow,to
 if(gm==='ai'||gm==='pikafish')saveGameState();
 if(engine.gameOver){
 	sndGameOver();stopTimer();
-	var wt=engine.winner==='red'?'红方':'黑方';
+	var wt=engine.winner==='red'?'绾㈡柟':'榛戞柟';
 	showGameOver(wt);
 	if(gm==='ai'){
 		var aiWin=(engine.winner===aiCl);
@@ -1368,20 +1360,18 @@ if(engine.gameOver){
 		updateTrainStatsUI();saveAiTrainStats();
 		var learningRate=aiWin?0.003:-0.005;
 		adjustAiTrainingWeights(moveCount,learningRate);
-		console.log('=== 用户走棋后游戏结束 ===');
-		console.log('AI执'+(aiCl==='red'?'红':'黑')+'，'+(aiWin?'获胜':'失败'));
-		console.log('学习率:',learningRate);
+		console.log('=== 鐢ㄦ埛璧版鍚庢父鎴忕粨鏉?===');
+		console.log('AI鎵?+(aiCl==='red'?'绾?:'榛?)+'锛?+(aiWin?'鑾疯儨':'澶辫触'));
+		console.log('瀛︿範鐜?',learningRate);
 		clearGameState();
 	}
 	if(gm==='pikafish'){ clearGameState(); }
 	return;
 }
 
-// 更新长将计数器
-if(rs.check){
-	sndCheck();toast('将军!',1500);
-	// 首着吃子不计算在内
-	if(!(checkStreak===0&&rs.captured)){
+// 鏇存柊闀垮皢璁℃暟鍣?if(rs.check){
+	sndCheck();toast('灏嗗啗!',1500);
+	// 棣栫潃鍚冨瓙涓嶈绠楀湪鍐?	if(!(checkStreak===0&&rs.captured)){
 		if(lastCheckColor===mc){checkStreak++;}else{checkStreak=1;lastCheckColor=mc;}
 	}
 }else{
@@ -1400,68 +1390,68 @@ if(engine.winner===aiCl)recordGameResult('aiWin');
 else if(engine.winner===myCl)recordGameResult('aiLose');
 else if(engine.winner==='draw')recordGameResult('draw');
 if(engine.winner===myCl){
-showOverlay('<h2>🎉 你赢了!</h2><p>恭喜战胜AI!</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="retryAiGame()">再来一局</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">返回</button></div>');
+showOverlay('<h2>馃帀 浣犺耽浜?</h2><p>鎭枩鎴樿儨AI!</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="retryAiGame()">鍐嶆潵涓€灞€</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">杩斿洖</button></div>');
 }else if(engine.winner===aiCl){
-showOverlay('<h2>💪 再接再厉</h2><p>AI获胜，请重新挑战</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="retryAiGame()">再来一局</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">返回</button></div>');
+showOverlay('<h2>馃挭 鍐嶆帴鍐嶅帀</h2><p>AI鑾疯儨锛岃閲嶆柊鎸戞垬</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="retryAiGame()">鍐嶆潵涓€灞€</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">杩斿洖</button></div>');
 }else{
-showOverlay('<h2>🤝 和棋</h2><p>双方握手言和</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="retryAiGame()">再来一局</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">返回</button></div>');
+showOverlay('<h2>馃 鍜屾</h2><p>鍙屾柟鎻℃墜瑷€鍜?/p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="retryAiGame()">鍐嶆潵涓€灞€</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">杩斿洖</button></div>');
 }
 }else if(gm==='pikafish'){
 if(engine.winner===aiCl)recordGameResult('aiWin');
 else if(engine.winner===myCl)recordGameResult('aiLose');
 else if(engine.winner==='draw')recordGameResult('draw');
 if(engine.winner===myCl){
-showOverlay('<h2>🎉 你赢了!</h2><p>恭喜战胜Pikafish!</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="retryPikafishGame()">再来一局</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">返回</button></div>');
+showOverlay('<h2>馃帀 浣犺耽浜?</h2><p>鎭枩鎴樿儨Pikafish!</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="retryPikafishGame()">鍐嶆潵涓€灞€</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">杩斿洖</button></div>');
 }else if(engine.winner===aiCl){
-showOverlay('<h2>💪 再接再厉</h2><p>Pikafish获胜，请重新挑战</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="retryPikafishGame()">再来一局</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">返回</button></div>');
+showOverlay('<h2>馃挭 鍐嶆帴鍐嶅帀</h2><p>Pikafish鑾疯儨锛岃閲嶆柊鎸戞垬</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="retryPikafishGame()">鍐嶆潵涓€灞€</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">杩斿洖</button></div>');
 }else{
-showOverlay('<h2>🤝 和棋</h2><p>双方握手言和</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="retryPikafishGame()">再来一局</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">返回</button></div>');
+showOverlay('<h2>馃 鍜屾</h2><p>鍙屾柟鎻℃墜瑷€鍜?/p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="retryPikafishGame()">鍐嶆潵涓€灞€</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">杩斿洖</button></div>');
 }
 }else if(gm==='local'){
-showOverlay('<h2>🏆 '+wt+'获胜!</h2><p>恭喜'+wt+'!</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="localRestart()">再来一局</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">退出</button></div>');
+showOverlay('<h2>馃弳 '+wt+'鑾疯儨!</h2><p>鎭枩'+wt+'!</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="localRestart()">鍐嶆潵涓€灞€</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">閫€鍑?/button></div>');
 }else{
 recordOnlineGameResult();
-if(engine.winner==='draw'){showOverlay('<h2>🤝 和棋</h2><p>双方握手言和</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="newGame()">再来一局</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">退出</button></div>');clearGameState();}
-else{var isWin=(engine.winner===myCl);showOverlay('<h2>'+(isWin?'🎉 胜利!':'😔 失败')+'</h2><p>'+wt+'获胜</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="newGame()">再来一局</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">退出</button></div>');clearGameState();}
+if(engine.winner==='draw'){showOverlay('<h2>馃 鍜屾</h2><p>鍙屾柟鎻℃墜瑷€鍜?/p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="newGame()">鍐嶆潵涓€灞€</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">閫€鍑?/button></div>');clearGameState();}
+else{var isWin=(engine.winner===myCl);showOverlay('<h2>'+(isWin?'馃帀 鑳滃埄!':'馃様 澶辫触')+'</h2><p>'+wt+'鑾疯儨</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="newGame()">鍐嶆潵涓€灞€</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">閫€鍑?/button></div>');clearGameState();}
 }
 }
 
 
 
 function localRestart(){soundEnabled=true;gameOverSoundPlayed=false;undoUsed=false;hideOverlay();boardFlip=Math.random()<0.5;myCl=boardFlip?'black':'red';
-D('redName').textContent=myCl==='red'?'你（红方）':'对手（红方）';D('blackName').textContent=myCl==='black'?'你（黑方）':'对手（黑方）';
+D('redName').textContent=myCl==='red'?'浣狅紙绾㈡柟锛?:'瀵规墜锛堢孩鏂癸級';D('blackName').textContent=myCl==='black'?'浣狅紙榛戞柟锛?:'瀵规墜锛堥粦鏂癸級';
 engine.initBoard();engine.currentTurn='red';engine.gameOver=false;engine.winner=null;engine.moveHistory=[];
 capRed=[];capBlk=[];lastMove=null;selected=null;validMoves=[];gameStarted=true;clickCount=0;checkStreak=0;lastCheckColor=null;
-D('turnText').textContent='红方走棋';drawBoardBg();render();startTimer();sndStart();}
+D('turnText').textContent='绾㈡柟璧版';drawBoardBg();render();startTimer();sndStart();}
 
 function doResign(){
 if(!gameStarted||engine.gameOver)return;
-showOverlay('<h2>确认认输?</h2><p>认输后对方获胜</p><div class="btns2"><button class="btn btn-red" style="width:auto;padding:10px 20px;font-size:14px" onclick="confirmResign()">确认</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="hideOverlay()">取消</button></div>');
+showOverlay('<h2>纭璁よ緭?</h2><p>璁よ緭鍚庡鏂硅幏鑳?/p><div class="btns2"><button class="btn btn-red" style="width:auto;padding:10px 20px;font-size:14px" onclick="confirmResign()">纭</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="hideOverlay()">鍙栨秷</button></div>');
 }
 function confirmResign(){hideOverlay();
 engine.gameOver=true;engine.winner=engine.currentTurn==='red'?'black':'red';
-stopAi();stopTimer();render();showGameOver(engine.winner==='red'?'红方':'黑方');
+stopAi();stopTimer();render();showGameOver(engine.winner==='red'?'绾㈡柟':'榛戞柟');
 if(gm==='online'&&sockOk)socket.emit('resign');}
 
-function doDrawReq(){if(!gameStarted||engine.gameOver)return;if(gm==='online'&&sockOk)socket.emit('request_draw');toast('已发送求和请求');}
-function accDraw(){hideOverlay();engine.gameOver=true;engine.winner='draw';stopTimer();showGameOver('和棋');if(sockOk)socket.emit('accept_draw');}
+function doDrawReq(){if(!gameStarted||engine.gameOver)return;if(gm==='online'&&sockOk)socket.emit('request_draw');toast('宸插彂閫佹眰鍜岃姹?);}
+function accDraw(){hideOverlay();engine.gameOver=true;engine.winner='draw';stopTimer();showGameOver('鍜屾');if(sockOk)socket.emit('accept_draw');}
 function rejDraw(){hideOverlay();if(sockOk)socket.emit('reject_draw');}
 function acceptRematch(){socket.emit('accept_rematch');}
 
 function doUndo(){
 if(!gameStarted||engine.gameOver)return;
-if(undoUsed){toast('不能连续悔棋',1500);return;}
-if(engine.moveHistory.length===0){toast('没有可悔的棋步',1500);return;}
+if(undoUsed){toast('涓嶈兘杩炵画鎮旀',1500);return;}
+if(engine.moveHistory.length===0){toast('娌℃湁鍙倲鐨勬姝?,1500);return;}
 var last=engine.moveHistory[engine.moveHistory.length-1];
 if(gm==='online'&&sockOk){
-if(last.piece.color!==myCl){toast('只能悔自己的棋',1500);return;}
+if(last.piece.color!==myCl){toast('鍙兘鎮旇嚜宸辩殑妫?,1500);return;}
 socket.emit('request_undo');
-toast('已发送悔棋请求',1500);
+toast('宸插彂閫佹倲妫嬭姹?,1500);
 }else if(gm==='ai'||gm==='pikafish'){
 confirmUndoAi();
 }else if(gm==='local'){
-var undoCl=last.piece.color==='red'?'红方':'黑方';
-showOverlay('<h2>↩ 悔棋确认</h2><p>撤销'+undoCl+'的上一步</p><div class="btns2"><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="confirmUndoLocal()">确认</button><button class="btn btn-red" onclick="hideOverlay()">取消</button></div>');
+var undoCl=last.piece.color==='red'?'绾㈡柟':'榛戞柟';
+showOverlay('<h2>鈫?鎮旀纭</h2><p>鎾ら攢'+undoCl+'鐨勪笂涓€姝?/p><div class="btns2"><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="confirmUndoLocal()">纭</button><button class="btn btn-red" onclick="hideOverlay()">鍙栨秷</button></div>');
 }
 }
 
@@ -1472,11 +1462,11 @@ doUndoLocal();doUndoLocal();
 }else{
 doUndoLocal();
 }
-toast('悔棋成功',1500);
+toast('鎮旀鎴愬姛',1500);
 saveGameState();
 }
 
-function confirmUndoLocal(){hideOverlay();doUndoLocal();toast('悔棋成功',1500);}
+function confirmUndoLocal(){hideOverlay();doUndoLocal();toast('鎮旀鎴愬姛',1500);}
 function doUndoLocal(){
 if(engine.moveHistory.length===0)return;
 undoUsed=true;
@@ -1486,19 +1476,18 @@ engine.board[last.toRow][last.toCol]=last.captured||null;
 engine.currentTurn=last.prevTurn;
 engine.gameOver=false;engine.winner=null;
 if(last.captured){if(last.captured.color==='red')capRed.pop();else capBlk.pop();}
-// 悔棋后重置长将计数器（无法精确还原，安全起见全部重置）
-checkStreak=0;lastCheckColor=null;
+// 鎮旀鍚庨噸缃暱灏嗚鏁板櫒锛堟棤娉曠簿纭繕鍘燂紝瀹夊叏璧疯鍏ㄩ儴閲嶇疆锛?checkStreak=0;lastCheckColor=null;
 selected=null;validMoves=[];
 if(engine.moveHistory.length>0){var lm=engine.moveHistory[engine.moveHistory.length-1];lastMove={row:lm.toRow,col:lm.toCol};}else{lastMove=null;}
-D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
+D('turnText').textContent=engine.currentTurn==='red'?'绾㈡柟璧版':'榛戞柟璧版';
 if(!timerId){startTimer();}
 render();
 }
-function accUndo(){hideOverlay();if(sockOk)socket.emit('accept_undo');doUndoLocal();toast('悔棋成功',1500);}
+function accUndo(){hideOverlay();if(sockOk)socket.emit('accept_undo');doUndoLocal();toast('鎮旀鎴愬姛',1500);}
 function rejUndo(){hideOverlay();if(sockOk)socket.emit('reject_undo');}
 
 function leaveGame(){
-showOverlay('<h2>退出对局</h2><p>确认退出当前对局？</p><div class="btns2"><button class="btn btn-red" onclick="doLeaveGame()">确认退出</button><button class="btn btn-outline" onclick="hideOverlay()">取消</button></div>');
+showOverlay('<h2>閫€鍑哄灞€</h2><p>纭閫€鍑哄綋鍓嶅灞€锛?/p><div class="btns2"><button class="btn btn-red" onclick="doLeaveGame()">纭閫€鍑?/button><button class="btn btn-outline" onclick="hideOverlay()">鍙栨秷</button></div>');
 }
 function returnToLobby(){
 soundEnabled=false;gameOverSoundPlayed=false;
@@ -1506,8 +1495,8 @@ if(audioCtx){try{audioCtx.close();}catch(e){}audioCtx=null;}
 stopTimer();stopAi();gameStarted=false;selected=null;validMoves=[];capRed=[];capBlk=[];lastMove=null;engine.initBoard();
 gm='local';myCl=null;myRm=null;boardFlip=false;D('drawBtn').style.display='none';
 D('game').classList.remove('show');D('lobby').classList.remove('hide');
-D('redName').textContent='红方';D('blackName').textContent='黑方';
-D('lobbyStatus').textContent=sockOk?'● 服务器已连接':'○ 服务器离线（本地模式可用）';hideOverlay();hideReconnecting();
+D('redName').textContent='绾㈡柟';D('blackName').textContent='榛戞柟';
+D('lobbyStatus').textContent=sockOk?'鈼?鏈嶅姟鍣ㄥ凡杩炴帴':'鈼?鏈嶅姟鍣ㄧ绾匡紙鏈湴妯″紡鍙敤锛?;hideOverlay();hideReconnecting();
 try{localStorage.removeItem('xq_game');sessionStorage.removeItem('xq_game');}catch(e){}
 }
 function doLeaveGame(){
@@ -1522,8 +1511,8 @@ if(gm==='online'&&sockOk){try{socket.emit('leave_room');}catch(e){}}
 if(socket){try{socket.disconnect();}catch(e){}socket=null;sockOk=false;}
 gm='local';myCl=null;myRm=null;boardFlip=false;D('drawBtn').style.display='none';
 D('game').classList.remove('show');D('lobby').classList.remove('hide');
-D('redName').textContent='红方';D('blackName').textContent='黑方';
-D('lobbyStatus').textContent='○ 服务器离线（本地模式可用）';hideOverlay();hideReconnecting();
+D('redName').textContent='绾㈡柟';D('blackName').textContent='榛戞柟';
+D('lobbyStatus').textContent='鈼?鏈嶅姟鍣ㄧ绾匡紙鏈湴妯″紡鍙敤锛?;hideOverlay();hideReconnecting();
 try{localStorage.removeItem('xq_game');sessionStorage.removeItem('xq_game');}catch(e){}
 connectSocket();
 }
@@ -1539,8 +1528,8 @@ if(gm==='online'&&sockOk){try{socket.emit('leave_room');}catch(e){}}
 if(socket){try{socket.disconnect();}catch(e){}socket=null;sockOk=false;}
 gm='local';myCl=null;myRm=null;boardFlip=false;D('drawBtn').style.display='none';
 D('game').classList.remove('show');D('lobby').classList.remove('hide');
-D('redName').textContent='红方';D('blackName').textContent='黑方';
-D('lobbyStatus').textContent='○ 服务器离线（本地模式可用）';hideOverlay();hideReconnecting();
+D('redName').textContent='绾㈡柟';D('blackName').textContent='榛戞柟';
+D('lobbyStatus').textContent='鈼?鏈嶅姟鍣ㄧ绾匡紙鏈湴妯″紡鍙敤锛?;hideOverlay();hideReconnecting();
 try{localStorage.removeItem('xq_game');sessionStorage.removeItem('xq_game');}catch(e){}
 connectSocket();
 }
@@ -1576,7 +1565,7 @@ if(r>=0&&r<=9&&c>=0&&c<=8)cellClick(r,c);
 function newGame(){
 if(gm==='online'&&sockOk){
 socket.emit('rematch_request');
-showOverlay('<h2>等待对方确认...</h2><p>对方是否同意再来一局</p><div class="btns2"><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">退出</button></div>');
+showOverlay('<h2>绛夊緟瀵规柟纭...</h2><p>瀵规柟鏄惁鍚屾剰鍐嶆潵涓€灞€</p><div class="btns2"><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">閫€鍑?/button></div>');
 return;
 }
 soundEnabled=true;gameOverSoundPlayed=false;undoUsed=false;
@@ -1584,36 +1573,36 @@ hideOverlay();
 if(gm==='ai'){retryAiGame();return;}
 if(gm==='pikafish'){retryPikafishGame();return;}
 if(gm==='local'){boardFlip=Math.random()<0.5;myCl=boardFlip?'black':'red';
-D('redName').textContent=myCl==='red'?'你（红方）':'对手（红方）';D('blackName').textContent=myCl==='black'?'你（黑方）':'对手（黑方）';}
+D('redName').textContent=myCl==='red'?'浣狅紙绾㈡柟锛?:'瀵规墜锛堢孩鏂癸級';D('blackName').textContent=myCl==='black'?'浣狅紙榛戞柟锛?:'瀵规墜锛堥粦鏂癸級';}
 engine.initBoard();engine.currentTurn='red';engine.gameOver=false;engine.winner=null;engine.moveHistory=[];
 capRed=[];capBlk=[];lastMove=null;selected=null;validMoves=[];gameStarted=true;clickCount=0;checkStreak=0;lastCheckColor=null;
-D('turnText').textContent='红方走棋';
+D('turnText').textContent='绾㈡柟璧版';
 drawBoardBg();render();startTimer();sndStart();
 }
 
 function createRoom(){
-if(!sockOk){D('lobbyStatus').textContent='服务器未连接，请稍候再试';return;}
+if(!sockOk){D('lobbyStatus').textContent='鏈嶅姟鍣ㄦ湭杩炴帴锛岃绋嶅€欏啀璇?;return;}
 var customId=D('createInput').value.trim().toUpperCase();
-// 轮换先手：读取上一盘自己执的颜色，服务端将分配相反颜色
+// 杞崲鍏堟墜锛氳鍙栦笂涓€鐩樿嚜宸辨墽鐨勯鑹诧紝鏈嶅姟绔皢鍒嗛厤鐩稿弽棰滆壊
 var lastColor=null;try{lastColor=localStorage.getItem('xq_last_color');}catch(e){}
-D('lobbyStatus').textContent='正在创建房间...';
+D('lobbyStatus').textContent='姝ｅ湪鍒涘缓鎴块棿...';
 socket.emit('create_room',{roomId:customId||null,lastColor:lastColor});
 }
 function joinRoom(){
-if(!sockOk){D('lobbyStatus').textContent='服务器未连接，请稍候再试';return;}
+if(!sockOk){D('lobbyStatus').textContent='鏈嶅姟鍣ㄦ湭杩炴帴锛岃绋嶅€欏啀璇?;return;}
 var rm=D('roomInput').value.trim().toUpperCase();
-if(!rm){D('lobbyStatus').textContent='请输入房间号';return;}
-D('lobbyStatus').textContent='正在加入房间...';
+if(!rm){D('lobbyStatus').textContent='璇疯緭鍏ユ埧闂村彿';return;}
+D('lobbyStatus').textContent='姝ｅ湪鍔犲叆鎴块棿...';
 socket.emit('join_room',rm);
 }
 
 function connectSocket(){
-D('lobbyStatus').textContent='◌ 正在连接服务器...';
+D('lobbyStatus').textContent='鈼?姝ｅ湪杩炴帴鏈嶅姟鍣?..';
 try{
-if(typeof io==='undefined'){D('lobbyStatus').textContent='○ 服务器离线（本地模式可用）';sockOk=false;return;}
+if(typeof io==='undefined'){D('lobbyStatus').textContent='鈼?鏈嶅姟鍣ㄧ绾匡紙鏈湴妯″紡鍙敤锛?;sockOk=false;return;}
 if(socket){try{socket.disconnect();}catch(e){}socket=null;}
 socket=io({transports:['websocket','polling'],reconnection:true,reconnectionAttempts:Infinity,reconnectionDelay:1000,timeout:8000,pingTimeout:8000,pingInterval:4000,randomizationFactor:0});
-socket.on('connect',function(){sockOk=true;D('lobbyStatus').textContent='● 服务器已连接';D('footerText').textContent='人机对弈需联网 | 在线模式两人对战';
+socket.on('connect',function(){sockOk=true;D('lobbyStatus').textContent='鈼?鏈嶅姟鍣ㄥ凡杩炴帴';D('footerText').textContent='浜烘満瀵瑰紙闇€鑱旂綉 | 鍦ㄧ嚎妯″紡涓や汉瀵规垬';
 hideReconnecting();
 var isPageReload=!!window._pendingReconnect;
 if(window._pendingRoomAction&&socket.roomId){var pa=window._pendingRoomAction;window._pendingRoomAction=null;
@@ -1627,14 +1616,13 @@ window._isPageReload=isPageReload;
 });
 socket.on('disconnect',function(){sockOk=false;disconnectTime=Date.now();if(gm==='online'&&myRm){showReconnecting();}});
 socket.on('ping',function(){socket.emit('pong');});
-socket.on('connect_error',function(){sockOk=false;D('lobbyStatus').textContent='○ 连接失败（本地模式可用）';});
-socket.on('online_count',function(count){D('onlineCount').textContent='当前在线: '+count+' 人';});
+socket.on('connect_error',function(){sockOk=false;D('lobbyStatus').textContent='鈼?杩炴帴澶辫触锛堟湰鍦版ā寮忓彲鐢級';});
+socket.on('online_count',function(count){D('onlineCount').textContent='褰撳墠鍦ㄧ嚎: '+count+' 浜?;});
 socket.on('room_created',function(d){
 myRm=d.roomId;myCl=d.color;gm='online';
-try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 记录本盘颜色，下一盘轮换先手
-D('lobbyStatus').innerHTML='房间号: <strong style="font-size:20px;color:#d4a843;letter-spacing:3px;">'+d.roomId+'</strong>';
+try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 璁板綍鏈洏棰滆壊锛屼笅涓€鐩樿疆鎹㈠厛鎵?D('lobbyStatus').innerHTML='鎴块棿鍙? <strong style="font-size:20px;color:#d4a843;letter-spacing:3px;">'+d.roomId+'</strong>';
 enterOnlineGame(d.roomId,d.color);
-D('turnText').textContent='等待对手加入...';
+D('turnText').textContent='绛夊緟瀵规墜鍔犲叆...';
 });
 socket.on('redirect_room',function(d){
 window._pendingRoomAction=d;
@@ -1642,17 +1630,16 @@ socket.reconnectToRoom(d.roomId);
 });
 socket.on('room_joined',function(d){
 myRm=d.roomId;myCl=d.color;gm='online';D('lobbyStatus').textContent='';
-try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 记录本盘颜色，下一盘轮换先手
-enterOnlineGame(d.roomId,d.color);
+try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 璁板綍鏈洏棰滆壊锛屼笅涓€鐩樿疆鎹㈠厛鎵?enterOnlineGame(d.roomId,d.color);
 });
 socket.on('game_start',function(d){
-gameStarted=true;D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
+gameStarted=true;D('turnText').textContent=engine.currentTurn==='red'?'绾㈡柟璧版':'榛戞柟璧版';
 updateBoardSize();drawBoardBg();render();
-toast('对手已加入，对局开始!',2000);startTimer();
+toast('瀵规墜宸插姞鍏ワ紝瀵瑰眬寮€濮?',2000);startTimer();
 sndStart();
 });
 socket.on('move_ack',function(d){
-// 服务端已确认走棋：清除本地 pendingMove，停止补发定时器
+// 鏈嶅姟绔凡纭璧版锛氭竻闄ゆ湰鍦?pendingMove锛屽仠姝㈣ˉ鍙戝畾鏃跺櫒
 if(pendingMove){
 var acked=false;
 if(d&&d.lastMove){
@@ -1667,31 +1654,29 @@ if(pendingRetryTimer){clearTimeout(pendingRetryTimer);pendingRetryTimer=null;}
 }
 });
 socket.on('move_rejected',function(d){
-// 服务端拒绝了走棋（如回合不匹配）：回退本地一步并请求全量同步纠正，
-// 避免本地与服务端状态分叉
-if(!pendingMove)return;
+// 鏈嶅姟绔嫆缁濅簡璧版锛堝鍥炲悎涓嶅尮閰嶏級锛氬洖閫€鏈湴涓€姝ュ苟璇锋眰鍏ㄩ噺鍚屾绾犳锛?// 閬垮厤鏈湴涓庢湇鍔＄鐘舵€佸垎鍙?if(!pendingMove)return;
 var pm=pendingMove;
 pendingMove=null;
 if(pendingRetryTimer){clearTimeout(pendingRetryTimer);pendingRetryTimer=null;}
-// 本地撤销刚走的一步（与该 pendingMove 匹配时）
+// 鏈湴鎾ら攢鍒氳蛋鐨勪竴姝ワ紙涓庤 pendingMove 鍖归厤鏃讹級
 if(engine.moveHistory.length>0){
 var lm=engine.moveHistory[engine.moveHistory.length-1];
 if(lm.fromRow===pm.fromRow&&lm.fromCol===pm.fromCol&&lm.toRow===pm.toRow&&lm.toCol===pm.toCol){
 undoLastMoveHelper();
 selected=null;validMoves=[];
 if(engine.moveHistory.length>0){var lm2=engine.moveHistory[engine.moveHistory.length-1];lastMove={row:lm2.toRow,col:lm2.toCol};}else{lastMove=null;}
-D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
+D('turnText').textContent=engine.currentTurn==='red'?'绾㈡柟璧版':'榛戞柟璧版';
 render();
 }
 }
-// 拉取服务端全量状态，确保两端一致（防分叉）
+// 鎷夊彇鏈嶅姟绔叏閲忕姸鎬侊紝纭繚涓ょ涓€鑷达紙闃插垎鍙夛級
 if(gm==='online'&&myRm&&sockOk){socket.emit('reconnect_room',{roomId:myRm,color:myCl});}
-toast((d&&d.reason==='not_your_turn')?'状态已同步，请重新走棋':'走棋未生效，已同步状态',1800);
+toast((d&&d.reason==='not_your_turn')?'鐘舵€佸凡鍚屾锛岃閲嶆柊璧版':'璧版鏈敓鏁堬紝宸插悓姝ョ姸鎬?,1800);
 saveGameState();
 });
 socket.on('opponent_move',function(d){
 if(d.fromRow!==undefined){
-// 去重：检查该走棋是否已在本地历史中（可能已被 room_state 全量同步应用过）
+// 鍘婚噸锛氭鏌ヨ璧版鏄惁宸插湪鏈湴鍘嗗彶涓紙鍙兘宸茶 room_state 鍏ㄩ噺鍚屾搴旂敤杩囷級
 var alreadyApplied=false;
 if(engine.moveHistory.length>0){
 var lastLocal=engine.moveHistory[engine.moveHistory.length-1];
@@ -1710,19 +1695,19 @@ else{sndMove();}
 selected=null;validMoves=[];lastMove={row:d.toRow,col:d.toCol};
 if(cs===0)drawBoardBg();
 render();
-D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
-if(d.gameOver){sndGameOver();stopTimer();engine.gameOver=true;engine.winner=d.winner;showGameOver(d.winner==='red'?'红方':'黑方');}
+D('turnText').textContent=engine.currentTurn==='red'?'绾㈡柟璧版':'榛戞柟璧版';
+if(d.gameOver){sndGameOver();stopTimer();engine.gameOver=true;engine.winner=d.winner;showGameOver(d.winner==='red'?'绾㈡柟':'榛戞柟');}
 else if(engine.iic&&engine.iic(engine.currentTurn))sndCheck();
 saveGameState();
 }
 });
 socket.on('game_over',function(d){
 pendingMove=null;if(pendingRetryTimer){clearTimeout(pendingRetryTimer);pendingRetryTimer=null;}
-sndGameOver();stopTimer();engine.gameOver=true;engine.winner=d.winner;showGameOver(d.winner==='draw'?'和棋':(d.winner==='red'?'红方':'黑方'));clearGameState();
+sndGameOver();stopTimer();engine.gameOver=true;engine.winner=d.winner;showGameOver(d.winner==='draw'?'鍜屾':(d.winner==='red'?'绾㈡柟':'榛戞柟'));clearGameState();
 });
 socket.on('timeout',function(d){
 pendingMove=null;if(pendingRetryTimer){clearTimeout(pendingRetryTimer);pendingRetryTimer=null;}
-stopTimer();engine.gameOver=true;engine.winner=d.winner;showGameOver(d.winner==='red'?'红方':'黑方');clearGameState();
+stopTimer();engine.gameOver=true;engine.winner=d.winner;showGameOver(d.winner==='red'?'绾㈡柟':'榛戞柟');clearGameState();
 });
 socket.on('player_disconnected',function(d){
 	if(gm==='online'&&myRm){
@@ -1735,17 +1720,14 @@ socket.on('player_reconnected',function(d){
 });
 socket.on('room_state',function(d){
 myRm=d.roomId;myCl=d.color;gm='online';
-try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 重连/换先后同步本盘颜色
-D('lobby').classList.add('hide');D('game').classList.add('show');
-D('modeBadge').textContent='房间: '+d.roomId;
-D('redName').textContent=myCl==='red'?'你（红方）':'对手（红方）';
-D('blackName').textContent=myCl==='black'?'你（黑方）':'对手（黑方）';
+try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 閲嶈繛/鎹㈠厛鍚庡悓姝ユ湰鐩橀鑹?D('lobby').classList.add('hide');D('game').classList.add('show');
+D('modeBadge').textContent='鎴块棿: '+d.roomId;
+D('redName').textContent=myCl==='red'?'浣狅紙绾㈡柟锛?:'瀵规墜锛堢孩鏂癸級';
+D('blackName').textContent=myCl==='black'?'浣狅紙榛戞柟锛?:'瀵规墜锛堥粦鏂癸級';
 D('drawBtn').style.display='inline-flex';
 boardFlip=(myCl==='black');
 var isPageReload=window._isPageReload;window._isPageReload=false;
-// 本地领先保护：本地恰好比服务端多1步且正是 pendingMove（未确认走棋）时，
-// 全量同步不应覆盖本地（防止"刚走的棋回退"），等待 move_ack 或自动补发
-var localPendingAhead=false;
+// 鏈湴棰嗗厛淇濇姢锛氭湰鍦版伆濂芥瘮鏈嶅姟绔1姝ヤ笖姝ｆ槸 pendingMove锛堟湭纭璧版锛夋椂锛?// 鍏ㄩ噺鍚屾涓嶅簲瑕嗙洊鏈湴锛堥槻姝?鍒氳蛋鐨勬鍥為€€"锛夛紝绛夊緟 move_ack 鎴栬嚜鍔ㄨˉ鍙?var localPendingAhead=false;
 if(!isPageReload&&pendingMove&&engine.moveHistory.length===d.moveHistory.length+1){
 var _lp=engine.moveHistory[engine.moveHistory.length-1];
 if(_lp&&_lp.fromRow===pendingMove.fromRow&&_lp.fromCol===pendingMove.fromCol&&_lp.toRow===pendingMove.toRow&&_lp.toCol===pendingMove.toCol){localPendingAhead=true;}
@@ -1754,18 +1736,17 @@ if(engine.gameOver&&!isPageReload){
 if(!localPendingAhead){
 engine.gameOver=d.gameOver;engine.winner=d.winner;
 if(d.gameStarted!==undefined){gameStarted=d.gameStarted;}else{gameStarted=(d.moveHistory&&d.moveHistory.length>0);}
-D('turnText').textContent=gameStarted?(engine.currentTurn==='red'?'红方走棋':'黑方走棋'):'等待对手加入...';
+D('turnText').textContent=gameStarted?(engine.currentTurn==='red'?'绾㈡柟璧版':'榛戞柟璧版'):'绛夊緟瀵规墜鍔犲叆...';
 if(d.capturedRed)capRed=d.capturedRed;if(d.capturedBlack)capBlk=d.capturedBlack;
 if(d.redTime!=null){redLeft=d.redTime;blkLeft=d.blkTime;}
 updateBoardSize();drawBoardBg();render();
 }
 return;
 }
-// 全量同步：当本地历史与服务器不一致时重新初始化，确保两个终端状态完全一致
-// 防御性检查：如果服务器历史为空但本地有历史，不重置（防止DO冷启动后状态丢失）
+// 鍏ㄩ噺鍚屾锛氬綋鏈湴鍘嗗彶涓庢湇鍔″櫒涓嶄竴鑷存椂閲嶆柊鍒濆鍖栵紝纭繚涓や釜缁堢鐘舵€佸畬鍏ㄤ竴鑷?// 闃插尽鎬ф鏌ワ細濡傛灉鏈嶅姟鍣ㄥ巻鍙蹭负绌轰絾鏈湴鏈夊巻鍙诧紝涓嶉噸缃紙闃叉DO鍐峰惎鍔ㄥ悗鐘舵€佷涪澶憋級
 if(engine.moveHistory.length!==d.moveHistory.length||isPageReload){
 if(!(d.moveHistory.length===0&&engine.moveHistory.length>0&&!isPageReload)){
-// 如果仅差1步且非页面重载，增量应用缺失的走棋（避免全量同步导致的视觉闪烁）
+// 濡傛灉浠呭樊1姝ヤ笖闈為〉闈㈤噸杞斤紝澧為噺搴旂敤缂哄け鐨勮蛋妫嬶紙閬垮厤鍏ㄩ噺鍚屾瀵艰嚧鐨勮瑙夐棯鐑侊級
 if(d.moveHistory.length===engine.moveHistory.length+1&&!isPageReload){
 var newMove=d.moveHistory[d.moveHistory.length-1];
 var mr=engine.move(newMove.fromRow,newMove.fromCol,newMove.toRow,newMove.toCol);
@@ -1774,16 +1755,15 @@ if(mr.captured){if(mr.captured.color==='red')capRed.push(mr.captured);else capBl
 lastMove={row:newMove.toRow,col:newMove.toCol};
 engine.currentTurn=d.currentTurn;
 }else{
-// 增量应用失败，回退到全量同步
-engine.initBoard();engine.currentTurn='red';engine.gameOver=false;engine.winner=null;engine.moveHistory=[];
+// 澧為噺搴旂敤澶辫触锛屽洖閫€鍒板叏閲忓悓姝?engine.initBoard();engine.currentTurn='red';engine.gameOver=false;engine.winner=null;engine.moveHistory=[];
 capRed=[];capBlk=[];lastMove=null;
 for(var i=0;i<d.moveHistory.length;i++){var m=d.moveHistory[i];var rs=engine.move(m.fromRow,m.fromCol,m.toRow,m.toCol);if(rs&&rs.captured){if(rs.captured.color==='red')capRed.push(rs.captured);else capBlk.push(rs.captured);}}
 if(d.moveHistory.length>0){var lm=d.moveHistory[d.moveHistory.length-1];lastMove={row:lm.toRow,col:lm.toCol};}
 engine.currentTurn=d.currentTurn;
 }
 }else{
-// 差异较大或页面重载：全量同步
-// 本地领先保护：若本地恰好多出 pendingMove（未确认走棋），保留本地，等待 ack/补发
+// 宸紓杈冨ぇ鎴栭〉闈㈤噸杞斤細鍏ㄩ噺鍚屾
+// 鏈湴棰嗗厛淇濇姢锛氳嫢鏈湴鎭板ソ澶氬嚭 pendingMove锛堟湭纭璧版锛夛紝淇濈暀鏈湴锛岀瓑寰?ack/琛ュ彂
 if(!localPendingAhead){
 engine.initBoard();engine.currentTurn='red';engine.gameOver=false;engine.winner=null;engine.moveHistory=[];
 capRed=[];capBlk=[];lastMove=null;
@@ -1793,35 +1773,34 @@ engine.currentTurn=d.currentTurn;
 }
 }
 }}else{
-// 历史一致时仅更新lastMove
+// 鍘嗗彶涓€鑷存椂浠呮洿鏂發astMove
 if(d.moveHistory.length>0){var lm=d.moveHistory[d.moveHistory.length-1];lastMove={row:lm.toRow,col:lm.toCol};}
 }
 if(!localPendingAhead){engine.gameOver=d.gameOver;engine.winner=d.winner;}
 if(!localPendingAhead){
 if(d.capturedRed)capRed=d.capturedRed;if(d.capturedBlack)capBlk=d.capturedBlack;
 }else{
-// 本地领先未确认：gameOver/captured 以本地为准（服务端尚未计入该步）
+// 鏈湴棰嗗厛鏈‘璁わ細gameOver/captured 浠ユ湰鍦颁负鍑嗭紙鏈嶅姟绔皻鏈鍏ヨ姝ワ級
 }
-// 若服务端未提供 gameStarted，根据是否有走棋记录判断（向后兼容旧版服务端）
-if(d.gameStarted!==undefined){gameStarted=d.gameStarted;}else{gameStarted=(d.moveHistory&&d.moveHistory.length>0);}
+// 鑻ユ湇鍔＄鏈彁渚?gameStarted锛屾牴鎹槸鍚︽湁璧版璁板綍鍒ゆ柇锛堝悜鍚庡吋瀹规棫鐗堟湇鍔＄锛?if(d.gameStarted!==undefined){gameStarted=d.gameStarted;}else{gameStarted=(d.moveHistory&&d.moveHistory.length>0);}
 selected=null;validMoves=[];
-D('turnText').textContent=gameStarted?(engine.currentTurn==='red'?'红方走棋':'黑方走棋'):'等待对手加入...';
+D('turnText').textContent=gameStarted?(engine.currentTurn==='red'?'绾㈡柟璧版':'榛戞柟璧版'):'绛夊緟瀵规墜鍔犲叆...';
 if(d.redTime!=null){redLeft=d.redTime;blkLeft=d.blkTime;}
-if(gameStarted){stopTimer();if(redLeft<=0||blkLeft<=0){redLeft=900;blkLeft=900;}timerId=setInterval(function(){if(engine.gameOver){stopTimer();return;}if(engine.currentTurn==='red'){redLeft=Math.max(0,redLeft-1);}else{blkLeft=Math.max(0,blkLeft-1);}updateTimers();if(redLeft<=0){stopTimer();engine.gameOver=true;engine.winner='black';sndGameOver();showGameOver('黑方');clearGameState();}else if(blkLeft<=0){stopTimer();engine.gameOver=true;engine.winner='red';sndGameOver();showGameOver('红方');clearGameState();}},1000);updateTimers();}
+if(gameStarted){stopTimer();if(redLeft<=0||blkLeft<=0){redLeft=900;blkLeft=900;}timerId=setInterval(function(){if(engine.gameOver){stopTimer();return;}if(engine.currentTurn==='red'){redLeft=Math.max(0,redLeft-1);}else{blkLeft=Math.max(0,blkLeft-1);}updateTimers();if(redLeft<=0){stopTimer();engine.gameOver=true;engine.winner='black';sndGameOver();showGameOver('榛戞柟');clearGameState();}else if(blkLeft<=0){stopTimer();engine.gameOver=true;engine.winner='red';sndGameOver();showGameOver('绾㈡柟');clearGameState();}},1000);updateTimers();}
 requestAnimationFrame(function(){drawBoardBg();render();});
 hideOverlay();hideReconnecting();
 
 saveGameState();
 });
-socket.on('opponent_left',function(){hideReconnecting();toast('棋局已结束',5000);setTimeout(function(){leaveGameSilent();},5000);});
-socket.on('room_timeout',function(){hideReconnecting();toast('棋局已结束',5000);setTimeout(function(){leaveGameSilent();},5000);});
-socket.on('draw_requested',function(){showOverlay('<h2>🤝 求和请求</h2><p>对手请求和棋</p><div class="btns2"><button class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:13px" onclick="accDraw()">同意</button><button class="btn btn-red" onclick="rejDraw()">拒绝</button></div>');});
-socket.on('draw_rejected',function(){toast('对方拒绝了求和');});
-socket.on('rematch_requested',function(){showOverlay('<h2>对方请求再来一局</h2><p>是否同意重新开始？</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="acceptRematch()">同意</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">拒绝并退出</button></div>');});
-socket.on('rematch_start',function(){hideOverlay();undoUsed=false;pendingMove=null;if(pendingRetryTimer){clearTimeout(pendingRetryTimer);pendingRetryTimer=null;}engine.initBoard();engine.currentTurn='red';engine.gameOver=false;engine.winner=null;engine.moveHistory=[];capRed=[];capBlk=[];lastMove=null;selected=null;validMoves=[];gameStarted=true;clickCount=0;D('turnText').textContent='红方走棋';updateBoardSize();drawBoardBg();render();startTimer();toast('再来一局!',1500);sndStart();saveGameState();});
+socket.on('opponent_left',function(){hideReconnecting();toast('妫嬪眬宸茬粨鏉?,5000);setTimeout(function(){leaveGameSilent();},5000);});
+socket.on('room_timeout',function(){hideReconnecting();toast('妫嬪眬宸茬粨鏉?,5000);setTimeout(function(){leaveGameSilent();},5000);});
+socket.on('draw_requested',function(){showOverlay('<h2>馃 姹傚拰璇锋眰</h2><p>瀵规墜璇锋眰鍜屾</p><div class="btns2"><button class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:13px" onclick="accDraw()">鍚屾剰</button><button class="btn btn-red" onclick="rejDraw()">鎷掔粷</button></div>');});
+socket.on('draw_rejected',function(){toast('瀵规柟鎷掔粷浜嗘眰鍜?);});
+socket.on('rematch_requested',function(){showOverlay('<h2>瀵规柟璇锋眰鍐嶆潵涓€灞€</h2><p>鏄惁鍚屾剰閲嶆柊寮€濮嬶紵</p><div class="btns2"><button class="btn btn-green" style="width:auto;padding:10px 20px;font-size:14px" onclick="acceptRematch()">鍚屾剰</button><button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="leaveGame()">鎷掔粷骞堕€€鍑?/button></div>');});
+socket.on('rematch_start',function(){hideOverlay();undoUsed=false;pendingMove=null;if(pendingRetryTimer){clearTimeout(pendingRetryTimer);pendingRetryTimer=null;}engine.initBoard();engine.currentTurn='red';engine.gameOver=false;engine.winner=null;engine.moveHistory=[];capRed=[];capBlk=[];lastMove=null;selected=null;validMoves=[];gameStarted=true;clickCount=0;D('turnText').textContent='绾㈡柟璧版';updateBoardSize();drawBoardBg();render();startTimer();toast('鍐嶆潵涓€灞€!',1500);sndStart();saveGameState();});
 socket.on('error', function(msg){
-    if(gm==='online'&&myRm&&(msg==='房间已不存在'||msg==='无法重连'||msg.indexOf('无法重连')>=0)){
-        // 不自动退出，启动重连重试
+    if(gm==='online'&&myRm&&(msg==='鎴块棿宸蹭笉瀛樺湪'||msg==='鏃犳硶閲嶈繛'||msg.indexOf('鏃犳硶閲嶈繛')>=0)){
+        // 涓嶈嚜鍔ㄩ€€鍑猴紝鍚姩閲嶈繛閲嶈瘯
         showReconnecting();
         if(!reconnectRetryTimer){reconnectRetryCount=0;startReconnectRetry();}
     }else{
@@ -1829,11 +1808,11 @@ socket.on('error', function(msg){
         toast(msg,2500);
     }
 });
-socket.on('undo_requested',function(){toast('对手请求悔棋',2000);showOverlay('<h2>↩ 悔棋请求</h2><p>对手请求悔棋</p><div class="btns2"><button class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:13px" onclick="accUndo()">同意</button><button class="btn btn-red" onclick="rejUndo()">拒绝</button></div>');});
-socket.on('undo_accepted',function(){doUndoLocal();toast('悔棋成功',1500);});
-socket.on('undo_rejected',function(){toast('对方拒绝了悔棋',2000);});
-socket.on('chat',function(d){var el=D('chatDisplay');if(!el)return;var txt=(d.color==='red'?'红方':'黑方')+': '+d.message;el.textContent=txt;el.title=txt;});
-}catch(e){sockOk=false;D('lobbyStatus').textContent='○ 服务器离线（本地模式可用）';}
+socket.on('undo_requested',function(){toast('瀵规墜璇锋眰鎮旀',2000);showOverlay('<h2>鈫?鎮旀璇锋眰</h2><p>瀵规墜璇锋眰鎮旀</p><div class="btns2"><button class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:13px" onclick="accUndo()">鍚屾剰</button><button class="btn btn-red" onclick="rejUndo()">鎷掔粷</button></div>');});
+socket.on('undo_accepted',function(){doUndoLocal();toast('鎮旀鎴愬姛',1500);});
+socket.on('undo_rejected',function(){toast('瀵规柟鎷掔粷浜嗘倲妫?,2000);});
+socket.on('chat',function(d){var el=D('chatDisplay');if(!el)return;var txt=(d.color==='red'?'绾㈡柟':'榛戞柟')+': '+d.message;el.textContent=txt;el.title=txt;});
+}catch(e){sockOk=false;D('lobbyStatus').textContent='鈼?鏈嶅姟鍣ㄧ绾匡紙鏈湴妯″紡鍙敤锛?;}
 }
 
 function sendChat(){if(gm!=='online'||!sockOk)return;var inp=D('chatInput'),v=inp.value.trim();if(!v)return;socket.emit('chat',v);inp.value='';}
@@ -1882,7 +1861,7 @@ reconnectRetryTimer=setInterval(function(){
 reconnectRetryCount++;
 if(reconnectRetryCount>reconnectRetryMax){
 stopReconnectRetry();
-showOverlay('<h2>重连失败</h2><p>房间已失效，无法恢复对局</p><div class="btns2"><button class="btn btn-outline" onclick="forceExitGame()">返回大厅</button></div>');
+showOverlay('<h2>閲嶈繛澶辫触</h2><p>鎴块棿宸插け鏁堬紝鏃犳硶鎭㈠瀵瑰眬</p><div class="btns2"><button class="btn btn-outline" onclick="forceExitGame()">杩斿洖澶у巺</button></div>');
 setTimeout(function(){forceExitGame();},5000);
 return;
 }
@@ -1904,7 +1883,7 @@ stopTimer();stopAi();gameStarted=false;selected=null;validMoves=[];capRed=[];cap
 if(socket){try{socket.disconnect();}catch(e){}socket=null;sockOk=false;}
 gm='local';myCl=null;myRm=null;boardFlip=false;D('drawBtn').style.display='none';
 D('game').classList.remove('show');D('lobby').classList.remove('hide');
-D('redName').textContent='红方';D('blackName').textContent='黑方';
+D('redName').textContent='绾㈡柟';D('blackName').textContent='榛戞柟';
 D('lobbyStatus').textContent='';hideOverlay();
 try{localStorage.removeItem('xq_game');sessionStorage.removeItem('xq_game');}catch(e){}
 connectSocket();
@@ -1913,12 +1892,12 @@ connectSocket();
 function enterOnlineGame(rid,cl){
 soundEnabled=true;gameOverSoundPlayed=false;undoUsed=false;
 boardFlip=(cl==='black');D('lobby').classList.add('hide');D('game').classList.add('show');
-D('modeBadge').textContent='房间: '+rid;
+D('modeBadge').textContent='鎴块棿: '+rid;
 engine.initBoard();engine.currentTurn='red';engine.gameOver=false;engine.winner=null;engine.moveHistory=[];
 capRed=[];capBlk=[];lastMove=null;selected=null;validMoves=[];gameStarted=false;clickCount=0;
-D('turnText').textContent='等待对手...';
-D('redName').textContent=cl==='red'?'你（红方）':'对手（红方）';
-D('blackName').textContent=cl==='black'?'你（黑方）':'对手（黑方）';
+D('turnText').textContent='绛夊緟瀵规墜...';
+D('redName').textContent=cl==='red'?'浣狅紙绾㈡柟锛?:'瀵规墜锛堢孩鏂癸級';
+D('blackName').textContent=cl==='black'?'浣狅紙榛戞柟锛?:'瀵规墜锛堥粦鏂癸級';
 D('drawBtn').style.display='inline-flex';
 saveGameState();
 requestAnimationFrame(function(){
@@ -4520,8 +4499,7 @@ if(validBookMoves.length === 0){
 		continue;
 	}
 
-// 谱招加权筛选，优先攻击性走法
-validBookMoves.sort(function(a,b){
+// 璋辨嫑鍔犳潈绛涢€夛紝浼樺厛鏀诲嚮鎬ц蛋娉?validBookMoves.sort(function(a,b){
 var scoreA = 0, scoreB = 0;
 var pieceA = tempBoard.gp(a.fromRow, a.fromCol);
 var pieceB = tempBoard.gp(b.fromRow, b.fromCol);
@@ -4544,7 +4522,7 @@ selected.captured = tempBoard.gp(selected.toRow, selected.toCol);
 return selected;
 }
 
-// 无匹配棋谱，进入中局搜索
+// 鏃犲尮閰嶆璋憋紝杩涘叆涓眬鎼滅储
 return null;
 }
 
@@ -4562,7 +4540,7 @@ var mgEgLib={};
 function lookupMgEgLib(board){
 var phase=aiGetPhase(board);
 if(phase<2)return null; // Only use library for endgame; midgame uses regular search
-if(aiCl!=='black')return null; // 残局库仅存储黑方走法，AI执红时由搜索引擎处理
+if(aiCl!=='black')return null; // 娈嬪眬搴撲粎瀛樺偍榛戞柟璧版硶锛孉I鎵х孩鏃剁敱鎼滅储寮曟搸澶勭悊
 var key=boardKey(board,'black');
 if(mgEgLib[key])return mgEgLib[key][Math.floor(Math.random()*mgEgLib[key].length)];
 // Count pieces
@@ -4625,7 +4603,7 @@ if(s>bpScore){bpScore=s;bestPawn=m;}
 }
 if(bestPawn)return bestPawn;
 }
-// 3. General endgame scoring: only for simple endgames (≤3 pieces per side)
+// 3. General endgame scoring: only for simple endgames (鈮? pieces per side)
 // Complex endgames use the search engine (depth 15) for better play
 if(phase>=2&&bPcs.length<=3&&rPcs.length<=3){
 // Adjust weights based on phase: midgame more cautious, endgame more aggressive
@@ -4666,68 +4644,57 @@ return esc;
 var escBefore=kingEscapeCount();
 return scoreMoves(function(m){
 var s=0;
-// 吃子：降低权重，但吃将/车/炮/马仍有合理分值
-if(m.captured){
+// 鍚冨瓙锛氶檷浣庢潈閲嶏紝浣嗗悆灏?杞?鐐?椹粛鏈夊悎鐞嗗垎鍊?if(m.captured){
 if(m.captured.type==='king')s+=50000;
 else {
 s+=PV[m.captured.type]*capWeight;
-// 亏本兑换严厉惩罚：己方棋子价值 > 对方被吃棋子价值
-var loss=PV[m.piece.type]-PV[m.captured.type];
+// 浜忔湰鍏戞崲涓ュ帀鎯╃綒锛氬繁鏂规瀛愪环鍊?> 瀵规柟琚悆妫嬪瓙浠峰€?var loss=PV[m.piece.type]-PV[m.captured.type];
 if(loss>0)s-=loss*lossPenalty;
 }
 }
-// 将军加分（大幅提升）
+// 灏嗗啗鍔犲垎锛堝ぇ骞呮彁鍗囷級
 if(moveGivesCheck(m))s+=400*posWeight;
-// 将/帅：逼近对方将、控制中路
-if(m.piece.type==='king'){
+// 灏?甯咃細閫艰繎瀵规柟灏嗐€佹帶鍒朵腑璺?if(m.piece.type==='king'){
 var dr=Math.abs(m.toRow-rKing.row)+Math.abs(m.toCol-rKing.col);
 s-=dr*10*posWeight;
-// 对面将加分
-if(m.toCol===rKing.col){
+// 瀵归潰灏嗗姞鍒?if(m.toCol===rKing.col){
 var blocked=false;
 var minR=Math.min(m.toRow,rKing.row),maxR=Math.max(m.toRow,rKing.row);
 for(var rr=minR+1;rr<maxR;rr++){if(board[rr][m.toCol]){blocked=true;break;}}
 if(!blocked)s+=300*posWeight;
 }
 }
-// 车：逼近对方将、控制线路、限制将的逃路
+// 杞︼細閫艰繎瀵规柟灏嗐€佹帶鍒剁嚎璺€侀檺鍒跺皢鐨勯€冭矾
 if(m.piece.type==='rook'){
 var dr=Math.abs(m.toRow-rKing.row)+Math.abs(m.toCol-rKing.col);
 s+=(150-dr*8)*posWeight;
 if(m.toRow===rKing.row||m.toCol===rKing.col)s+=80*posWeight;
-// 车移动到对方将的相邻行/列（限制逃路）
-if(m.toRow===rKing.row-1||m.toRow===rKing.row+1)s+=60*posWeight;
+// 杞︾Щ鍔ㄥ埌瀵规柟灏嗙殑鐩搁偦琛?鍒楋紙闄愬埗閫冭矾锛?if(m.toRow===rKing.row-1||m.toRow===rKing.row+1)s+=60*posWeight;
 if(m.toCol===rKing.col-1||m.toCol===rKing.col+1)s+=60*posWeight;
-// 车在底线或对方半场加分
-if(m.toRow>=7)s+=30*posWeight;
+// 杞﹀湪搴曠嚎鎴栧鏂瑰崐鍦哄姞鍒?if(m.toRow>=7)s+=30*posWeight;
 }
-// 炮：借架攻击、控制线路
-if(m.piece.type==='cannon'){
+// 鐐細鍊熸灦鏀诲嚮銆佹帶鍒剁嚎璺?if(m.piece.type==='cannon'){
 var dr=Math.abs(m.toRow-rKing.row)+Math.abs(m.toCol-rKing.col);
 s+=(80-dr*5)*posWeight;
-// 炮与对方将在同一直线上（有炮架即可将军）
+// 鐐笌瀵规柟灏嗗湪鍚屼竴鐩寸嚎涓婏紙鏈夌偖鏋跺嵆鍙皢鍐涳級
 if(m.toRow===rKing.row||m.toCol===rKing.col)s+=60*posWeight;
 }
-// 马：逼近对方将
-if(m.piece.type==='horse'){
+// 椹細閫艰繎瀵规柟灏?if(m.piece.type==='horse'){
 var dr=Math.abs(m.toRow-rKing.row)+Math.abs(m.toCol-rKing.col);
 s+=(80-dr*8)*posWeight;
-// 马能将军的位置（马步可达对方将）
+// 椹兘灏嗗啗鐨勪綅缃紙椹鍙揪瀵规柟灏嗭級
 var hd=Math.abs(m.toRow-rKing.row),hc=Math.abs(m.toCol-rKing.col);
 if((hd===2&&hc===1)||(hd===1&&hc===2))s+=200*posWeight;
 }
-// 兵/卒：过河推进、逼近对方将
-if(m.piece.type==='pawn'){
+// 鍏?鍗掞細杩囨渤鎺ㄨ繘銆侀€艰繎瀵规柟灏?if(m.piece.type==='pawn'){
 if(m.toRow>m.fromRow)s+=25*posWeight;
 if(m.toRow>=5)s+=m.toRow*6*posWeight;
-// 兵逼近对方将
-var pdr=Math.abs(m.toRow-rKing.row)+Math.abs(m.toCol-rKing.col);
+// 鍏甸€艰繎瀵规柟灏?var pdr=Math.abs(m.toRow-rKing.row)+Math.abs(m.toCol-rKing.col);
 s+=Math.max(0,40-pdr*4)*posWeight;
-// 兵拱将（直接威胁对方将）
+// 鍏垫嫳灏嗭紙鐩存帴濞佽儊瀵规柟灏嗭級
 if(Math.abs(m.toRow-rKing.row)<=1&&Math.abs(m.toCol-rKing.col)<=1)s+=150*posWeight;
 }
-// 限制对方将逃路：走完后对方将逃路减少则加分
-var cp=board[m.toRow][m.toCol];
+// 闄愬埗瀵规柟灏嗛€冭矾锛氳蛋瀹屽悗瀵规柟灏嗛€冭矾鍑忓皯鍒欏姞鍒?var cp=board[m.toRow][m.toCol];
 board[m.toRow][m.toCol]=m.piece; board[m.fromRow][m.fromCol]=null;
 var escAfter=kingEscapeCount();
 board[m.fromRow][m.fromCol]=m.piece; board[m.toRow][m.toCol]=cp;
@@ -4800,7 +4767,7 @@ return false;
 function simpleSEE(board,move,color){
 var toRow=move.toRow,toCol=move.toCol;
 var piece=move.piece;
-// ==========新增两行空判断，修复根源报错=========
+// ==========鏂板涓よ绌哄垽鏂紝淇鏍规簮鎶ラ敊=========
 if(!piece) return 0;
 var gain = 0;
 if(move.captured && move.captured.type){
@@ -5024,7 +4991,7 @@ if(hasRed)score-=60;
 }
 if(blkRookOn7)score+=15;
 if(redRookOn2)score-=15;
-// Material penalties (防止大子换小子)
+// Material penalties (闃叉澶у瓙鎹㈠皬瀛?
 if(blackHorses>0&&blackCannons>0)score+=100;
 if(redHorses>0&&redCannons>0)score-=100;
 var majorDiff=redMajorsVal-blackMajorsVal;
@@ -5075,9 +5042,9 @@ if(isBlk)mobB++;else mobR++;
 }
 score+=(mobB-mobR)*3;
 score+=spB*aiWeights.mobility;score-=spR*aiWeights.mobility;
-// === 开局出子发展奖励：脱谱后鼓励主动出子 ===
-// 变更日志：大幅增强出车奖励（车未动惩罚40→80，车已出动奖励提升），解决"7步后才出车"问题
-// 变更日志：AI学习功能 - 权重改为aiWeights属性，支持自动调整
+// === 寮€灞€鍑哄瓙鍙戝睍濂栧姳锛氳劚璋卞悗榧撳姳涓诲姩鍑哄瓙 ===
+// 鍙樻洿鏃ュ織锛氬ぇ骞呭寮哄嚭杞﹀鍔憋紙杞︽湭鍔ㄦ儵缃?0鈫?0锛岃溅宸插嚭鍔ㄥ鍔辨彁鍗囷級锛岃В鍐?7姝ュ悗鎵嶅嚭杞?闂
+// 鍙樻洿鏃ュ織锛欰I瀛︿範鍔熻兘 - 鏉冮噸鏀逛负aiWeights灞炴€э紝鏀寔鑷姩璋冩暣
 if(phase===0){
 for(var r=0;r<10;r++)for(var c=0;c<9;c++){
 var dp=board[r][c];if(!dp)continue;
@@ -5101,9 +5068,9 @@ else score-=aiWeights.rookDeveloped;
 }
 }
 }
-// === 残局专用评估：王活跃度、兵升变、车控制 ===
+// === 娈嬪眬涓撶敤璇勪及锛氱帇娲昏穬搴︺€佸叺鍗囧彉銆佽溅鎺у埗 ===
 if(phase>=2){
-// 找到双方将的位置
+// 鎵惧埌鍙屾柟灏嗙殑浣嶇疆
 var bK=null,rK=null;
 for(var r=0;r<10&&(!bK||!rK);r++)for(var c=0;c<9&&(!bK||!rK);c++){
 var kp=board[r][c];
@@ -5112,30 +5079,25 @@ if(kp.type==='king'&&kp.color==='black')bK={r:r,c:c};
 if(kp.type==='king'&&kp.color==='red')rK={r:r,c:c};
 }
 if(bK&&rK){
-// 王活跃度：残局中王应主动出击，逼近对方将
-var bKDist=Math.abs(bK.r-rK.r)+Math.abs(bK.c-rK.c);
-score+=(10-bKDist)*15; // 黑将越近红将越好
-// 黑将控制中路（列3-5）
-if(bK.c>=3&&bK.c<=5)score+=30;
-// 对面将（将帅同列且无遮挡）
-if(bK.c===rK.c){
+// 鐜嬫椿璺冨害锛氭畫灞€涓帇搴斾富鍔ㄥ嚭鍑伙紝閫艰繎瀵规柟灏?var bKDist=Math.abs(bK.r-rK.r)+Math.abs(bK.c-rK.c);
+score+=(10-bKDist)*15; // 榛戝皢瓒婅繎绾㈠皢瓒婂ソ
+// 榛戝皢鎺у埗涓矾锛堝垪3-5锛?if(bK.c>=3&&bK.c<=5)score+=30;
+// 瀵归潰灏嗭紙灏嗗竻鍚屽垪涓旀棤閬尅锛?if(bK.c===rK.c){
 var blk=false;
 var mnR=Math.min(bK.r,rK.r),mxR=Math.max(bK.r,rK.r);
 for(var rr=mnR+1;rr<mxR;rr++){if(board[rr][bK.c]){blk=true;break;}}
-if(!blk)score+=80; // 对面将有利于黑方（先手）
+if(!blk)score+=80; // 瀵归潰灏嗘湁鍒╀簬榛戞柟锛堝厛鎵嬶級
 }
-// 红将逃离惩罚：红将在边缘不利于红方
-if(rK.c<2||rK.c>6)score+=20;
+// 绾㈠皢閫冪鎯╃綒锛氱孩灏嗗湪杈圭紭涓嶅埄浜庣孩鏂?if(rK.c<2||rK.c>6)score+=20;
 if(rK.r<2||rK.r>7)score+=20;
-// 兵升变：黑兵越接近第9行越有价值
-for(var r=0;r<10;r++)for(var c=0;c<9;c++){
+// 鍏靛崌鍙橈細榛戝叺瓒婃帴杩戠9琛岃秺鏈変环鍊?for(var r=0;r<10;r++)for(var c=0;c<9;c++){
 var pp=board[r][c];
 if(!pp)continue;
 if(pp.color==='black'&&pp.type==='pawn'){
 if(r>=5){
 var advance=r-4; // 1-5
-score+=advance*advance*8; // 平方递增：第5行+8, 第6行+32, 第7行+72, 第8行+128, 第9行+200
-if(r===9)score+=300; // 即将升变
+score+=advance*advance*8; // 骞虫柟閫掑锛氱5琛?8, 绗?琛?32, 绗?琛?72, 绗?琛?128, 绗?琛?200
+if(r===9)score+=300; // 鍗冲皢鍗囧彉
 }
 }
 if(pp.color==='red'&&pp.type==='pawn'){
@@ -5145,7 +5107,7 @@ score-=advance2*advance2*8;
 if(r===0)score-=300;
 }
 }
-// 车与对方将同线：控制线路
+// 杞︿笌瀵规柟灏嗗悓绾匡細鎺у埗绾胯矾
 if(pp.color==='black'&&pp.type==='rook'){
 if(pp.r===rK.r||pp.c===rK.c)score+=80;
 if(pp.r>=5)score+=40;
@@ -5176,8 +5138,7 @@ nr+=dr;nc+=dc;
 }
 score-=rRookMob*5;
 }
-// 炮与对方将同线
-if(pp.color==='black'&&pp.type==='cannon'){
+// 鐐笌瀵规柟灏嗗悓绾?if(pp.color==='black'&&pp.type==='cannon'){
 if(pp.r===rK.r||pp.c===rK.c)score+=25;
 }
 if(pp.color==='red'&&pp.type==='cannon'){
@@ -5186,17 +5147,16 @@ if(pp.r===bK.r||pp.c===bK.c)score-=25;
 }
 }
 }
-// 变更日志：加入攻王威胁评估，鼓励AI进攻和将杀
-// 评估我方子力对敌方将的威胁程度 + 限制敌方将活动空间
-if(bKing&&rKing){
-// 黑方攻红将：检查红将九宫格内被黑方攻击的格子数
+// 鍙樻洿鏃ュ織锛氬姞鍏ユ敾鐜嬪▉鑳佽瘎浼帮紝榧撳姳AI杩涙敾鍜屽皢鏉€
+// 璇勪及鎴戞柟瀛愬姏瀵规晫鏂瑰皢鐨勫▉鑳佺▼搴?+ 闄愬埗鏁屾柟灏嗘椿鍔ㄧ┖闂?if(bKing&&rKing){
+// 榛戞柟鏀荤孩灏嗭細妫€鏌ョ孩灏嗕節瀹牸鍐呰榛戞柟鏀诲嚮鐨勬牸瀛愭暟
 var rAtkByBlk=0;
 var rkr0=Math.max(7,rKing.row-1),rkr1=Math.min(9,rKing.row+1);
 var rkc0=Math.max(3,rKing.col-1),rkc1=Math.min(5,rKing.col+1);
 for(var kr=rkr0;kr<=rkr1;kr++)for(var kc=rkc0;kc<=rkc1;kc++){
 if(isSquareAttackedFast(board,kr,kc,'black'))rAtkByBlk++;
 }
-// 红将活动空间（九宫内可移动的格子数）
+// 绾㈠皢娲诲姩绌洪棿锛堜節瀹唴鍙Щ鍔ㄧ殑鏍煎瓙鏁帮級
 var rKingMob=0;
 var rDirs=[[-1,0],[1,0],[0,-1],[0,1]];
 for(var d=0;d<4;d++){
@@ -5206,10 +5166,8 @@ var t=board[nr][nc];
 if(!t||t.color==='black')rKingMob++;
 }
 }
-score+=rAtkByBlk*aiWeights.attackKing; // 攻王奖励（AI学习功能：权重可调整）
-score+=(4-rKingMob)*aiWeights.limitKingMob; // 限制红将活动空间奖励
-// 红方攻黑将（对称）
-var bAtkByRed=0;
+score+=rAtkByBlk*aiWeights.attackKing; // 鏀荤帇濂栧姳锛圓I瀛︿範鍔熻兘锛氭潈閲嶅彲璋冩暣锛?score+=(4-rKingMob)*aiWeights.limitKingMob; // 闄愬埗绾㈠皢娲诲姩绌洪棿濂栧姳
+// 绾㈡柟鏀婚粦灏嗭紙瀵圭О锛?var bAtkByRed=0;
 var bkr0=Math.max(0,bKing.row-1),bkr1=Math.min(2,bKing.row+1);
 var bkc0=Math.max(3,bKing.col-1),bkc1=Math.min(5,bKing.col+1);
 for(var kr=bkr0;kr<=bkr1;kr++)for(var kc=bkc0;kc<=bkc1;kc++){
@@ -5226,13 +5184,12 @@ if(!t||t.color==='red')bKingMob++;
 }
 score-=bAtkByRed*aiWeights.attackKing;
 score-=(4-bKingMob)*aiWeights.limitKingMob;
-// 变更日志：增加大子靠近敌方将奖励，鼓励车/炮/马逼近敌将组织攻杀
+// 鍙樻洿鏃ュ織锛氬鍔犲ぇ瀛愰潬杩戞晫鏂瑰皢濂栧姳锛岄紦鍔辫溅/鐐?椹€艰繎鏁屽皢缁勭粐鏀绘潃
 for(var mr2=0;mr2<10;mr2++)for(var mc2=0;mc2<9;mc2++){
 var ap=board[mr2][mc2];if(!ap)continue;
 if(ap.color==='black'&&(ap.type==='rook'||ap.type==='cannon'||ap.type==='horse')){
 var dist=Math.abs(mr2-rKing.row)+Math.abs(mc2-rKing.col);
-if(dist<=3)score+=(4-dist)*aiWeights.approach; // 越近奖励越高（AI学习功能：权重可调整）
-}
+if(dist<=3)score+=(4-dist)*aiWeights.approach; // 瓒婅繎濂栧姳瓒婇珮锛圓I瀛︿範鍔熻兘锛氭潈閲嶅彲璋冩暣锛?}
 if(ap.color==='red'&&(ap.type==='rook'||ap.type==='cannon'||ap.type==='horse')){
 var dist2=Math.abs(mr2-bKing.row)+Math.abs(mc2-bKing.col);
 if(dist2<=3)score-=(4-dist2)*aiWeights.approach;
@@ -5241,7 +5198,7 @@ if(dist2<=3)score-=(4-dist2)*aiWeights.approach;
 }
 score+=aiDetectFormationScore(board);
 score+=aiDetectPinnedAndHeartHorse(board);
-// 悬挂棋子检测：惩罚被攻击的棋子
+// 鎮寕妫嬪瓙妫€娴嬶細鎯╃綒琚敾鍑荤殑妫嬪瓙
 for(var r=0;r<10;r++)for(var c=0;c<9;c++){
 	var p=board[r][c];if(!p)continue;
 	if(p.type==='king')continue;
@@ -5291,10 +5248,10 @@ if(!m.captured&&m.piece&&m.piece.type!=='king'){
 		else if(m.piece.type==='cannon')sc+=2000;
 	}
 	}
-	// 将军走法奖励 + 快速出子奖励 + 威胁/安全走法排序
+	// 灏嗗啗璧版硶濂栧姳 + 蹇€熷嚭瀛愬鍔?+ 濞佽儊/瀹夊叏璧版硶鎺掑簭
 		if(board&&color&&m.piece){
 		var oppColor=color==='black'?'red':'black';
-		// 威胁/安全走法排序：优先逃离被攻击的子，避免走到被攻击的格子
+		// 濞佽儊/瀹夊叏璧版硶鎺掑簭锛氫紭鍏堥€冪琚敾鍑荤殑瀛愶紝閬垮厤璧板埌琚敾鍑荤殑鏍煎瓙
 		if(m.piece.type!=='king'){
 			var fromThreatened=isSquareAttackedFast(board,m.fromRow,m.fromCol,oppColor);
 			var toSafe=!isSquareAttackedFast(board,m.toRow,m.toCol,oppColor);
@@ -5302,7 +5259,7 @@ if(!m.captured&&m.piece&&m.piece.type!=='king'){
 			else if(fromThreatened){sc+=30000+PV[m.piece.type]*5;}
 			if(!fromThreatened&&!toSafe&&!m.captured){sc-=5000;}
 		}
-		// 快速出子奖励：马炮从原位走出高分，车从底线上提高分
+		// 蹇€熷嚭瀛愬鍔憋細椹偖浠庡師浣嶈蛋鍑洪珮鍒嗭紝杞︿粠搴曠嚎涓婃彁楂樺垎
 		if(!m.captured){
 			if(m.piece.type==='horse'){
 				var isHorseHome=(color==='black'&&m.fromRow<=2&&(m.fromCol===1||m.fromCol===7))||(color==='red'&&m.fromRow>=7&&(m.fromCol===1||m.fromCol===7));
@@ -5366,8 +5323,7 @@ var moves=aiGetAllMoves(board,color);
 var qMoves;
 if(inCheck){
 qMoves=moves;
-// 被将军时限制走法数量，防止搜索爆炸
-if(qMoves.length>15){qMoves=qMoves.slice(0,15);}
+// 琚皢鍐涙椂闄愬埗璧版硶鏁伴噺锛岄槻姝㈡悳绱㈢垎鐐?if(qMoves.length>15){qMoves=qMoves.slice(0,15);}
 }else{
 qMoves=[];
 for(var i=0;i<moves.length;i++){
@@ -5379,8 +5335,7 @@ if(qMoves.length===0)return st;
 }
 aiSortMoves(qMoves,0,board,color);
 for(var i=0;i<qMoves.length;i++){
-// 变更日志：走法循环加入超时检查，防止被将军时静态搜索分支过多卡死
-if(aiStartTime&&Date.now()-aiStartTime>aiMaxTime)break;
+// 鍙樻洿鏃ュ織锛氳蛋娉曞惊鐜姞鍏ヨ秴鏃舵鏌ワ紝闃叉琚皢鍐涙椂闈欐€佹悳绱㈠垎鏀繃澶氬崱姝?if(aiStartTime&&Date.now()-aiStartTime>aiMaxTime)break;
 	var m=qMoves[i],cp=aiApplyMove(board,m);
 	if(aiStartTime&&Date.now()-aiStartTime>aiMaxTime){aiUndoMove(board,m,cp);return maximizing?alpha:beta;}
 	var ev=aiQuiesce(board,alpha,beta,!maximizing,qd-1);
@@ -5447,12 +5402,11 @@ board[move.toRow][move.toCol]=captured;
 function aiSearch(board,depth,alpha,beta,maximizing,ply,extCount){
 aiNodes++;
 if(extCount===undefined)extCount=0;
-// 超时检查：优先检查，防止搜索树爆炸导致浏览器卡死
+// 瓒呮椂妫€鏌ワ細浼樺厛妫€鏌ワ紝闃叉鎼滅储鏍戠垎鐐稿鑷存祻瑙堝櫒鍗℃
 if(aiStartTime&&Date.now()-aiStartTime>aiMaxTime){window._aiTimedOut=true;aiTT={};aiKillers=[];for(var r=0;r<10;r++){aiHistory[r]=[];for(var c=0;c<9;c++){aiHistory[r][c]=[];for(var tr=0;tr<10;tr++){aiHistory[r][c][tr]=[];for(var tc=0;tc<9;tc++)aiHistory[r][c][tr][tc]=0;}}};return maximizing?alpha:beta;}
-// 最大扩展深度限制：防止无限将军循环
+// 鏈€澶ф墿灞曟繁搴﹂檺鍒讹細闃叉鏃犻檺灏嗗啗寰幆
 if(ply>60)return aiEval(board);
-// 将军扩展次数限制：最多连续扩展3次
-if(extCount>3)extCount=3;
+// 灏嗗啗鎵╁睍娆℃暟闄愬埗锛氭渶澶氳繛缁墿灞?娆?if(extCount>3)extCount=3;
 // Transposition table probe
 var key=boardKey(board,maximizing?'black':'red');
 var entry=aiTT[key];
@@ -5493,7 +5447,7 @@ if(!maximizing&&nmScore<=alpha)return alpha;
 }
 // Normal search with PVS + LMR + check extensions
 var hashMove=entry?entry.move:null;
-// IID: no hash move → search shallow to find one for better ordering
+// IID: no hash move 鈫?search shallow to find one for better ordering
 if(!hashMove&&depth>=4){
 aiSearch(board,depth-2,alpha,beta,maximizing,ply,extCount);
 entry=aiTT[key];
@@ -5504,7 +5458,7 @@ var bestMove=null,origAlpha=alpha,nodeEval=null;
 if(maximizing){
 var bestScore=-Infinity;
 for(var i=0;i<moves.length;i++){
-			// 变更日志：走法循环中加入超时检查，防止被将军时搜索爆炸卡死
+			// 鍙樻洿鏃ュ織锛氳蛋娉曞惊鐜腑鍔犲叆瓒呮椂妫€鏌ワ紝闃叉琚皢鍐涙椂鎼滅储鐖嗙偢鍗℃
 			if(window._aiTimedOut||(aiStartTime&&Date.now()-aiStartTime>aiMaxTime))break;
 			var m=moves[i];
 			if(depth<=2&&!m.captured&&m.piece&&m.piece.type!=='king'&&!inCheck){if(nodeEval===null)nodeEval=aiEval(board);if(nodeEval+5000<=alpha)continue;}
@@ -5538,7 +5492,7 @@ return bestScore;
 }else{
 var bestScore=Infinity,origBeta=beta;
 for(var i=0;i<moves.length;i++){
-			// 变更日志：走法循环中加入超时检查，防止被将军时搜索爆炸卡死
+			// 鍙樻洿鏃ュ織锛氳蛋娉曞惊鐜腑鍔犲叆瓒呮椂妫€鏌ワ紝闃叉琚皢鍐涙椂鎼滅储鐖嗙偢鍗℃
 			if(window._aiTimedOut||(aiStartTime&&Date.now()-aiStartTime>aiMaxTime))break;
 			var m=moves[i];
 			if(depth<=2&&!m.captured&&m.piece&&m.piece.type!=='king'&&!inCheck){if(nodeEval===null)nodeEval=aiEval(board);if(nodeEval-5000>=beta)continue;}
@@ -5610,7 +5564,7 @@ var boardCopy=[];
 for(var r=0;r<10;r++){boardCopy[r]=[];for(var c=0;c<9;c++)boardCopy[r][c]=boardRef[r][c];}
 var allMoves=aiGetAllMoves(boardCopy,aiCl);
 if(allMoves.length===0){_restoreEngine();return null;}
-// === 将杀检测：优先寻找能直接将死对方的走法 ===
+// === 灏嗘潃妫€娴嬶細浼樺厛瀵绘壘鑳界洿鎺ュ皢姝诲鏂圭殑璧版硶 ===
 for(var mi=0;mi<allMoves.length;mi++){
 var m=allMoves[mi];
 if(m.captured&&m.captured.type==='king'){_restoreEngine();return m;}
@@ -5618,7 +5572,7 @@ if(aiIsMateMove(boardCopy,m,aiCl)){_restoreEngine();return m;}
 }
 aiNodes=0;aiStartTime=Date.now();window._aiTimedOut=false;aiTT={};aiKillers=[];
 aiSortMoves(allMoves, 0, boardCopy, aiCl);
-// === 将杀走法最高优先级 ===
+// === 灏嗘潃璧版硶鏈€楂樹紭鍏堢骇 ===
 for(var si2=0;si2<allMoves.length;si2++){
 var m2=allMoves[si2];
 if(aiIsMateMove(boardCopy,m2,aiCl)){
@@ -5627,8 +5581,7 @@ allMoves[si2].sortScore+=10000;
 }
 allMoves.sort(function(a,b){return b.sortScore-a.sortScore;});
 	var bestMove=allMoves[0],prevScore=0;
-// 搜索深度：人机实战开局限10层，中局和残局11层
-var totalPieces = 0;
+// 鎼滅储娣卞害锛氫汉鏈哄疄鎴樺紑灞€闄?0灞傦紝涓眬鍜屾畫灞€11灞?var totalPieces = 0;
 for(var r=0;r<10;r++) for(var c=0;c<9;c++) if(boardCopy[r][c]) totalPieces++;
 var maxDepth = totalPieces >= 16 ? 11 : 12;
 var savedAiMaxTime = aiMaxTime;
@@ -5676,8 +5629,7 @@ aiSortMoves(allMoves,depth,boardCopy,aiCl);
 	if(timedOut)break;
 }
 aiMaxTime = savedAiMaxTime;
-	// SEE安全检查：过滤明显亏本的吃子走法（如炮打马）
-	if(bestMove && bestMove.captured && bestMove.piece && bestMove.piece.type !== 'king' && bestMove.piece.type !== 'pawn'){
+	// SEE瀹夊叏妫€鏌ワ細杩囨护鏄庢樉浜忔湰鐨勫悆瀛愯蛋娉曪紙濡傜偖鎵撻┈锛?	if(bestMove && bestMove.captured && bestMove.piece && bestMove.piece.type !== 'king' && bestMove.piece.type !== 'pawn'){
 		var seeCheckBoard = [];
 		for(var sr=0;sr<10;sr++){seeCheckBoard[sr]=[];for(var sc=0;sc<9;sc++)seeCheckBoard[sr][sc]=boardRef[sr][sc];}
 		bestMove.piece = seeCheckBoard[bestMove.fromRow][bestMove.fromCol];
@@ -5715,10 +5667,10 @@ aiMaxTime = savedAiMaxTime;
 function doAiMove(move){
 if(window._aiGuardTimer){clearTimeout(window._aiGuardTimer);window._aiGuardTimer=null;}
 if(!move){aiThinking=false;return;}
-if(move.fromRow===undefined||move.fromCol===undefined||move.toRow===undefined||move.toCol===undefined){aiThinking=false;console.error('AI返回无效走法:',move);return;}
+if(move.fromRow===undefined||move.fromCol===undefined||move.toRow===undefined||move.toCol===undefined){aiThinking=false;console.error('AI杩斿洖鏃犳晥璧版硶:',move);return;}
 var mr=engine.move(move.fromRow,move.fromCol,move.toRow,move.toCol);
 if(!mr){
-console.warn('AI走法执行失败，回退到搜索:',move);
+console.warn('AI璧版硶鎵ц澶辫触锛屽洖閫€鍒版悳绱?',move);
 var foundValid=false;
 for(var r=0;r<10&&!foundValid;r++){
 for(var c=0;c<9&&!foundValid;c++){
@@ -5733,26 +5685,24 @@ if(mr){move={fromRow:r,fromCol:c,toRow:vm.row,toCol:vm.col,piece:engine.board[r]
 }
 }
 if(!foundValid){
-console.warn('回退到aiFindBestMoveNoBook，aiCl:', aiCl);
+console.warn('鍥為€€鍒癮iFindBestMoveNoBook锛宎iCl:', aiCl);
 var fb=aiFindBestMoveNoBook(undefined, aiCl);
 if(fb){
-console.warn('回退找到走法:', fb);
+console.warn('鍥為€€鎵惧埌璧版硶:', fb);
 fb.piece=engine.board[fb.fromRow][fb.fromCol];
 mr=engine.move(fb.fromRow,fb.fromCol,fb.toRow,fb.toCol);
 move=fb;
 }
 }
-if(!mr){aiThinking=false;console.error('AI走法执行失败:',move);return;}
+if(!mr){aiThinking=false;console.error('AI璧版硶鎵ц澶辫触:',move);return;}
 }
 aiThinking=false;
 var mc2=engine.moveHistory[engine.moveHistory.length-1].piece.color;
 
-// 长将违规：AI不应产生违规走法，但防御性检查
-// 首着吃子不计算在内
-if(mr.check&&checkStreak>=6&&lastCheckColor===mc2&&!(checkStreak===0&&mr.captured)){
+// 闀垮皢杩濊锛欰I涓嶅簲浜х敓杩濊璧版硶锛屼絾闃插尽鎬ф鏌?// 棣栫潃鍚冨瓙涓嶈绠楀湪鍐?if(mr.check&&checkStreak>=6&&lastCheckColor===mc2&&!(checkStreak===0&&mr.captured)){
 	undoLastMoveHelper();
-	console.warn('AI产生长将违规走法，已回退');
-	// 尝试fallback走法
+	console.warn('AI浜х敓闀垮皢杩濊璧版硶锛屽凡鍥為€€');
+	// 灏濊瘯fallback璧版硶
 	var fb2=aiFindBestMoveNoBook();
 	if(fb2){fb2.piece=engine.board[fb2.fromRow][fb2.fromCol];mr=engine.move(fb2.fromRow,fb2.fromCol,fb2.toRow,fb2.toCol);move=fb2;mc2=engine.moveHistory[engine.moveHistory.length-1].piece.color;}
 	if(!fb2||!mr){aiThinking=false;return;}
@@ -5761,26 +5711,24 @@ if(mr.check&&checkStreak>=6&&lastCheckColor===mc2&&!(checkStreak===0&&mr.capture
 if(move.captured||mr.captured){var cp=move.captured||mr.captured;sndCapture();if(cp.color==='red')capRed.push(cp);else capBlk.push(cp);}
 else{sndMove();}
 selected=null;validMoves=[];lastMove={row:move.toRow,col:move.toCol};render();
-D('turnText').textContent=(aiCl==='black')?'红方走棋':'黑方走棋';
-if(engine.gameOver){sndGameOver();stopTimer();showGameOver(engine.winner==='red'?'红方':'黑方');
+D('turnText').textContent=(aiCl==='black')?'绾㈡柟璧版':'榛戞柟璧版';
+if(engine.gameOver){sndGameOver();stopTimer();showGameOver(engine.winner==='red'?'绾㈡柟':'榛戞柟');
 		if(gm==='ai'){
 			var moves=engine.moveHistory.length;
 			var winner=engine.winner;
 			var aiWon=(winner===aiCl);
 			var learningRate=aiWon?0.002:-0.005;
 			adjustAiTrainingWeights(moves,learningRate);
-			console.log('=== 人机对弈结束，调整AI权重 ===');
-			console.log('AI执'+(aiCl==='red'?'红':'黑')+'，'+(aiWon?'获胜':'失败'));
-			console.log('学习率:',learningRate);
-			console.log('新权重:',JSON.stringify(aiWeights));
+			console.log('=== 浜烘満瀵瑰紙缁撴潫锛岃皟鏁碅I鏉冮噸 ===');
+			console.log('AI鎵?+(aiCl==='red'?'绾?:'榛?)+'锛?+(aiWon?'鑾疯儨':'澶辫触'));
+			console.log('瀛︿範鐜?',learningRate);
+			console.log('鏂版潈閲?',JSON.stringify(aiWeights));
 		}
 		clearGameState();return;}
 
-// 更新长将计数器
-if(mr&&mr.check){
-    sndCheck();toast('将军!',1500);
-    // 首着吃子不计算在内
-    if(!(checkStreak===0&&mr.captured)){
+// 鏇存柊闀垮皢璁℃暟鍣?if(mr&&mr.check){
+    sndCheck();toast('灏嗗啗!',1500);
+    // 棣栫潃鍚冨瓙涓嶈绠楀湪鍐?    if(!(checkStreak===0&&mr.captured)){
         if(lastCheckColor===mc2){checkStreak++;}else{checkStreak=1;lastCheckColor=mc2;}
     }
 }else{
@@ -5808,7 +5756,7 @@ if(aiIsMateMove(boardCopy,m,aiCl))return m;
 	aiSortMoves(allMoves, 0, boardCopy, aiCl);
 	allMoves.sort(function(a,b){return b.sortScore-a.sortScore;});
 	var bestMove=allMoves[0],prevScore=0;
-// 搜索深度：训练时开局限5层，中局和残局6层（平衡速度与质量）
+// 鎼滅储娣卞害锛氳缁冩椂寮€灞€闄?灞傦紝涓眬鍜屾畫灞€6灞傦紙骞宠　閫熷害涓庤川閲忥級
 var totalPieces = 0;
 for(var r=0;r<10;r++) for(var c=0;c<9;c++) if(boardCopy[r][c]) totalPieces++;
 var maxDepth = totalPieces >= 16 ? 11 : 12;
@@ -5853,8 +5801,7 @@ if(Date.now()-aiStartTime>aiMaxTime){timedOut=true;break;}
 	bestMove=currentBest;prevScore=currentBestScore;
 	if(timedOut)break;
 	}
-	// SEE安全检查：过滤明显亏本的吃子走法
-	if(bestMove && bestMove.captured && bestMove.piece && bestMove.piece.type !== 'king' && bestMove.piece.type !== 'pawn'){
+	// SEE瀹夊叏妫€鏌ワ細杩囨护鏄庢樉浜忔湰鐨勫悆瀛愯蛋娉?	if(bestMove && bestMove.captured && bestMove.piece && bestMove.piece.type !== 'king' && bestMove.piece.type !== 'pawn'){
 		var seeCheckBoard2 = [];
 		for(var sr2=0;sr2<10;sr2++){seeCheckBoard2[sr2]=[];for(var sc2=0;sc2<9;sc2++)seeCheckBoard2[sr2][sc2]=boardRef[sr2][sc2];}
 		bestMove.piece = seeCheckBoard2[bestMove.fromRow][bestMove.fromCol];
@@ -5895,7 +5842,7 @@ if(Date.now()-aiStartTime>aiMaxTime){timedOut=true;break;}
 	return bestMove;
 }
 
-// ========== 高级AI云库接入（chessdb.cn）：人机对弈AI优先走云库，失败回退本地引擎 ==========
+// ========== 楂樼骇AI浜戝簱鎺ュ叆锛坈hessdb.cn锛夛細浜烘満瀵瑰紙AI浼樺厛璧颁簯搴擄紝澶辫触鍥為€€鏈湴寮曟搸 ==========
 function boardToFen(board, currentTurn){
 	var pieceMap = {
 		king:   {red:'K', black:'k'},
@@ -5926,8 +5873,7 @@ function boardToFen(board, currentTurn){
 }
 
 function cloudQueryBest(fen, endgameOnly, callback){
-	// 通用querybest查询，endgameOnly=true时仅查残局库
-	var url = 'https://www.chessdb.cn/chessdb.php?action=querybest&board=' + encodeURIComponent(fen)
+	// 閫氱敤querybest鏌ヨ锛宔ndgameOnly=true鏃朵粎鏌ユ畫灞€搴?	var url = 'https://www.chessdb.cn/chessdb.php?action=querybest&board=' + encodeURIComponent(fen)
 		+ '&egtbmetric=dtm';
 	if(endgameOnly) url += '&endgame=1';
 
@@ -5935,9 +5881,9 @@ function cloudQueryBest(fen, endgameOnly, callback){
 	.then(function(r){ return r.text(); })
 	.then(function(response){
 		response = (response || '').trim();
-		console.log('云库querybest' + (endgameOnly ? '(仅残局)' : '') + '返回:', response);
+		console.log('浜戝簱querybest' + (endgameOnly ? '(浠呮畫灞€)' : '') + '杩斿洖:', response);
 
-		// 解析: move:[MOVE] / egtb:[MOVE] / search:[MOVE]
+		// 瑙ｆ瀽: move:[MOVE] / egtb:[MOVE] / search:[MOVE]
 		var moveStr = null;
 		if(response.indexOf('move:') === 0){
 			moveStr = response.substring(5);
@@ -5954,7 +5900,7 @@ function cloudQueryBest(fen, endgameOnly, callback){
 		callback(null, response);
 	})
 	.catch(function(err){
-		console.error('云库querybest' + (endgameOnly ? '(仅残局)' : '') + '查询失败:', err);
+		console.error('浜戝簱querybest' + (endgameOnly ? '(浠呮畫灞€)' : '') + '鏌ヨ澶辫触:', err);
 		callback(null, 'error');
 	});
 }
@@ -5966,15 +5912,14 @@ function cloudQueryAllPick(fen, callback){
 	.then(function(r){ return r.text(); })
 	.then(function(response){
 		response = (response || '').trim();
-		console.log('云库queryall返回:', response);
+		console.log('浜戝簱queryall杩斿洖:', response);
 
-		// queryall 返回格式: move,score,rank,winrate,note|move,score,rank,winrate,note|...
+		// queryall 杩斿洖鏍煎紡: move,score,rank,winrate,note|move,score,rank,winrate,note|...
 		if(!response || response === 'unknown' || response === 'invalid board' || response === 'checkmate' || response === 'stalemate'){
 			callback(null); return;
 		}
 
-		// 解析所有着法
-		var entries = response.split('|');
+		// 瑙ｆ瀽鎵€鏈夌潃娉?		var entries = response.split('|');
 		var validMoves = [];
 		for(var i = 0; i < entries.length; i++){
 			var parts = entries[i].split(',');
@@ -5986,53 +5931,48 @@ function cloudQueryAllPick(fen, callback){
 
 		if(validMoves.length === 0){ callback(null); return; }
 
-		// 随机选择一个着法
-		var pick = validMoves[Math.floor(Math.random() * validMoves.length)];
-		console.log('云库queryall随机选择着法: ' + pick + ' (共' + validMoves.length + '个着法)');
+		// 闅忔満閫夋嫨涓€涓潃娉?		var pick = validMoves[Math.floor(Math.random() * validMoves.length)];
+		console.log('浜戝簱queryall闅忔満閫夋嫨鐫€娉? ' + pick + ' (鍏? + validMoves.length + '涓潃娉?');
 		callback(pick);
 	})
 	.catch(function(err){
-		console.error('云库queryall查询失败:', err);
+		console.error('浜戝簱queryall鏌ヨ澶辫触:', err);
 		callback(null);
 	});
 }
 
 function applyCloudMove(moveStr){
-	// chessdb.cn坐标: 列a-i(0-8), 行0-9从底部(红方底线)开始
-	// 内部坐标: 行0=顶部(黑方底线), 行9=底部(红方底线)
+	// chessdb.cn鍧愭爣: 鍒梐-i(0-8), 琛?-9浠庡簳閮?绾㈡柟搴曠嚎)寮€濮?	// 鍐呴儴鍧愭爣: 琛?=椤堕儴(榛戞柟搴曠嚎), 琛?=搴曢儴(绾㈡柟搴曠嚎)
 	var fromCol = moveStr.charCodeAt(0) - 97;
 	var fromRowApi = parseInt(moveStr[1]);
 	var toCol = moveStr.charCodeAt(2) - 97;
 	var toRowApi = parseInt(moveStr[3]);
 	var move = {fromRow: 9 - fromRowApi, fromCol: fromCol, toRow: 9 - toRowApi, toCol: toCol};
-	console.log('云库着法:', moveStr, '→ 内部坐标:', JSON.stringify(move));
+	console.log('浜戝簱鐫€娉?', moveStr, '鈫?鍐呴儴鍧愭爣:', JSON.stringify(move));
 	doAiMove(move);
 }
 
-// 人机对弈AI入口：优先使用高级AI云库（开局库+残局库），无结果/超时/失败时回退本地AI引擎
+// 浜烘満瀵瑰紙AI鍏ュ彛锛氫紭鍏堜娇鐢ㄩ珮绾I浜戝簱锛堝紑灞€搴?娈嬪眬搴擄級锛屾棤缁撴灉/瓒呮椂/澶辫触鏃跺洖閫€鏈湴AI寮曟搸
 function startAiThink(){
 if(aiThinking||engine.gameOver||engine.currentTurn!==aiCl)return;
 aiThinking=true;
-D('turnText').textContent='云端AI思考中...';
+D('turnText').textContent='浜戠AI鎬濊€冧腑...';
 var fen=boardToFen(engine.board,engine.currentTurn);
-var settled=false;   // 防止云库迟到的响应与本地回退重复落子
+var settled=false;   // 闃叉浜戝簱杩熷埌鐨勫搷搴斾笌鏈湴鍥為€€閲嶅钀藉瓙
 var useLocal=function(){
 	if(settled)return; settled=true;
-	aiThinking=false;               // 复位，交还原有本地AI流程（其内部自行置位）
-	startAiThinkLocal();
+	aiThinking=false;               // 澶嶄綅锛屼氦杩樺師鏈夋湰鍦癆I娴佺▼锛堝叾鍐呴儴鑷缃綅锛?	startAiThinkLocal();
 };
-// 总超时保护：云库无响应6秒即回退本地，防止卡死
-setTimeout(function(){ if(aiThinking&&!settled){ console.log('云库查询超时，回退本地AI'); useLocal(); } },6000);
+// 鎬昏秴鏃朵繚鎶わ細浜戝簱鏃犲搷搴?绉掑嵆鍥為€€鏈湴锛岄槻姝㈠崱姝?setTimeout(function(){ if(aiThinking&&!settled){ console.log('浜戝簱鏌ヨ瓒呮椂锛屽洖閫€鏈湴AI'); useLocal(); } },6000);
 cloudQueryBest(fen,false,function(mv1,rp1){
 	if(settled||!aiThinking)return;
 	if(mv1&&mv1.length>=4){ settled=true; aiThinking=false; applyCloudMove(mv1); return; }
-	// 策略2: 仅查残局库 (endgame=1)
+	// 绛栫暐2: 浠呮煡娈嬪眬搴?(endgame=1)
 	if(rp1==='nobestmove'||rp1==='unknown'||rp1==='error'){
 		cloudQueryBest(fen,true,function(mv2,rp2){
 			if(settled||!aiThinking)return;
 			if(mv2&&mv2.length>=4){ settled=true; aiThinking=false; applyCloudMove(mv2); return; }
-			// 策略3: queryall 获取所有已知着法随机选一步
-			cloudQueryAllPick(fen,function(mv3){
+			// 绛栫暐3: queryall 鑾峰彇鎵€鏈夊凡鐭ョ潃娉曢殢鏈洪€変竴姝?			cloudQueryAllPick(fen,function(mv3){
 				if(settled||!aiThinking)return;
 				if(mv3){ settled=true; aiThinking=false; applyCloudMove(mv3); return; }
 				useLocal();
@@ -6040,7 +5980,7 @@ cloudQueryBest(fen,false,function(mv1,rp1){
 		});
 		return;
 	}
-	// checkmate / stalemate / invalid board 等：直接回退本地AI处理终局
+	// checkmate / stalemate / invalid board 绛夛細鐩存帴鍥為€€鏈湴AI澶勭悊缁堝眬
 	useLocal();
 });
 }
@@ -6048,30 +5988,30 @@ cloudQueryBest(fen,false,function(mv1,rp1){
 function startAiThinkLocal(){
 if(aiThinking||engine.gameOver||engine.currentTurn!==aiCl)return;
 aiThinking=true;
-D('turnText').textContent='AI思考中...';
+D('turnText').textContent='AI鎬濊€冧腑...';
 if(engine.moveHistory.length<=2){
 	var bm=lookupOpeningBook();
 	if(bm){
 		var piece=engine.board[bm.fromRow][bm.fromCol];
 		if(piece&&piece.color===aiCl){
-			console.log('=== 开局阶段直接使用主线程开局库 ===');
+			console.log('=== 寮€灞€闃舵鐩存帴浣跨敤涓荤嚎绋嬪紑灞€搴?===');
 			console.log('aiCl:', aiCl, 'move:', bm);
 			doAiMove(bm);
 			return;
 		}
 	}
 }
-// 终止旧Worker
+// 缁堟鏃orker
 if(aiWorker){try{aiWorker.terminate();}catch(e){}aiWorker=null;}
 try{
 aiWorker=new Worker('/ai-worker.js?v=' + Date.now());
 }catch(e){
-console.error('AI Worker创建失败，回退到主线程:',e);
+console.error('AI Worker鍒涘缓澶辫触锛屽洖閫€鍒颁富绾跨▼:',e);
 aiWorker=null;
 setTimeout(function(){
 var fb=aiFindBestMove(undefined,aiCl,engine.moveHistory.slice());
-if(fb){try{doAiMove(fb);}catch(ex){console.error('doAiMove异常:',ex);aiThinking=false;D('turnText').textContent=(aiCl==='black')?'红方走棋':'黑方走棋';}}
-else{aiThinking=false;D('turnText').textContent=(aiCl==='black')?'红方走棋':'黑方走棋';}
+if(fb){try{doAiMove(fb);}catch(ex){console.error('doAiMove寮傚父:',ex);aiThinking=false;D('turnText').textContent=(aiCl==='black')?'绾㈡柟璧版':'榛戞柟璧版';}}
+else{aiThinking=false;D('turnText').textContent=(aiCl==='black')?'绾㈡柟璧版':'榛戞柟璧版';}
 },50);
 return;
 }
@@ -6082,28 +6022,28 @@ if(aiWorker){try{aiWorker.terminate();}catch(e){}aiWorker=null;}
 if(move){
 	var piece=engine.board[move.fromRow][move.fromCol];
 	if(piece&&piece.color!==aiCl){
-		console.error('Worker返回错误颜色走法! aiCl:', aiCl, 'piece color:', piece.color, 'move:', move);
+		console.error('Worker杩斿洖閿欒棰滆壊璧版硶! aiCl:', aiCl, 'piece color:', piece.color, 'move:', move);
 		var fb=aiFindBestMove(undefined, aiCl, engine.moveHistory.slice());
-		if(fb){try{doAiMove(fb);}catch(ex){console.error('doAiMove异常:',ex);aiThinking=false;D('turnText').textContent=(aiCl==='black')?'红方走棋':'黑方走棋';}}
-		else{aiThinking=false;D('turnText').textContent=(aiCl==='black')?'红方走棋':'黑方走棋';}
+		if(fb){try{doAiMove(fb);}catch(ex){console.error('doAiMove寮傚父:',ex);aiThinking=false;D('turnText').textContent=(aiCl==='black')?'绾㈡柟璧版':'榛戞柟璧版';}}
+		else{aiThinking=false;D('turnText').textContent=(aiCl==='black')?'绾㈡柟璧版':'榛戞柟璧版';}
 		return;
 	}
-	try{doAiMove(move);}catch(ex){console.error('doAiMove异常:',ex);aiThinking=false;D('turnText').textContent=(aiCl==='black')?'红方走棋':'黑方走棋';}
+	try{doAiMove(move);}catch(ex){console.error('doAiMove寮傚父:',ex);aiThinking=false;D('turnText').textContent=(aiCl==='black')?'绾㈡柟璧版':'榛戞柟璧版';}
 }
-else{aiThinking=false;D('turnText').textContent=(aiCl==='black')?'红方走棋':'黑方走棋';}
+else{aiThinking=false;D('turnText').textContent=(aiCl==='black')?'绾㈡柟璧版':'榛戞柟璧版';}
 };
 aiWorker.onerror=function(e){
-console.error('AI Worker错误，回退到主线程:',e);
+console.error('AI Worker閿欒锛屽洖閫€鍒颁富绾跨▼:',e);
 if(window._aiGuardTimer){clearTimeout(window._aiGuardTimer);window._aiGuardTimer=null;}
 if(aiWorker){try{aiWorker.terminate();}catch(e){}aiWorker=null;}
 aiThinking=false;
 setTimeout(function(){
 var fb=aiFindBestMove(undefined,aiCl,engine.moveHistory.slice());
-if(fb){try{doAiMove(fb);}catch(ex){console.error('doAiMove异常:',ex);aiThinking=false;D('turnText').textContent=(aiCl==='black')?'红方走棋':'黑方走棋';}}
-else{aiThinking=false;D('turnText').textContent=(aiCl==='black')?'红方走棋':'黑方走棋';}
+if(fb){try{doAiMove(fb);}catch(ex){console.error('doAiMove寮傚父:',ex);aiThinking=false;D('turnText').textContent=(aiCl==='black')?'绾㈡柟璧版':'榛戞柟璧版';}}
+else{aiThinking=false;D('turnText').textContent=(aiCl==='black')?'绾㈡柟璧版':'榛戞柟璧版';}
 },50);
 };
-// 构建棋盘数据发送给Worker
+// 鏋勫缓妫嬬洏鏁版嵁鍙戦€佺粰Worker
 var boardData=[];
 for(var r=0;r<10;r++){
 boardData[r]=[];
@@ -6124,13 +6064,13 @@ aiMaxTime:8000,
 aiWeights:aiWeights
 });
 }catch(e){
-console.error('AI Worker postMessage失败:',e);
+console.error('AI Worker postMessage澶辫触:',e);
 if(aiWorker){try{aiWorker.terminate();}catch(e){}aiWorker=null;}
 aiWorker=null;aiThinking=false;
 setTimeout(function(){
 var fb=aiFindBestMove(undefined,undefined,engine.moveHistory.slice());
-if(fb){try{doAiMove(fb);}catch(ex){console.error('doAiMove异常:',ex);D('turnText').textContent=(aiCl==='black')?'红方走棋':'黑方走棋';}}
-else{D('turnText').textContent=(aiCl==='black')?'红方走棋':'黑方走棋';}
+if(fb){try{doAiMove(fb);}catch(ex){console.error('doAiMove寮傚父:',ex);D('turnText').textContent=(aiCl==='black')?'绾㈡柟璧版':'榛戞柟璧版';}}
+else{D('turnText').textContent=(aiCl==='black')?'绾㈡柟璧版':'榛戞柟璧版';}
 },50);
 return;
 }
@@ -6139,11 +6079,11 @@ if(aiThinking){
 if(aiWorker){try{aiWorker.terminate();}catch(e){}aiWorker=null;}
 stopAi();
 aiTT={};aiKillers=[];for(var r=0;r<10;r++){aiHistory[r]=[];for(var c=0;c<9;c++){aiHistory[r][c]=[];for(var tr=0;tr<10;tr++){aiHistory[r][c][tr]=[];for(var tc=0;tc<9;tc++)aiHistory[r][c][tr][tc]=0;}}};
-toast("AI思考超时自动落子",1200);
+toast("AI鎬濊€冭秴鏃惰嚜鍔ㄨ惤瀛?,1200);
 setTimeout(function(){
 var fb=aiFindBestMoveNoBook();
-if(fb){try{doAiMove(fb);}catch(ex){console.error('doAiMove异常:',ex);D('turnText').textContent=(aiCl==='black')?'红方走棋':'黑方走棋';}}
-else{D('turnText').textContent=(aiCl==='black')?'红方走棋':'黑方走棋';}
+if(fb){try{doAiMove(fb);}catch(ex){console.error('doAiMove寮傚父:',ex);D('turnText').textContent=(aiCl==='black')?'绾㈡柟璧版':'榛戞柟璧版';}}
+else{D('turnText').textContent=(aiCl==='black')?'绾㈡柟璧版':'榛戞柟璧版';}
 },50);
 }
 },45000);
@@ -6156,7 +6096,7 @@ if(aiWorker){try{aiWorker.terminate();}catch(e){}aiWorker=null;}
 aiThinking=false;
 }
 
-// ========== Pikafish 深度引擎 ==========
+// ========== Pikafish 娣卞害寮曟搸 ==========
 function startPikafishGame(userColor){
 	if(aiThinking) return;
 	userColor = userColor || (Math.random() < 0.5 ? 'red' : 'black');
@@ -6164,9 +6104,9 @@ function startPikafishGame(userColor){
 	gm = 'pikafish'; myCl = userColor; myRm = null; boardFlip = (userColor === 'black');
 	aiCl = (userColor === 'red') ? 'black' : 'red';
 	D('drawBtn').style.display = 'none';
-	D('redName').textContent = (userColor === 'red') ? '我（红方）' : 'Pikafish（红方）';
-	D('blackName').textContent = (userColor === 'black') ? '我（黑方）' : 'Pikafish（黑方）';
-	D('modeBadge').textContent = 'Pikafish 深度AI';
+	D('redName').textContent = (userColor === 'red') ? '鎴戯紙绾㈡柟锛? : 'Pikafish锛堢孩鏂癸級';
+	D('blackName').textContent = (userColor === 'black') ? '鎴戯紙榛戞柟锛? : 'Pikafish锛堥粦鏂癸級';
+	D('modeBadge').textContent = 'Pikafish 娣卞害AI';
 	engine.initBoard(); engine.currentTurn = 'red'; engine.gameOver = false; engine.winner = null; engine.moveHistory = [];
 	capRed = []; capBlk = []; lastMove = null; selected = null; validMoves = []; gameStarted = true; clickCount = 0;
 	checkStreak = 0; lastCheckColor = null;
@@ -6182,7 +6122,7 @@ async function pikafishDeepThink(){
 		return;
 	}
 	aiThinking = true;
-	D('turnText').textContent = 'Pikafish 深度思考中...';
+	D('turnText').textContent = 'Pikafish 娣卞害鎬濊€冧腑...';
 	console.log('=== Pikafish Deep AI thinking (depth 15) ===');
 
 	try {
@@ -6191,7 +6131,7 @@ async function pikafishDeepThink(){
 		var move = await pfEngine.findBestMove(engine.board, engine.currentTurn, 3, 3000);
 		console.log('[pikafishDeepThink] findBestMove returned:', JSON.stringify(move));
 		if(move){
-			// Pikafish 返回 UCI 格式走法 (如 "b2e2")，需转换为内部格式 {fromRow,fromCol,toRow,toCol}
+			// Pikafish 杩斿洖 UCI 鏍煎紡璧版硶 (濡?"b2e2")锛岄渶杞崲涓哄唴閮ㄦ牸寮?{fromRow,fromCol,toRow,toCol}
 			if (typeof move === 'string' && move.length >= 4 && move !== '0000') {
 				var fromCol = move.charCodeAt(0) - 97;
 				var fromRow = parseInt(move[1]);
@@ -6213,17 +6153,17 @@ async function pikafishDeepThink(){
 				return;
 			}
 		}
-		console.log('Pikafish 返回空着法，回退到本地AI');
+		console.log('Pikafish 杩斿洖绌虹潃娉曪紝鍥為€€鍒版湰鍦癆I');
 	} catch(e) {
 		console.error('Pikafish deep engine error:', e);
 	}
 
-	// 回退到本地AI
+	// 鍥為€€鍒版湰鍦癆I
 	aiThinking = false;
 	setTimeout(function(){
 		var fb = aiFindBestMove(undefined, aiCl, engine.moveHistory.slice());
-		if(fb){ try{ doAiMove(fb); } catch(ex){ console.error('doAiMove异常:',ex); aiThinking = false; D('turnText').textContent = (aiCl === 'black') ? '红方走棋' : '黑方走棋'; } }
-		else { aiThinking = false; D('turnText').textContent = (aiCl === 'black') ? '红方走棋' : '黑方走棋'; }
+		if(fb){ try{ doAiMove(fb); } catch(ex){ console.error('doAiMove寮傚父:',ex); aiThinking = false; D('turnText').textContent = (aiCl === 'black') ? '绾㈡柟璧版' : '榛戞柟璧版'; } }
+		else { aiThinking = false; D('turnText').textContent = (aiCl === 'black') ? '绾㈡柟璧版' : '榛戞柟璧版'; }
 	}, 50);
 }
 
@@ -6234,12 +6174,12 @@ function retryPikafishGame(){
 	gm = 'pikafish';
 	var uc = Math.random() < 0.5 ? 'red' : 'black';
 	myCl = uc; boardFlip = (uc === 'black'); aiCl = (uc === 'red') ? 'black' : 'red';
-	D('redName').textContent = (uc === 'red') ? '我（红方）' : 'Pikafish（红方）';
-	D('blackName').textContent = (uc === 'black') ? '我（黑方）' : 'Pikafish（黑方）';
-	D('modeBadge').textContent = 'Pikafish 深度AI';
+	D('redName').textContent = (uc === 'red') ? '鎴戯紙绾㈡柟锛? : 'Pikafish锛堢孩鏂癸級';
+	D('blackName').textContent = (uc === 'black') ? '鎴戯紙榛戞柟锛? : 'Pikafish锛堥粦鏂癸級';
+	D('modeBadge').textContent = 'Pikafish 娣卞害AI';
 	engine.initBoard(); engine.currentTurn = 'red'; engine.gameOver = false; engine.winner = null; engine.moveHistory = [];
 	capRed = []; capBlk = []; lastMove = null; selected = null; validMoves = []; gameStarted = true; clickCount = 0; checkStreak = 0; lastCheckColor = null;
-	D('turnText').textContent = '红方走棋';
+	D('turnText').textContent = '绾㈡柟璧版';
 	drawBoardBg(); render(); startTimer(); sndStart();
 	saveGameState();
 	if(aiCl === 'red' && !engine.gameOver){ pikafishDeepThink(); }
@@ -6257,12 +6197,10 @@ var ww=wrap.clientWidth,wh=wrap.clientHeight;
 if(ww<=0||wh<=0)return;
 var isFs=!!(document.fullscreenElement||document.webkitFullscreenElement);
 var isDesktop=window.innerWidth>=769;
-// 桌面端用 window.innerHeight 避免全屏切换时 clientHeight 未更新
-var h=isDesktop?window.innerHeight:wh;
-// 棋盘 9:10, 桌面端用0.882使棋子外边界刚好到浏览器上下边界
+// 妗岄潰绔敤 window.innerHeight 閬垮厤鍏ㄥ睆鍒囨崲鏃?clientHeight 鏈洿鏂?var h=isDesktop?window.innerHeight:wh;
+// 妫嬬洏 9:10, 妗岄潰绔敤0.882浣挎瀛愬杈圭晫鍒氬ソ鍒版祻瑙堝櫒涓婁笅杈圭晫
 var bw=Math.min(ww,h*(isDesktop?0.882:0.88));
-// 桌面端不限460px，手机端限制最大宽度
-if(!isDesktop&&!isFs)bw=Math.min(bw,460);
+// 妗岄潰绔笉闄?60px锛屾墜鏈虹闄愬埗鏈€澶у搴?if(!isDesktop&&!isFs)bw=Math.min(bw,460);
 board.style.setProperty('width',bw+'px','important');
 board.style.setProperty('height',(bw*10/9)+'px','important');
 board.style.setProperty('max-width','none','important');
@@ -6287,7 +6225,7 @@ else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();
 function onFsChange(){
 var isFs=!!(document.fullscreenElement||document.webkitFullscreenElement);
 var btn=D('fsBtn');if(btn)btn.textContent=isFs?'\u2715':'\u26F6';
-// 多次延迟更新，确保全屏过渡动画完成后布局稳定
+// 澶氭寤惰繜鏇存柊锛岀‘淇濆叏灞忚繃娓″姩鐢诲畬鎴愬悗甯冨眬绋冲畾
 updateBoardSize();
 requestAnimationFrame(function(){
 updateBoardSize();
@@ -6323,10 +6261,10 @@ try{var s=localStorage.getItem('xq_game');if(s){var g=JSON.parse(s);
 if(g.gm==='ai'||g.gm==='pikafish'){
 gm=g.gm;myCl=g.myCl||'red';aiCl=g.aiCl||'black';boardFlip=(myCl==='black');soundEnabled=true;gameOverSoundPlayed=false;
 D('lobby').classList.add('hide');D('game').classList.add('show');
-D('modeBadge').textContent=(g.gm==='pikafish')?'Pikafish深度AI':'人机对弈';
+D('modeBadge').textContent=(g.gm==='pikafish')?'Pikafish娣卞害AI':'浜烘満瀵瑰紙';
 D('drawBtn').style.display='none';
-D('redName').textContent=(myCl==='red')?'我（红方）':'AI（红方）';
-D('blackName').textContent=(myCl==='black')?'我（黑方）':'AI（黑方）';
+D('redName').textContent=(myCl==='red')?'鎴戯紙绾㈡柟锛?:'AI锛堢孩鏂癸級';
+D('blackName').textContent=(myCl==='black')?'鎴戯紙榛戞柟锛?:'AI锛堥粦鏂癸級';
 engine.initBoard();
 capRed=[];capBlk=[];lastMove=null;
 if(g.moveHistory){for(var i=0;i<g.moveHistory.length;i++){var m=g.moveHistory[i];var rs=engine.move(m.fromRow,m.fromCol,m.toRow,m.toCol);if(rs&&rs.captured){if(rs.captured.color==='red')capRed.push(rs.captured);else capBlk.push(rs.captured);}}}
@@ -6336,7 +6274,7 @@ if(g.redLeft!=null){redLeft=g.redLeft;blkLeft=g.blkLeft;}
 engine.currentTurn=g.currentTurn||'red';engine.gameOver=g.gameOver||false;engine.winner=g.winner||null;
 undoUsed=g.undoUsed||false;
 gameStarted=true;selected=null;validMoves=[];
-D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
+D('turnText').textContent=engine.currentTurn==='red'?'绾㈡柟璧版':'榛戞柟璧版';
 requestAnimationFrame(function(){updateBoardSize();drawBoardBg();render();});
 if(!engine.gameOver){startTimer();updateTimers();}
 if(engine.currentTurn===aiCl&&!engine.gameOver){
@@ -6347,11 +6285,11 @@ window._pendingReconnect=g;
 gm='online';myRm=g.myRm;myCl=g.myCl;
 boardFlip=(myCl==='black');
 D('lobby').classList.add('hide');D('game').classList.add('show');
-D('modeBadge').textContent='房间: '+g.myRm;
+D('modeBadge').textContent='鎴块棿: '+g.myRm;
 D('drawBtn').style.display='inline-flex';
-D('redName').textContent=g.myCl==='red'?'你（红方）':'对手（红方）';
-D('blackName').textContent=g.myCl==='black'?'你（黑方）':'对手（黑方）';
-D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
+D('redName').textContent=g.myCl==='red'?'浣狅紙绾㈡柟锛?:'瀵规墜锛堢孩鏂癸級';
+D('blackName').textContent=g.myCl==='black'?'浣狅紙榛戞柟锛?:'瀵规墜锛堥粦鏂癸級';
+D('turnText').textContent=engine.currentTurn==='red'?'绾㈡柟璧版':'榛戞柟璧版';
 engine.initBoard();
 capRed=[];capBlk=[];lastMove=null;
 if(g.moveHistory){for(var i=0;i<g.moveHistory.length;i++){var m=g.moveHistory[i];var rs=engine.move(m.fromRow,m.fromCol,m.toRow,m.toCol);if(rs&&rs.captured){if(rs.captured.color==='red')capRed.push(rs.captured);else capBlk.push(rs.captured);}}}
@@ -6359,22 +6297,21 @@ if(g.moveHistory&&g.moveHistory.length>0){var lm=g.moveHistory[g.moveHistory.len
 if(g.capRed)capRed=g.capRed;if(g.capBlk)capBlk=g.capBlk;
 engine.currentTurn=g.currentTurn||'red';engine.gameOver=g.gameOver||false;engine.winner=g.winner||null;
 gameStarted=(g.moveHistory&&g.moveHistory.length>0);
-D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
+D('turnText').textContent=engine.currentTurn==='red'?'绾㈡柟璧版':'榛戞柟璧版';
 requestAnimationFrame(function(){updateBoardSize();drawBoardBg();render();});
 showReconnecting();
 }}}catch(e){}
 })();
 
-// v2: 大厅后台预载 Pikafish 引擎资产（进站静默下载→IndexedDB缓存，点击按钮秒开）
-window.addEventListener('load', function(){
+// v2: 澶у巺鍚庡彴棰勮浇 Pikafish 寮曟搸璧勪骇锛堣繘绔欓潤榛樹笅杞解啋IndexedDB缂撳瓨锛岀偣鍑绘寜閽寮€锛?window.addEventListener('load', function(){
   setTimeout(function(){
     try{
       if(window._pikaWasmBinary && window._pikaNnueBinary) return;
       if(new URLSearchParams(location.search).get('start')==='pikafish') return;
       Promise.resolve(loadPikafishWasm())
         .then(function(){ return loadPikafishNnue(); })
-        .then(function(){ console.log('[Pikafish] 后台预载完成，随时可开始深度对局'); })
-        .catch(function(e){ console.log('[Pikafish] 后台预载跳过:', (e&&e.message)||e); });
+        .then(function(){ console.log('[Pikafish] 鍚庡彴棰勮浇瀹屾垚锛岄殢鏃跺彲寮€濮嬫繁搴﹀灞€'); })
+        .catch(function(e){ console.log('[Pikafish] 鍚庡彴棰勮浇璺宠繃:', (e&&e.message)||e); });
     }catch(e){}
   }, 2000);
 });
@@ -6382,61 +6319,61 @@ window.addEventListener('load', function(){
 connectSocket();
 </script>
 <script>
-// ===== 皮肤系统（移植自 xq-x-meaigo） =====
+// ===== 鐨偆绯荤粺锛堢Щ妞嶈嚜 xq-x-meaigo锛?=====
 window._xqSkinApply=function(key){try{if(key)document.body.setAttribute('data-skin',key);else document.body.removeAttribute('data-skin');localStorage.setItem('xq_skin',key||'');}catch(e){}
 try{if(typeof drawBoardBg==='function')drawBoardBg();}catch(e){}
 try{if(typeof render==='function')render();}catch(e){}};
 window.openSkinModal=function(){
 var ov=document.getElementById('skinOverlay');
 if(!ov){ov=document.createElement('div');ov.id='skinOverlay';
-ov.innerHTML='<div id="skinBox"><h3>🎨 皮肤</h3>'+
-'<div class="skinOpt" data-k=""><div class="skinSw" style="background:linear-gradient(135deg,#c28e56,#e8c99a)"></div><div><div class="sn">默认 · 胡桃木</div><div class="sd">经典暖木金棕（当前线上原版）</div></div><span class="ck">✔</span></div>'+
-'<div class="skinOpt" data-k="qing"><div class="skinSw" style="background:linear-gradient(135deg,#9fc4d0,#2a5d7a)"></div><div><div class="sn">青花瓷</div><div class="sd">深青墨底 · 湖蓝瓷白 · 淡青木棋盘</div></div><span class="ck">✔</span></div>'+
-'<div class="skinOpt" data-k="zhu"><div class="skinSw" style="background:linear-gradient(135deg,#e2543e,#5a2210)"></div><div><div class="sn">朱砂宫墙</div><div class="sd">宫墙深红 · 朱砂鎏金 · 深红木棋盘</div></div><span class="ck">✔</span></div>'+
-'<div class="skinOpt" data-k="zq"><div class="skinSw" style="background:linear-gradient(135deg,#8fd9ac,#2e7d52)"></div><div><div class="sn">竹青（浅绿）</div><div class="sd">浅绿素雅 · 竹绿强调 · 竹青木棋盘</div></div><span class="ck">✔</span></div>'+
-'<div style="text-align:center;margin-top:12px"><button class="btn btn-outline" style="padding:8px 26px" id="skinCloseBtn">关 闭</button></div></div>';
+ov.innerHTML='<div id="skinBox"><h3>馃帹 鐨偆</h3>'+
+'<div class="skinOpt" data-k=""><div class="skinSw" style="background:linear-gradient(135deg,#c28e56,#e8c99a)"></div><div><div class="sn">榛樿 路 鑳℃鏈?/div><div class="sd">缁忓吀鏆栨湪閲戞锛堝綋鍓嶇嚎涓婂師鐗堬級</div></div><span class="ck">鉁?/span></div>'+
+'<div class="skinOpt" data-k="qing"><div class="skinSw" style="background:linear-gradient(135deg,#9fc4d0,#2a5d7a)"></div><div><div class="sn">闈掕姳鐡?/div><div class="sd">娣遍潚澧ㄥ簳 路 婀栬摑鐡风櫧 路 娣￠潚鏈ㄦ鐩?/div></div><span class="ck">鉁?/span></div>'+
+'<div class="skinOpt" data-k="zhu"><div class="skinSw" style="background:linear-gradient(135deg,#e2543e,#5a2210)"></div><div><div class="sn">鏈辩爞瀹</div><div class="sd">瀹娣辩孩 路 鏈辩爞閹忛噾 路 娣辩孩鏈ㄦ鐩?/div></div><span class="ck">鉁?/span></div>'+
+'<div class="skinOpt" data-k="zq"><div class="skinSw" style="background:linear-gradient(135deg,#8fd9ac,#2e7d52)"></div><div><div class="sn">绔归潚锛堟祬缁匡級</div><div class="sd">娴呯豢绱犻泤 路 绔圭豢寮鸿皟 路 绔归潚鏈ㄦ鐩?/div></div><span class="ck">鉁?/span></div>'+
+'<div style="text-align:center;margin-top:12px"><button class="btn btn-outline" style="padding:8px 26px" id="skinCloseBtn">鍏?闂?/button></div></div>';
 document.body.appendChild(ov);
 ov.addEventListener('click',function(e){if(e.target===ov)ov.style.display='none';});
 var close=document.getElementById('skinCloseBtn');if(close)close.onclick=function(){ov.style.display='none';};
 Array.prototype.forEach.call(ov.querySelectorAll('.skinOpt'),function(el){
 el.onclick=function(){var k=el.getAttribute('data-k')||'';window._xqSkinApply(k);window.openSkinModal();
-try{toast('已切换皮肤：'+(k==='qing'?'青花瓷':k==='zhu'?'朱砂宫墙':k==='zq'?'竹青':'默认 · 胡桃木'),1800);}catch(e){}};
+try{toast('宸插垏鎹㈢毊鑲わ細'+(k==='qing'?'闈掕姳鐡?:k==='zhu'?'鏈辩爞瀹':k==='zq'?'绔归潚':'榛樿 路 鑳℃鏈?),1800);}catch(e){}};
 });
 }
 var cur='';try{cur=document.body.getAttribute('data-skin')||'';}catch(e){}
 Array.prototype.forEach.call(ov.querySelectorAll('.skinOpt'),function(el){el.classList.toggle('cur',(el.getAttribute('data-k')||'')===cur);});
 ov.style.display='flex';
 };
-// ===== 大厅对局房间列表（移植自 xq-x-meaigo） =====
+// ===== 澶у巺瀵瑰眬鎴块棿鍒楄〃锛堢Щ妞嶈嚜 xq-x-meaigo锛?=====
 function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 window._xqLoadRooms=function(){try{
 var lobby=document.getElementById('lobby');if(!lobby||lobby.classList.contains('hide'))return;
 var panel=document.getElementById('roomListPanel'),list=document.getElementById('roomList');if(!panel||!list)return;
 var _xqRenderRooms=function(j){
 var rooms=(j&&j.rooms)||[];panel.style.display=rooms.length?'':'none';
-var cnt=document.getElementById('roomListCount');if(cnt)cnt.textContent=rooms.length?('共 '+rooms.length+' 间'):'';
-if(!rooms.length){list.innerHTML='<div style="font-size:12px;color:#8a7a68">暂无对局房间 · 创建或加入房间后这里实时显示对战双方</div>';return;}
+var cnt=document.getElementById('roomListCount');if(cnt)cnt.textContent=rooms.length?('鍏?'+rooms.length+' 闂?):'';
+if(!rooms.length){list.innerHTML='<div style="font-size:12px;color:#8a7a68">鏆傛棤瀵瑰眬鎴块棿 路 鍒涘缓鎴栧姞鍏ユ埧闂村悗杩欓噷瀹炴椂鏄剧ず瀵规垬鍙屾柟</div>';return;}
 list.innerHTML=rooms.map(function(rm){var playing=rm.status==='playing';
-var redTxt=rm.red?('红方'+escHtml(rm.red)):'红方待入座';
-var blkTxt=rm.black?('黑方'+escHtml(rm.black)):'黑方待入座';
-var stTxt=playing?'<span style="color:#2ecc71">● 对战中</span>':'<span style="color:#f0c674">○ 等待中</span>';
+var redTxt=rm.red?('绾㈡柟'+escHtml(rm.red)):'绾㈡柟寰呭叆搴?;
+var blkTxt=rm.black?('榛戞柟'+escHtml(rm.black)):'榛戞柟寰呭叆搴?;
+var stTxt=playing?'<span style="color:#2ecc71">鈼?瀵规垬涓?/span>':'<span style="color:#f0c674">鈼?绛夊緟涓?/span>';
 var names='<span style="color:#ff9a8d">'+redTxt+'</span> <span style="color:#6b5340">vs</span> <span style="color:#c4a882">'+blkTxt+'</span>';
 var btns=playing
-?'<button class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:11px" onclick="watchRoom(\''+escHtml(rm.id)+'\')">观战</button>'
-:'<button class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:11px" onclick="joinRoomById(\''+escHtml(rm.id)+'\')">加入</button>';
+?'<button class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:11px" onclick="watchRoom(\''+escHtml(rm.id)+'\')">瑙傛垬</button>'
+:'<button class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:11px" onclick="joinRoomById(\''+escHtml(rm.id)+'\')">鍔犲叆</button>';
 return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#241409;border:1px solid #3d2117;border-radius:8px;padding:7px 10px;flex-wrap:wrap"><span style="font-size:12px;color:#f0c674;font-weight:700">#'+escHtml(rm.id)+'</span><span style="font-size:12px;flex:1;min-width:130px">'+stTxt+' '+names+'</span><span>'+btns+'</span></div>';}).join('');};
 var _xqFetchRooms=function(base,fallback){
 fetch(base+'/api/rooms',{signal:(function(){try{return AbortSignal.timeout(8000);}catch(e){return undefined;}})()}).then(function(r){return r.json();}).then(function(j){_xqRenderRooms(j);}).catch(function(e){if(fallback)fallback();});};
 _xqFetchRooms(window._xqGameOrigin?window._xqGameOrigin():window.location.origin,function(){_xqFetchRooms(window._xqAltOrigin?window._xqAltOrigin():window.location.origin,null);});
 }catch(e){}};
 window.joinRoomById=function(rid){try{
-if(!sockOk||!socket||!socket.connected){toast('服务器未连接，请稍候',2000);return;}
-window._xqSpectator=false;D('lobbyStatus').textContent='正在加入房间 '+rid+' ...';
+if(!sockOk||!socket||!socket.connected){toast('鏈嶅姟鍣ㄦ湭杩炴帴锛岃绋嶅€?,2000);return;}
+window._xqSpectator=false;D('lobbyStatus').textContent='姝ｅ湪鍔犲叆鎴块棿 '+rid+' ...';
 socket.emit('join_room',rid);
 }catch(e){}};
 window.watchRoom=function(rid){try{
-if(!sockOk||!socket||!socket.connected){toast('服务器未连接，请稍候',2000);return;}
-window._xqSpectator=true;D('lobbyStatus').textContent='正在进入观战 '+rid+' ...';
+if(!sockOk||!socket||!socket.connected){toast('鏈嶅姟鍣ㄦ湭杩炴帴锛岃绋嶅€?,2000);return;}
+window._xqSpectator=true;D('lobbyStatus').textContent='姝ｅ湪杩涘叆瑙傛垬 '+rid+' ...';
 socket.emit('join_room',rid);
 }catch(e){}};
 function _xqEnterSpectator(d){
@@ -6444,8 +6381,8 @@ try{
 myRm=d.roomId;myCl=null;gm='online';window._xqSpectator=true;
 document.body.setAttribute('data-xq-spec','1');
 D('lobby').classList.add('hide');D('game').classList.add('show');
-D('modeBadge').textContent='观战: '+d.roomId;
-D('redName').textContent='红方';D('blackName').textContent='黑方';
+D('modeBadge').textContent='瑙傛垬: '+d.roomId;
+D('redName').textContent='绾㈡柟';D('blackName').textContent='榛戞柟';
 D('drawBtn').style.display='inline-flex';
 boardFlip=false;gameStarted=true;
 engine.initBoard();engine.currentTurn='red';engine.gameOver=false;engine.winner=null;engine.moveHistory=[];capRed=[];capBlk=[];lastMove=null;selected=null;validMoves=[];clickCount=0;
@@ -6454,19 +6391,19 @@ for(var i=0;i<mh.length;i++){var m=mh[i];var rs=engine.move(m.fromRow,m.fromCol,
 if(mh.length>0){var lm=mh[mh.length-1];lastMove={row:lm.toRow,col:lm.toCol};if(lm.currentTurn)engine.currentTurn=lm.currentTurn;}
 if(d.redTime!=null){redLeft=d.redTime;blkLeft=d.blkTime;}
 updateBoardSize();
-D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
+D('turnText').textContent=engine.currentTurn==='red'?'绾㈡柟璧版':'榛戞柟璧版';
 requestAnimationFrame(function(){drawBoardBg();render();});
-toast('已进入观战模式',1500);
+toast('宸茶繘鍏ヨ鎴樻ā寮?,1500);
 }catch(e){}}
 function _xqFixSpectatorUI(d){
 try{
 myCl=null;window._xqSpectator=true;
 document.body.setAttribute('data-xq-spec','1');
-D('modeBadge').textContent='观战: '+(d&&d.roomId?d.roomId:(myRm||''));
-D('redName').textContent='红方';D('blackName').textContent='黑方';
+D('modeBadge').textContent='瑙傛垬: '+(d&&d.roomId?d.roomId:(myRm||''));
+D('redName').textContent='绾㈡柟';D('blackName').textContent='榛戞柟';
 D('drawBtn').style.display='inline-flex';
 boardFlip=false;
-if(gameStarted)D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
+if(gameStarted)D('turnText').textContent=engine.currentTurn==='red'?'绾㈡柟璧版':'榛戞柟璧版';
 }catch(e){}}
 function _xqRememberPid(d){try{if(d&&d.pid&&d.roomId){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){}}
 function _xqAttachRoomListListeners(){
@@ -6478,9 +6415,7 @@ socket.on('room_created',function(d){window._xqSpectator=false;_xqRememberPid(d)
 socket.on('room_joined',function(d){window._xqSpectator=false;_xqRememberPid(d);try{document.body.removeAttribute('data-xq-spec');}catch(e){}});
 socket.on('spectator_joined',function(d){try{_xqEnterSpectator(d);}catch(e){}});
 socket.on('room_state',function(d){try{if(window._xqSpectator){_xqFixSpectatorUI(d);}_xqRememberPid(d);}catch(e){}});
-// 刷新秒接管：给 SocketClient 原型加透传包装，仅在 reconnect_room 载荷中注入 pid，
-// 服务端 pidMatches 分支即可立即判定"是本人"并接管座位，无需等待 25 秒僵尸判定
-try{
+// 鍒锋柊绉掓帴绠★細缁?SocketClient 鍘熷瀷鍔犻€忎紶鍖呰锛屼粎鍦?reconnect_room 杞借嵎涓敞鍏?pid锛?// 鏈嶅姟绔?pidMatches 鍒嗘敮鍗冲彲绔嬪嵆鍒ゅ畾"鏄湰浜?骞舵帴绠″骇浣嶏紝鏃犻渶绛夊緟 25 绉掑兊灏稿垽瀹?try{
 var _SC=socket.constructor;
 if(_SC&&_SC.prototype&&typeof _SC.prototype.emit==='function'&&!_SC.prototype._xqPidPatched){
 var _oe=_SC.prototype.emit;
@@ -6500,7 +6435,7 @@ _SC.prototype._xqPidPatched=true;
 }catch(e){}}
 try{_xqAttachRoomListListeners();}catch(e){}
 try{var _olg=window.leaveGame;if(typeof _olg==='function'){window.leaveGame=function(){try{document.body.removeAttribute('data-xq-spec');}catch(e){}return _olg.apply(this,arguments);};}}catch(e){}
-/* --- 线路自动回退: WS连续失败时静默切换到备用域名(页面地址不变,两端同一后端) --- */
+/* --- 绾胯矾鑷姩鍥為€€: WS杩炵画澶辫触鏃堕潤榛樺垏鎹㈠埌澶囩敤鍩熷悕(椤甸潰鍦板潃涓嶅彉,涓ょ鍚屼竴鍚庣) --- */
 try{(function(){
 if(window._xqFailoverInstalled)return;window._xqFailoverInstalled=true;
 var primary=window.location.host;
@@ -6525,7 +6460,7 @@ try{
 if(ev==='connect'){this._xqFails=0;}
 else if(ev==='disconnect'){
 this._xqFails=(this._xqFails||0)+1;
-if(this._xqFails>=2&&cur!==alt){cur=alt;this._xqFails=0;console.warn('[xq-failover] WS switch to '+alt);try{if(typeof toast==='function')toast('主线路不稳,已切换备用线路',2000);}catch(e){}}
+if(this._xqFails>=2&&cur!==alt){cur=alt;this._xqFails=0;console.warn('[xq-failover] WS switch to '+alt);try{if(typeof toast==='function')toast('涓荤嚎璺笉绋?宸插垏鎹㈠鐢ㄧ嚎璺?,2000);}catch(e){}}
 }
 }catch(e){}
 return _ot.apply(this,arguments);
