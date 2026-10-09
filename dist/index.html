@@ -1,31 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN" data-version="v8">
-<head><script>
-/* --- 入口竞速(层1)+真实测量(RUM): 择优跳转+匿名上报(每会话一次) --- */
-try{(function(){
-if(location.protocol!=='https:')return;
-try{if(sessionStorage.getItem('_xqRaceDone'))return;}catch(e){}
-var CAND=['x.696919.xyz','x.meaigo.eu.org'];
-var P=["pc1.696919.xyz","pc2.696919.xyz","pc3.696919.xyz","pc4.696919.xyz","pc5.696919.xyz","pc6.696919.xyz","pc7.696919.xyz","pc8.696919.xyz","pc9.696919.xyz"];
-var host=location.hostname;
-var list=CAND.filter(function(h){return h!==host;});
-function probe(h){return new Promise(function(res){var t0=Date.now(),fin=false;var t=setTimeout(function(){if(!fin){fin=true;res(9e9);}},1600);fetch('https://'+h+'/favicon.ico?__race='+t0,{method:'HEAD',mode:'no-cors',cache:'no-store'}).then(function(){if(!fin){fin=true;clearTimeout(t);res(Date.now()-t0);}}).catch(function(){if(!fin){fin=true;clearTimeout(t);res(9e9);}});});}
-var ps=[probe(host)],alts=[];
-for(var i=0;i<list.length;i++){alts.push(list[i]);ps.push(probe(list[i]));}
-for(var j=0;j<P.length;j++){ps.push(probe(P[j]));}
-Promise.all(ps).then(function(rs){try{
-var curMs=rs[0],best=null;
-for(var k=0;k<alts.length;k++){if(rs[k+1]<9e9&&(!best||rs[k+1]<best.ms))best={h:alts[k],ms:rs[k+1]};}
-try{sessionStorage.setItem('_xqRaceDone','1');}catch(e){}
-var bad=curMs>=9e9;
-var muchBetter=best&&best.ms<700&&curMs>best.ms*2;
-if(best&&(bad||muchBetter)){location.replace('https://'+best.h+location.pathname+location.search+location.hash);return;}
-if(Math.random()<0.25){var o=alts.length,rep={entry:host,t_self:Math.min(curMs,32000)|0,t_alt:best?Math.min(best.ms,32000)|0:0,t_p1:Math.min(rs[o+1]|0,32000),t_p2:Math.min(rs[o+2]|0,32000),t_p3:Math.min(rs[o+3]|0,32000),t_p4:Math.min(rs[o+4]|0,32000),t_p5:Math.min(rs[o+5]|0,32000),t_p6:Math.min(rs[o+6]|0,32000),t_p7:Math.min(rs[o+7]|0,32000),t_p8:Math.min(rs[o+8]|0,32000),t_p9:Math.min(rs[o+9]|0,32000)};
-try{navigator.sendBeacon('/api/race-report',new Blob([JSON.stringify(rep)],{type:'application/json'}));}catch(e){}
-}
-}catch(e){}});
-})();}catch(e){}
-</script>
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
 <title>中国象棋</title>
@@ -34,7 +9,7 @@ try{navigator.sendBeacon('/api/race-report',new Blob([JSON.stringify(rep)],{type
 html,body{height:100%;overflow:hidden;font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#3a2a18;color:#f0e6d3;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
 #app{position:fixed;inset:0;display:flex;flex-direction:column}
 
-#lobby{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px}
+#lobby{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px;background:radial-gradient(1100px 520px at 50% -8%,#57402a 0%,#4a361f 55%,#3a2a18 100%)}
 #lobby.hide{display:none}
 .logo{font-size:56px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4))}
 .title{font-size:32px;font-weight:900;color:#d4a843;letter-spacing:6px}
@@ -99,7 +74,7 @@ html,body{height:100%;overflow:hidden;font-family:'PingFang SC','Microsoft YaHei
 .overlay h2{font-size:20px;color:#d4a843;margin-bottom:4px}
 .overlay p{font-size:13px;color:#c4a882;margin-bottom:14px}
 .overlay .btns2{display:flex;gap:8px;justify-content:center}
-.chat-display{height:24px;line-height:24px;padding:0 10px;text-align:center;background:#3a2a18;border-bottom:1px solid #3d2117;color:#d4a843;font-size:13px;font-family:system-ui,-apple-system,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.chat-display{height:24px;line-height:24px;padding:0 10px;text-align:center;background:#1a0f0a;border-bottom:1px solid #3d2117;color:#d4a843;font-size:13px;font-family:system-ui,-apple-system,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
 .chat-area{display:flex;gap:8px;padding:8px;background:#2c1810;border-top:1px solid #5a3a28;flex-shrink:0}
 .chat-input{flex:1;padding:6px 10px;border:1px solid #5a3a28;border-radius:8px;background:#3d2117;color:#f0e6d3;font-size:13px;outline:none}
 .chat-input:focus{border-color:#d4a843}
@@ -135,7 +110,7 @@ html,body{height:100%;overflow:hidden;font-family:'PingFang SC','Microsoft YaHei
   .left-panel .header>.pinfo:last-child .pname{font-size:16px}
   .left-panel .header>.pinfo:last-child .avatar{width:36px;height:36px;font-size:16px}
   /* 聊天显示 */
-  .left-panel .chat-display{order:7;flex:0 0 auto;max-height:200px;min-height:50px;padding:10px 12px;overflow-y:auto;white-space:normal;word-break:break-all;line-height:1.5;font-size:13px;color:#d4a843;background:#3a2a18;text-align:left;border:1px solid #3d2117;border-radius:8px}
+  .left-panel .chat-display{order:7;flex:0 0 auto;max-height:200px;min-height:50px;padding:10px 12px;overflow-y:auto;white-space:normal;word-break:break-all;line-height:1.5;font-size:13px;color:#d4a843;background:#1a0f0a;text-align:left;border:1px solid #3d2117;border-radius:8px}
   .left-panel .chat-display:empty::after{content:'暂无消息';color:#5a4a3a;font-size:11px}
   /* 棋盘：去掉padding和overflow限制，让棋子刚好到浏览器边界 */
   .board-wrap{flex:1;padding:0;min-height:0;min-width:0;overflow:visible}
@@ -246,7 +221,7 @@ body[data-skin="zq"] #roomList>div{background:#ffffff!important;border-color:#bf
 body[data-skin="zhu"] #roomListPanel{background:#1a0909!important;border-color:#5a2a22!important}
 body[data-skin="zhu"] #roomList>div{background:#240d0d!important;border-color:#5a2a22!important}
 /* --- 大厅卡片化美化 --- */
-.lobby-cols .btns{width:100%;max-width:420px;gap:11px;background:#241409;border:1px solid #3d2117;border-radius:16px;padding:14px 14px 12px;box-shadow:0 10px 28px rgba(0,0,0,.35)}
+.lobby-cols .btns{width:100%;max-width:420px;gap:11px;background:#2c1810;border:1px solid #3d2117;border-radius:16px;padding:14px 14px 12px;box-shadow:0 10px 28px rgba(0,0,0,.35)}
 .lobby-cols .btns:first-child::before{content:'⚔ 对弈模式';display:block;font-size:13px;font-weight:800;letter-spacing:4px;color:#d4a843;text-align:center;margin:0 0 10px}
 .lobby-cols .btns>.divider{color:#d4a843;font-size:13px;font-weight:800;letter-spacing:4px;margin:2px 0 4px}
 .lobby-cols .btn{box-shadow:0 2px 10px rgba(0,0,0,.28)}
@@ -309,7 +284,7 @@ body[data-xq-spec] .right-panel .actions button:not([onclick*="leaveGame"]):not(
 <button class="btn btn-green" onclick="startAiGame()">  人机对弈</button>
 <button class="btn btn-blue" onclick="startPikafishGame()">🤖 Pikafish深度AI</button>
 
-		<div id="trainPanel" style="background:#3a2a18;border-radius:8px;padding:10px 14px;margin:0 0 8px 0;border:1px solid #3d2117;text-align:left">
+		<div id="trainPanel" style="background:#1a0f0a;border-radius:8px;padding:10px 14px;margin:0 0 8px 0;border:1px solid #3d2117;text-align:left">
 		<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
 		<span style="color:#2ecc71;font-size:13px;font-weight:700">⚡ AI快速训练</span>
 		<button id="trainStartBtn" class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:11px;background:#2ecc71;color:#fff;border-color:#27ae60" onclick="startAiTraining()">开始训练</button>
@@ -334,7 +309,7 @@ body[data-xq-spec] .right-panel .actions button:not([onclick*="leaveGame"]):not(
 <input id="roomInput" placeholder="输入房间号加入" maxlength="6" autocomplete="off" onkeydown="if(event.key==='Enter')joinRoom()">
 <button class="btn btn-outline" style="width:auto;flex-shrink:0" onclick="joinRoom()">加入</button>
 </div>
-<div id="roomListPanel" style="display:none;background:#3a2a18;border-radius:10px;padding:10px 14px;border:1px solid #3d2117;text-align:left;width:100%;box-sizing:border-box">
+<div id="roomListPanel" style="display:none;background:#1a0f0a;border-radius:10px;padding:10px 14px;border:1px solid #3d2117;text-align:left;width:100%;box-sizing:border-box">
 <div style="display:flex;align-items:center;justify-content:space-between"><span style="color:#f0c674;font-size:13px;font-weight:700">🎮 对局房间</span><span id="roomListCount" style="font-size:11px;color:#8a7a68"></span></div>
 <div id="roomList" style="margin-top:6px;display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto"></div>
 </div>
@@ -1631,6 +1606,7 @@ socket.on('connect_error',function(){sockOk=false;D('lobbyStatus').textContent='
 socket.on('online_count',function(count){D('onlineCount').textContent='当前在线: '+count+' 人';});
 socket.on('room_created',function(d){
 myRm=d.roomId;myCl=d.color;gm='online';
+try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 记录本盘颜色，下一盘轮换先手
 D('lobbyStatus').innerHTML='房间号: <strong style="font-size:20px;color:#d4a843;letter-spacing:3px;">'+d.roomId+'</strong>';
 enterOnlineGame(d.roomId,d.color);
@@ -1642,6 +1618,7 @@ socket.reconnectToRoom(d.roomId);
 });
 socket.on('room_joined',function(d){
 myRm=d.roomId;myCl=d.color;gm='online';D('lobbyStatus').textContent='';
+try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 记录本盘颜色，下一盘轮换先手
 enterOnlineGame(d.roomId,d.color);
 });
@@ -1735,6 +1712,7 @@ socket.on('player_reconnected',function(d){
 });
 socket.on('room_state',function(d){
 myRm=d.roomId;myCl=d.color;gm='online';
+try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 重连/换先后同步本盘颜色
 D('lobby').classList.add('hide');D('game').classList.add('show');
 D('modeBadge').textContent='房间: '+d.roomId;
@@ -1851,7 +1829,7 @@ sessionStorage.setItem('xq_game','1');
 }catch(e){}
 }else if(gm==='online'&&myRm&&myCl){
 try{
-var st={gm:'online',myRm:myRm,myCl:myCl,currentTurn:engine.currentTurn,gameOver:engine.gameOver,winner:engine.winner,moveHistory:engine.moveHistory.slice(),capRed:capRed.slice(),capBlk:capBlk.slice(),redLeft:redLeft,blkLeft:blkLeft};
+var st={gm:'online',myRm:myRm,myCl:myCl,pid:(window._xqPid&&window._xqPid.rm===myRm&&window._xqPid.pid)?window._xqPid.pid:null,currentTurn:engine.currentTurn,gameOver:engine.gameOver,winner:engine.winner,moveHistory:engine.moveHistory.slice(),capRed:capRed.slice(),capBlk:capBlk.slice(),redLeft:redLeft,blkLeft:blkLeft};
 localStorage.setItem('xq_game',JSON.stringify(st));
 sessionStorage.setItem('xq_game','1');
 }catch(e){}
@@ -6185,38 +6163,73 @@ async function pikafishDeepThink(){
 	D('turnText').textContent = 'Pikafish 深度思考中...';
 	console.log('=== Pikafish Deep AI thinking (depth 15) ===');
 
-	try {
-		var pfEngine = await getPikafishEngine();
-		console.log('[pikafishDeepThink] pfEngine ready=' + pfEngine.ready);
-		var move = await pfEngine.findBestMove(engine.board, engine.currentTurn, 3, 3000);
-		console.log('[pikafishDeepThink] findBestMove returned:', JSON.stringify(move));
-		if(move){
-			// Pikafish 返回 UCI 格式走法 (如 "b2e2")，需转换为内部格式 {fromRow,fromCol,toRow,toCol}
-			if (typeof move === 'string' && move.length >= 4 && move !== '0000') {
-				var fromCol = move.charCodeAt(0) - 97;
-				var fromRow = parseInt(move[1]);
-				var toCol = move.charCodeAt(2) - 97;
-				var toRow = parseInt(move[3]);
-				if (!isNaN(fromRow) && !isNaN(toRow) && fromCol >= 0 && fromCol <= 8 && toCol >= 0 && toCol <= 8 && fromRow >= 0 && fromRow <= 9 && toRow >= 0 && toRow <= 9) {
-					move = {
-						fromRow: fromRow,
-						fromCol: fromCol,
-						toRow: toRow,
-						toCol: toCol,
-						piece: engine.board[fromRow] && engine.board[fromRow][fromCol]
-					};
-					console.log('[pikafishDeepThink] converted UCI move to:', JSON.stringify(move));
+	// v166: 云端引擎韧性增强 —— 二进制缺失/引擎初始化失败时自动重新触发加载并重试，
+	// 防止偶发一次加载失败导致整个会话永远退回本地AI（仅多次尝试后才回退）
+	function _pfEnsureLoading(kind) {
+		try {
+			if (kind === 'wasm') {
+				if (window._pikaWasmBinary || window._pikaWasmLoading) return;
+				window._pikaWasmLoading = true;
+				loadPikafishWasm().catch(function(e) { console.error('[Pikafish] WASM (重)载失败:', e && e.message); }).then(function() { window._pikaWasmLoading = false; });
+			} else {
+				if (window._pikaNnueBinary || window._pikaNnueLoading) return;
+				window._pikaNnueLoading = true;
+				loadPikafishNnue().catch(function(e) { console.error('[Pikafish] NNUE (重)载失败:', e && e.message); }).then(function() { window._pikaNnueLoading = false; });
+			}
+		} catch (eT) {}
+	}
+	_pfEnsureLoading('wasm'); _pfEnsureLoading('nnue');
+	var pfMove = null;
+	for (var _pfAttempt = 0; _pfAttempt < 2 && !pfMove; _pfAttempt++) {
+		try {
+			// 等待 WASM/NNUE 二进制就位（首轮最多120秒配合预载/重载；重试轮再给90秒）
+			var _pfWaitStart = Date.now();
+			var _pfWaitMax = (_pfAttempt === 0) ? 120000 : 90000;
+			while ((!window._pikaWasmBinary || !window._pikaNnueBinary) && Date.now() - _pfWaitStart < _pfWaitMax) {
+				await new Promise(function(r) { setTimeout(r, 500); });
+			}
+			if (!window._pikaWasmBinary || !window._pikaNnueBinary) {
+				console.warn('[pikafishDeepThink] 第' + (_pfAttempt + 1) + '轮二进制未就位，跳过');
+				continue;
+			}
+			var pfEngine = await getPikafishEngine();
+			console.log('[pikafishDeepThink] pfEngine ready=' + pfEngine.ready);
+			var move = await pfEngine.findBestMove(engine.board, engine.currentTurn, 3, 3000);
+			console.log('[pikafishDeepThink] findBestMove returned:', JSON.stringify(move));
+			if(move){
+				// Pikafish 返回 UCI 格式走法 (如 "b2e2")，需转换为内部格式 {fromRow,fromCol,toRow,toCol}
+				if (typeof move === 'string' && move.length >= 4 && move !== '0000') {
+					var fromCol = move.charCodeAt(0) - 97;
+					var fromRow = parseInt(move[1]);
+					var toCol = move.charCodeAt(2) - 97;
+					var toRow = parseInt(move[3]);
+					if (!isNaN(fromRow) && !isNaN(toRow) && fromCol >= 0 && fromCol <= 8 && toCol >= 0 && toCol <= 8 && fromRow >= 0 && fromRow <= 9 && toRow >= 0 && toRow <= 9) {
+						move = {
+							fromRow: fromRow,
+							fromCol: fromCol,
+							toRow: toRow,
+							toCol: toCol,
+							piece: engine.board[fromRow] && engine.board[fromRow][fromCol]
+						};
+						console.log('[pikafishDeepThink] converted UCI move to:', JSON.stringify(move));
+					}
+				}
+				if (move && typeof move === 'object' && move.fromRow !== undefined) {
+					pfMove = move;
 				}
 			}
-			if (move && typeof move === 'object' && move.fromRow !== undefined) {
-				doAiMove(move);
-				return;
-			}
+		} catch(e) {
+			console.error('[pikafishDeepThink] 第 ' + (_pfAttempt + 1) + ' 次尝试失败:', e);
+			// 复位引擎实例（清除已失败的 init promise），并重新触发二进制加载
+			try { if (typeof pikafishEngine !== 'undefined' && pikafishEngine) pikafishEngine.stop(); } catch (eST) {}
+			_pfEnsureLoading('wasm'); _pfEnsureLoading('nnue');
 		}
-		console.log('Pikafish 返回空着法，回退到本地AI');
-	} catch(e) {
-		console.error('Pikafish deep engine error:', e);
 	}
+	if (pfMove) {
+		doAiMove(pfMove);
+		return;
+	}
+	console.log('Pikafish 引擎多次尝试后仍失败，回退到本地AI');
 
 	// 回退到本地AI
 	aiThinking = false;
@@ -6345,6 +6358,7 @@ if(g.gm==='pikafish')pikafishDeepThink();else startAiThink();
 }else if(g.gm==='online'&&g.myRm){
 window._pendingReconnect=g;
 gm='online';myRm=g.myRm;myCl=g.myCl;
+try{if(g.pid){window._xqPid={rm:g.myRm,pid:g.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 恢复pid: 刷新后凭pid秒接管座位
 boardFlip=(myCl==='black');
 D('lobby').classList.add('hide');D('game').classList.add('show');
 D('modeBadge').textContent='房间: '+g.myRm;
@@ -6500,38 +6514,7 @@ _SC.prototype._xqPidPatched=true;
 }catch(e){}}
 try{_xqAttachRoomListListeners();}catch(e){}
 try{var _olg=window.leaveGame;if(typeof _olg==='function'){window.leaveGame=function(){try{document.body.removeAttribute('data-xq-spec');}catch(e){}return _olg.apply(this,arguments);};}}catch(e){}
-/* --- 线路自动回退: WS连续失败时静默切换到备用域名(页面地址不变,两端同一后端) --- */
-try{(function(){
-if(window._xqFailoverInstalled)return;window._xqFailoverInstalled=true;
-var primary=window.location.host;
-var alt=primary==='x.meaigo.eu.org'?'x.696919.xyz':'x.meaigo.eu.org';
-var cur=primary;
-window._xqGameOrigin=function(){return window.location.protocol+'//'+cur;};
-window._xqAltOrigin=function(){return window.location.protocol+'//'+(cur===primary?alt:primary);};
-var _SCP=window.SocketClient&&window.SocketClient.prototype;
-if(_SCP&&!_SCP._xqFailoverPatched){
-_SCP._xqFailoverPatched=true;
-var _oc=_SCP.connect;
-_SCP.connect=function(){
-try{
-if(cur&&this.url&&this.url.indexOf('//'+cur+'/')<0){this.url=this.url.replace(/^(wss?:\/\/)[^\/]+/,'$1'+cur);}
-if(cur&&this.baseUrl&&this.baseUrl.indexOf('//'+cur+'/')<0){this.baseUrl=this.baseUrl.replace(/^(wss?:\/\/)[^\/]+/,'$1'+cur);}
-}catch(e){}
-return _oc.apply(this,arguments);
-};
-var _ot=_SCP._trigger;
-_SCP._trigger=function(ev,data){
-try{
-if(ev==='connect'){this._xqFails=0;}
-else if(ev==='disconnect'){
-this._xqFails=(this._xqFails||0)+1;
-if(this._xqFails>=2&&cur!==alt){cur=alt;this._xqFails=0;console.warn('[xq-failover] WS switch to '+alt);try{if(typeof toast==='function')toast('主线路不稳,已切换备用线路',2000);}catch(e){}}
-}
-}catch(e){}
-return _ot.apply(this,arguments);
-};
-}
-})();}catch(e){}
+/* --- 线路自动回退已移除: 单域名部署(页面地址不变), WS 失败由 SocketClient 自带重连处理 --- */
 try{var _ofe=window.forceExitGame;if(typeof _ofe==='function'){window.forceExitGame=function(){try{document.body.removeAttribute('data-xq-spec');}catch(e){}return _ofe.apply(this,arguments);};}}catch(e){}
 try{var _xqOrigConnectSocket=window.connectSocket;if(typeof _xqOrigConnectSocket==='function'){window.connectSocket=function(){try{_xqOrigConnectSocket();}catch(e){}try{_xqAttachRoomListListeners();}catch(e){}};}}catch(e){}
 try{setTimeout(function(){_xqLoadRooms();},800);}catch(e){}
