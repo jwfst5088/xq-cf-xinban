@@ -153,7 +153,8 @@ var ChessRoom = class {
       const pair = new WebSocketPair();
       const [client, server] = Object.values(pair);
       const roomId2 = url.searchParams.get("roomId") || this.ctx.id.toString().split("-").pop();
-      await this.initRoom(roomId2);
+      this._roomId = roomId2;
+      this._roomReady = this.initRoom(roomId2);
       server.accept();
       this.handleRoomWebSocket(server);
       return new Response(null, { status: 101, webSocket: client });
@@ -216,6 +217,13 @@ var ChessRoom = class {
     startHeartbeat();
     ws.onmessage = async (event) => {
       try {
+        if (this._roomReady) {
+          try {
+            await this._roomReady;
+          } catch (e) {
+          }
+          this._roomReady = null;
+        }
         ws._lastSeen = Date.now();
         const data = JSON.parse(event.data);
         const eventName = data.event || data[0];
@@ -465,9 +473,9 @@ var ChessRoom = class {
           if (!this.room) return;
           this.broadcastToOpponent(ws, JSON.stringify({ event: "undo_rejected", data: {} }));
         } else if (eventName === "reconnect_room") {
-          if (!this.room) {
+          if (!this.room && this._roomId) {
             try {
-              await this.initRoom(this.room.id);
+              await this.initRoom(this._roomId);
             } catch (e2) {
             }
           }
@@ -1024,14 +1032,6 @@ async function handleWebSocket(ws, env) {
   onlineCount++;
   activeConnections.add(ws);
   ws._xqCounted = true;
-  try {
-    if (env.CHESS_DB) {
-      await env.CHESS_DB.exec("CREATE TABLE IF NOT EXISTS online_now (cid TEXT PRIMARY KEY, ts INTEGER)");
-      await env.CHESS_DB.prepare("INSERT OR REPLACE INTO online_now (cid, ts) VALUES (?1, ?2)").bind(cid, Date.now()).run();
-      dbTouched = Date.now();
-    }
-  } catch (e) {
-  }
   const sendRealCount = /* @__PURE__ */ __name(async () => {
     let n = onlineCount;
     try {
@@ -1049,7 +1049,18 @@ async function handleWebSocket(ws, env) {
       }
     }
   }, "sendRealCount");
-  await sendRealCount();
+  const _dropConn = /* @__PURE__ */ __name(() => {
+    if (!ws._xqCounted) return;
+    ws._xqCounted = false;
+    onlineCount--;
+    activeConnections.delete(ws);
+    try {
+      if (env.CHESS_DB) env.CHESS_DB.prepare("DELETE FROM online_now WHERE cid = ?1").bind(cid).run().catch(() => {
+      });
+    } catch (e) {
+    }
+    sendRealCount();
+  }, "_dropConn");
   let socketData = { roomId: null, color: null, spectator: false };
   ws.onmessage = async (event) => {
     try {
@@ -1091,24 +1102,24 @@ async function handleWebSocket(ws, env) {
       console.error("WebSocket message error:", e);
     }
   };
-  const _dropConn = /* @__PURE__ */ __name(() => {
-    if (!ws._xqCounted) return;
-    ws._xqCounted = false;
-    onlineCount--;
-    activeConnections.delete(ws);
-    try {
-      if (env.CHESS_DB) env.CHESS_DB.prepare("DELETE FROM online_now WHERE cid = ?1").bind(cid).run().catch(() => {
-      });
-    } catch (e) {
-    }
-    sendRealCount();
-  }, "_dropConn");
   ws.onclose = () => {
     _dropConn();
   };
   ws.onerror = () => {
     _dropConn();
   };
+  try {
+    if (env.CHESS_DB) {
+      env.CHESS_DB.exec("CREATE TABLE IF NOT EXISTS online_now (cid TEXT PRIMARY KEY, ts INTEGER)").then(() => {
+        return env.CHESS_DB.prepare("INSERT OR REPLACE INTO online_now (cid, ts) VALUES (?1, ?2)").bind(cid, Date.now()).run();
+      }).then(() => {
+        dbTouched = Date.now();
+      }).catch(() => {
+      });
+    }
+  } catch (e) {
+  }
+  sendRealCount();
 }
 __name(handleWebSocket, "handleWebSocket");
 __name2(handleWebSocket, "handleWebSocket");
