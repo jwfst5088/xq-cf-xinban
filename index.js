@@ -1015,13 +1015,17 @@ var index_default = {
           status: 200,
           headers: {
             "Content-Type": "text/html; charset=utf-8",
+            "Access-Control-Allow-Origin": "*",
             "Cache-Control": "no-store, no-cache, must-revalidate",
             "Pragma": "no-cache",
             "Expires": "0"
           }
         });
       }
-      return env.ASSETS.fetch(request);
+      const ar = await env.ASSETS.fetch(request);
+      const nr = new Response(ar.body, ar);
+      nr.headers.set("Access-Control-Allow-Origin", "*");
+      return nr;
     }
     return new Response("Not found", { status: 404 });
   }

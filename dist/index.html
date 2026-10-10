@@ -6556,6 +6556,8 @@ try{var _ofe=window.forceExitGame;if(typeof _ofe==='function'){window.forceExitG
 try{var _xqOrigConnectSocket=window.connectSocket;if(typeof _xqOrigConnectSocket==='function'){window.connectSocket=function(){try{_xqOrigConnectSocket();}catch(e){}try{_xqAttachRoomListListeners();}catch(e){}};}}catch(e){}
 try{setTimeout(function(){_xqLoadRooms();},800);}catch(e){}
 try{setInterval(function(){try{if(socket&&socket.connected)_xqLoadRooms();}catch(e){}},15000);}catch(e){}
+/* --- SW: 首次访问后注册; 该域名打不开时 SW 自动从备胎域名回源(x.meaigo/xb.meaigo), 地址栏不变 --- */
+try{if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('/sw.js').catch(function(){});}}catch(e){}
 </script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"0a4ff2af697e451c85fdf620787d507c","r":1}' crossorigin="anonymous"></script>
 </body>
