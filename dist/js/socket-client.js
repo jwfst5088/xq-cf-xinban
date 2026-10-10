@@ -20,7 +20,22 @@ class SocketClient {
     this._pongTimer = null;
     this._reconnectTimer = null;
     this._lastPong = 0;
+    this.endpoints = this._buildEndpoints();
+    this._epIndex = 0;
     console.log('SocketClient URL:', this.url, 'roomId:', this.roomId);
+  }
+
+  _buildEndpoints() {
+    const list = [this.baseUrl];
+    const proto = (window.location && window.location.protocol === 'https:') ? 'wss' : 'ws';
+    list.push(proto + '://x.meaigo.eu.org/ws', proto + '://xb.meaigo.eu.org/ws');
+    const seen = new Set();
+    const out = [];
+    for (const u of list) {
+      const base = (u || '').split('?')[0];
+      if (base && !seen.has(base)) { seen.add(base); out.push(u); }
+    }
+    return out.length ? out : [this.url];
   }
 
   on(event, callback) {
@@ -76,6 +91,9 @@ class SocketClient {
 
     this.connecting = true;
     this._trigger('connecting');
+
+    this.url = this.endpoints[this._epIndex] + (this.roomId ? '?roomId=' + this.roomId : '');
+    this.baseUrl = this.endpoints[this._epIndex];
 
     this.ws = new WebSocket(this.url);
 
@@ -134,6 +152,11 @@ class SocketClient {
       this._trigger('disconnect');
 
       if (this.reconnection && this.reconnectAttempts < this.maxReconnectAttempts) {
+        const prevEp = this._epIndex;
+        this._epIndex = (this._epIndex + 1) % this.endpoints.length;
+        if (this._epIndex !== prevEp) {
+          try { console.log('WS failover:', this.endpoints[prevEp], '->', this.endpoints[this._epIndex]); } catch (e) {}
+        }
         this._reconnectTimer = setTimeout(() => {
           this._reconnectTimer = null;
           this.reconnectAttempts++;
