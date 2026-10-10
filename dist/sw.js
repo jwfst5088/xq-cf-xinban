@@ -1,8 +1,8 @@
 /* 中国象棋 SW: 主域挂时从备胎域名回源, 地址栏不变; 网络优先保证页面最新 */
-const CACHE = 'xq-sw-v1';
+const CACHE = 'xq-sw-v2' // v2: 升版即全端清缓存自愈;
 const FALLBACK_ORIGINS = ['https://x.meaigo.eu.org', 'https://xb.meaigo.eu.org'];
-const T_PRIMARY = 3500;
-const T_FALLBACK = 2500;
+const T_PRIMARY = 8000 // 手机WiFi首字节常超3.5s, 3500会误进备用流程;
+const T_FALLBACK = 6000;
 
 self.addEventListener('install', (e) => { self.skipWaiting(); });
 self.addEventListener('activate', (e) => {
