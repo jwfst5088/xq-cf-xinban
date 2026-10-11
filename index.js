@@ -1,9 +1,13 @@
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
-// index.js
+// cf-chess.js
 var __defProp2 = Object.defineProperty;
 var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+var __defProp22 = Object.defineProperty;
+var __name22 = /* @__PURE__ */ __name2((target, value) => __defProp22(target, "name", { value, configurable: true }), "__name");
+var __defProp222 = Object.defineProperty;
+var __name222 = /* @__PURE__ */ __name22((target, value) => __defProp222(target, "name", { value, configurable: true }), "__name");
 var activeConnections = /* @__PURE__ */ new Set();
 var onlineCount = 0;
 var aiWeights = {
@@ -37,12 +41,20 @@ function broadcastOnlineCount() {
 }
 __name(broadcastOnlineCount, "broadcastOnlineCount");
 __name2(broadcastOnlineCount, "broadcastOnlineCount");
+__name22(broadcastOnlineCount, "broadcastOnlineCount");
+__name222(broadcastOnlineCount, "broadcastOnlineCount");
 var ChessRoom = class {
   static {
     __name(this, "ChessRoom");
   }
   static {
     __name2(this, "ChessRoom");
+  }
+  static {
+    __name22(this, "ChessRoom");
+  }
+  static {
+    __name222(this, "ChessRoom");
   }
   constructor(ctx, env) {
     this.ctx = ctx;
@@ -185,7 +197,7 @@ var ChessRoom = class {
     ws._lastSeen = Date.now();
     let heartbeatTimer = null;
     let heartbeatTimeout = null;
-    const startHeartbeat = /* @__PURE__ */ __name2(() => {
+    const startHeartbeat = /* @__PURE__ */ __name222(() => {
       stopHeartbeat();
       heartbeatTimer = setInterval(() => {
         if (heartbeatTimeout) {
@@ -204,7 +216,7 @@ var ChessRoom = class {
         }, 6e4);
       }, 3e4);
     }, "startHeartbeat");
-    const stopHeartbeat = /* @__PURE__ */ __name2(() => {
+    const stopHeartbeat = /* @__PURE__ */ __name222(() => {
       if (heartbeatTimer) {
         clearInterval(heartbeatTimer);
         heartbeatTimer = null;
@@ -481,8 +493,8 @@ var ChessRoom = class {
           }
           if (!this.room) return;
           const otherEntries = [...this.room.players.entries()].filter(([pws]) => pws !== ws);
-          const isReplaceable = /* @__PURE__ */ __name2((c) => otherEntries.some(([pws, p]) => p.color === c && (pws.readyState === WebSocket.CLOSED || pws.readyState === WebSocket.CLOSING || pws.readyState === WebSocket.CONNECTING || this.disconnected && this.disconnected[c])), "isReplaceable");
-          const isFree = /* @__PURE__ */ __name2((c) => !otherEntries.some(([, p]) => p.color === c), "isFree");
+          const isReplaceable = /* @__PURE__ */ __name222((c) => otherEntries.some(([pws, p]) => p.color === c && (pws.readyState === WebSocket.CLOSED || pws.readyState === WebSocket.CLOSING || pws.readyState === WebSocket.CONNECTING || this.disconnected && this.disconnected[c])), "isReplaceable");
+          const isFree = /* @__PURE__ */ __name222((c) => !otherEntries.some(([, p]) => p.color === c), "isFree");
           if (payload && payload.pid && this.room.playerTokens) {
             const tokColor = this.room.playerTokens.red === payload.pid ? "red" : this.room.playerTokens.black === payload.pid ? "black" : null;
             if (tokColor) {
@@ -622,7 +634,7 @@ var ChessRoom = class {
           } catch (e) {
           }
           try {
-            if (this.env.CHESS_DB) this.env.CHESS_DB.prepare("DELETE FROM room_state WHERE room_id = ?").bind(room.id).run();
+            if (this.env.CHESS_DB && !room.gameOver) this.env.CHESS_DB.prepare("DELETE FROM room_state WHERE room_id = ?").bind(room.id).run();
           } catch (e) {
           }
           if (this._cleanupTimer) {
@@ -668,6 +680,19 @@ var ChessRoom = class {
                 this.room._timer = null;
               }
               this._saveRoomState();
+              this.ctx.waitUntil(this._regUpdate(null));
+              if (!this.room._forfeitTeardown) {
+                this.room._forfeitTeardown = setTimeout(() => {
+                  const roomTeardown = this.room;
+                  if (!roomTeardown || !roomTeardown.gameOver) return;
+                  if (this._regKA) { clearInterval(this._regKA); this._regKA = null; }
+                  if (roomTeardown._timer) { clearInterval(roomTeardown._timer); roomTeardown._timer = null; }
+                  if (roomTeardown._disconnectTimer) { clearTimeout(roomTeardown._disconnectTimer); roomTeardown._disconnectTimer = null; }
+                  this.room = null;
+                  for (const [, pwsTeardown] of roomTeardown.players) { try { pwsTeardown.close(); } catch (eTeardown) {} }
+                  for (const swsTeardown of roomTeardown.spectators) { try { swsTeardown.close(); } catch (eTeardown2) {} }
+                }, 15e3);
+              }
               break;
             }
           }
@@ -818,6 +843,8 @@ async function initAiDb(db) {
 }
 __name(initAiDb, "initAiDb");
 __name2(initAiDb, "initAiDb");
+__name22(initAiDb, "initAiDb");
+__name222(initAiDb, "initAiDb");
 async function loadAiFromDb(db) {
   try {
     const result = await db.prepare("SELECT weights, stats FROM ai_weights WHERE id = 1").first();
@@ -850,6 +877,8 @@ async function loadAiFromDb(db) {
 }
 __name(loadAiFromDb, "loadAiFromDb");
 __name2(loadAiFromDb, "loadAiFromDb");
+__name22(loadAiFromDb, "loadAiFromDb");
+__name222(loadAiFromDb, "loadAiFromDb");
 async function saveAiToDb(db) {
   try {
     await db.exec(`CREATE TABLE IF NOT EXISTS ai_weights (id INTEGER PRIMARY KEY, weights TEXT, stats TEXT, updated_at INTEGER)`);
@@ -862,6 +891,8 @@ async function saveAiToDb(db) {
 }
 __name(saveAiToDb, "saveAiToDb");
 __name2(saveAiToDb, "saveAiToDb");
+__name22(saveAiToDb, "saveAiToDb");
+__name222(saveAiToDb, "saveAiToDb");
 async function handleApiRequest(request, env) {
   const url = new URL(request.url);
   const path = url.pathname;
@@ -976,6 +1007,8 @@ async function handleApiRequest(request, env) {
 }
 __name(handleApiRequest, "handleApiRequest");
 __name2(handleApiRequest, "handleApiRequest");
+__name22(handleApiRequest, "handleApiRequest");
+__name222(handleApiRequest, "handleApiRequest");
 var index_default = {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -1036,7 +1069,7 @@ async function handleWebSocket(ws, env) {
   onlineCount++;
   activeConnections.add(ws);
   ws._xqCounted = true;
-  const sendRealCount = /* @__PURE__ */ __name(async () => {
+  const sendRealCount = /* @__PURE__ */ __name22(async () => {
     let n = onlineCount;
     try {
       if (env.CHESS_DB) {
@@ -1053,7 +1086,7 @@ async function handleWebSocket(ws, env) {
       }
     }
   }, "sendRealCount");
-  const _dropConn = /* @__PURE__ */ __name(() => {
+  const _dropConn = /* @__PURE__ */ __name22(() => {
     if (!ws._xqCounted) return;
     ws._xqCounted = false;
     onlineCount--;
@@ -1127,8 +1160,10 @@ async function handleWebSocket(ws, env) {
 }
 __name(handleWebSocket, "handleWebSocket");
 __name2(handleWebSocket, "handleWebSocket");
+__name22(handleWebSocket, "handleWebSocket");
+__name222(handleWebSocket, "handleWebSocket");
 export {
   ChessRoom,
   index_default as default
 };
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=cf-chess.js.map
