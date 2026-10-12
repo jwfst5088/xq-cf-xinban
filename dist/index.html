@@ -396,9 +396,24 @@ body[data-xq-spec] .right-panel .actions button:not([onclick*="leaveGame"]):not(
 <script>
 // ========== Pikafish WASM 加载 (IndexedDB 缓存 + 分片顺序加载) ==========
 var WASM_DB = 'pikafish_wasm_cache';
-var WASM_KEY = 'pikafish_wasm_v2';
+// v169: 缓存键 v2→v3，强制旧客户端重新下载（防止 IndexedDB 中残留旧构建 wasm）
+var WASM_KEY = 'pikafish_wasm_v3';
 var WASM_SHARD_TIMEOUT = 180000;
 var WASM_TOTAL_TIMEOUT = 540000;
+// v169: 完整性校验（大小校验拦不住"同尺寸不同内容"的坏缓存，必须哈希校验）
+var WASM_EXPECT_SIZE = 769237;
+var WASM_EXPECT_SHA256 = '3b596a7e5a69940107eff10ee01e8a57b0e570124e5c5aa72144837d2afd0ec0';
+
+function sha256Hex(buf) {
+  try {
+    if (!(window.crypto && window.crypto.subtle)) return Promise.resolve('');
+    return window.crypto.subtle.digest('SHA-256', buf).then(function(h) {
+      var a = new Uint8Array(h), s = '';
+      for (var i = 0; i < a.length; i++) s += ('0' + a[i].toString(16)).slice(-2);
+      return s;
+    }).catch(function() { return ''; });
+  } catch (e) { return Promise.resolve(''); }
+}
 window._pikaWasmBinary = null;
 window._pikaNnueBinary = null;
 window._pikafishScriptsReady = false;
@@ -464,17 +479,23 @@ function loadWasmShard(url) {
 async function loadPikafishWasm() {
   console.log('[Pikafish] Starting WASM loading (IndexedDB cache)...');
   var cached = await getCachedWasm();
-  if (cached && cached.byteLength > 10000000) {
-    window._pikaWasmBinary = cached;
-    console.log('[Pikafish] Using cached WASM from IndexedDB, size:', cached.byteLength);
-    return;
+  if (cached && cached.byteLength === WASM_EXPECT_SIZE) {
+    var wh = await sha256Hex(cached);
+    if (!WASM_EXPECT_SHA256 || wh === WASM_EXPECT_SHA256) {
+      window._pikaWasmBinary = cached;
+      console.log('[Pikafish] Using cached WASM from IndexedDB, size:', cached.byteLength);
+      return;
+    }
+    console.warn('[Pikafish] Cached WASM SHA-256 mismatch (' + (wh || 'unavailable') + '), expected ' + WASM_EXPECT_SHA256 + ' — 缓存内容异常，重新下载');
+  } else if (cached) {
+    console.log('[Pikafish] Cached WASM size mismatch (' + cached.byteLength + ' bytes), re-downloading...');
   }
 
   console.log('[Pikafish] Downloading WASM parts (sequential)...');
   var parts = [];
   var totalStart = Date.now();
   for (var i = 0; i < 3; i++) {
-    var url = '/js/pikafish.wasm.part' + i + '?v=2';
+    var url = '/js/pikafish.wasm.part' + i + '?v=3';
     if (Date.now() - totalStart > WASM_TOTAL_TIMEOUT) {
       throw new Error('Total WASM loading timeout');
     }
@@ -504,9 +525,15 @@ async function loadPikafishWasm() {
     merged.set(parts[i], offset);
     offset += parts[i].byteLength;
   }
+  var wasmSha = await sha256Hex(merged.buffer);
+  var wasmOk = !WASM_EXPECT_SHA256 || wasmSha === WASM_EXPECT_SHA256;
   window._pikaWasmBinary = merged.buffer;
-  saveCachedWasm(merged.buffer);
-  console.log('[Pikafish] WASM merged, total size:', merged.byteLength);
+  if (wasmOk) {
+    saveCachedWasm(merged.buffer);
+  } else {
+    console.error('[Pikafish] WASM parts SHA-256 mismatch (' + (wasmSha || 'unavailable') + '), expected ' + WASM_EXPECT_SHA256 + ' — 分片内容异常，不写缓存');
+  }
+  console.log('[Pikafish] WASM merged, total size:', merged.byteLength, wasmOk ? '(sha256 ok)' : '(sha256 MISMATCH)');
 }
 
 // 异步加载 WASM
@@ -521,7 +548,13 @@ var NNUE_DB = 'pikafish_nnue_cache';
 // v162: v10 cache holds official Pikafish 2026-01-02 NNUE (53212941 bytes ZSTD).
 // Downloaded directly from https://github.com/official-pikafish/Pikafish/releases
 // Engine uses read_compressed_nnue() which reads via std::ifstream then ZSTD decompresses.
-var NNUE_KEY = 'pikafish_nnue_v10';
+// v169: 缓存键 v10→v11 + SHA-256 完整性校验。
+// 修复：部分浏览器 IndexedDB 中残留"同尺寸但内容不同/损坏"的 NNUE（仅靠大小校验拦不住），
+//       引擎报 "Network evaluation parameters compatible with the engine must be available."
+//       并自杀退出 → 反复重试失败 → 回退本地AI。v11 键强制全端重新下载当前正确网络。
+var NNUE_KEY = 'pikafish_nnue_v11';
+var NNUE_EXPECT_SIZE = 53212941;
+var NNUE_EXPECT_SHA256 = 'c4026370d7516d9b0f668447f9ca1931241538bdc689cde6fec6a991ac4d5f77';
 
 function getCachedNnue() {
   return new Promise(function(resolve) {
@@ -577,13 +610,16 @@ async function loadGzipShard(url) {
 async function loadPikafishNnue() {
   console.log('[Pikafish] Starting NNUE loading (IndexedDB cache)...');
   var cached = await getCachedNnue();
-  // v162: Official NNUE from Pikafish 2026-01-02 is exactly 53212941 bytes
-  if (cached && cached.byteLength === 53212941) {
-    window._pikaNnueBinary = cached;
-    console.log('[Pikafish] Using cached NNUE from IndexedDB, size:', cached.byteLength);
-    return;
-  }
-  if (cached) {
+  // v169: 大小 + SHA-256 双重校验，内容不符一律重新下载
+  if (cached && cached.byteLength === NNUE_EXPECT_SIZE) {
+    var nh = await sha256Hex(cached);
+    if (!NNUE_EXPECT_SHA256 || nh === NNUE_EXPECT_SHA256) {
+      window._pikaNnueBinary = cached;
+      console.log('[Pikafish] Using cached NNUE from IndexedDB, size:', cached.byteLength);
+      return;
+    }
+    console.warn('[Pikafish] Cached NNUE SHA-256 mismatch (' + (nh || 'unavailable') + '), expected ' + NNUE_EXPECT_SHA256 + ' — 缓存内容异常，重新下载');
+  } else if (cached) {
     console.log('[Pikafish] Cached NNUE size mismatch (' + cached.byteLength + ' bytes), re-downloading...');
   }
 
@@ -626,9 +662,15 @@ async function loadPikafishNnue() {
     merged.set(parts[i], offset);
     offset += parts[i].byteLength;
   }
+  var nnueSha = await sha256Hex(merged.buffer);
+  var nnueOk = !NNUE_EXPECT_SHA256 || nnueSha === NNUE_EXPECT_SHA256;
   window._pikaNnueBinary = merged.buffer;
-  saveCachedNnue(merged.buffer);
-  console.log('[Pikafish] NNUE merged, total size:', merged.byteLength);
+  if (nnueOk) {
+    saveCachedNnue(merged.buffer);
+  } else {
+    console.error('[Pikafish] NNUE parts SHA-256 mismatch (' + (nnueSha || 'unavailable') + '), expected ' + NNUE_EXPECT_SHA256 + ' — 分片内容异常，不写缓存');
+  }
+  console.log('[Pikafish] NNUE merged, total size:', merged.byteLength, nnueOk ? '(sha256 ok)' : '(sha256 MISMATCH)');
 }
 
 // 异步加载 NNUE (与 WASM 并行)
