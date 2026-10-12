@@ -1,13 +1,9 @@
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
-// cf-chess.js
+// index.js
 var __defProp2 = Object.defineProperty;
 var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-var __defProp22 = Object.defineProperty;
-var __name22 = /* @__PURE__ */ __name2((target, value) => __defProp22(target, "name", { value, configurable: true }), "__name");
-var __defProp222 = Object.defineProperty;
-var __name222 = /* @__PURE__ */ __name22((target, value) => __defProp222(target, "name", { value, configurable: true }), "__name");
 var activeConnections = /* @__PURE__ */ new Set();
 var onlineCount = 0;
 var aiWeights = {
@@ -41,20 +37,12 @@ function broadcastOnlineCount() {
 }
 __name(broadcastOnlineCount, "broadcastOnlineCount");
 __name2(broadcastOnlineCount, "broadcastOnlineCount");
-__name22(broadcastOnlineCount, "broadcastOnlineCount");
-__name222(broadcastOnlineCount, "broadcastOnlineCount");
 var ChessRoom = class {
   static {
     __name(this, "ChessRoom");
   }
   static {
     __name2(this, "ChessRoom");
-  }
-  static {
-    __name22(this, "ChessRoom");
-  }
-  static {
-    __name222(this, "ChessRoom");
   }
   constructor(ctx, env) {
     this.ctx = ctx;
@@ -165,8 +153,7 @@ var ChessRoom = class {
       const pair = new WebSocketPair();
       const [client, server] = Object.values(pair);
       const roomId2 = url.searchParams.get("roomId") || this.ctx.id.toString().split("-").pop();
-      this._roomId = roomId2;
-      this._roomReady = this.initRoom(roomId2);
+      await this.initRoom(roomId2);
       server.accept();
       this.handleRoomWebSocket(server);
       return new Response(null, { status: 101, webSocket: client });
@@ -197,7 +184,7 @@ var ChessRoom = class {
     ws._lastSeen = Date.now();
     let heartbeatTimer = null;
     let heartbeatTimeout = null;
-    const startHeartbeat = /* @__PURE__ */ __name222(() => {
+    const startHeartbeat = /* @__PURE__ */ __name2(() => {
       stopHeartbeat();
       heartbeatTimer = setInterval(() => {
         if (heartbeatTimeout) {
@@ -216,7 +203,7 @@ var ChessRoom = class {
         }, 6e4);
       }, 3e4);
     }, "startHeartbeat");
-    const stopHeartbeat = /* @__PURE__ */ __name222(() => {
+    const stopHeartbeat = /* @__PURE__ */ __name2(() => {
       if (heartbeatTimer) {
         clearInterval(heartbeatTimer);
         heartbeatTimer = null;
@@ -229,13 +216,6 @@ var ChessRoom = class {
     startHeartbeat();
     ws.onmessage = async (event) => {
       try {
-        if (this._roomReady) {
-          try {
-            await this._roomReady;
-          } catch (e) {
-          }
-          this._roomReady = null;
-        }
         ws._lastSeen = Date.now();
         const data = JSON.parse(event.data);
         const eventName = data.event || data[0];
@@ -485,16 +465,16 @@ var ChessRoom = class {
           if (!this.room) return;
           this.broadcastToOpponent(ws, JSON.stringify({ event: "undo_rejected", data: {} }));
         } else if (eventName === "reconnect_room") {
-          if (!this.room && this._roomId) {
+          if (!this.room) {
             try {
-              await this.initRoom(this._roomId);
+              await this.initRoom(this.room.id);
             } catch (e2) {
             }
           }
           if (!this.room) return;
           const otherEntries = [...this.room.players.entries()].filter(([pws]) => pws !== ws);
-          const isReplaceable = /* @__PURE__ */ __name222((c) => otherEntries.some(([pws, p]) => p.color === c && (pws.readyState === WebSocket.CLOSED || pws.readyState === WebSocket.CLOSING || pws.readyState === WebSocket.CONNECTING || this.disconnected && this.disconnected[c])), "isReplaceable");
-          const isFree = /* @__PURE__ */ __name222((c) => !otherEntries.some(([, p]) => p.color === c), "isFree");
+          const isReplaceable = /* @__PURE__ */ __name2((c) => otherEntries.some(([pws, p]) => p.color === c && (pws.readyState === WebSocket.CLOSED || pws.readyState === WebSocket.CLOSING || pws.readyState === WebSocket.CONNECTING || this.disconnected && this.disconnected[c])), "isReplaceable");
+          const isFree = /* @__PURE__ */ __name2((c) => !otherEntries.some(([, p]) => p.color === c), "isFree");
           if (payload && payload.pid && this.room.playerTokens) {
             const tokColor = this.room.playerTokens.red === payload.pid ? "red" : this.room.playerTokens.black === payload.pid ? "black" : null;
             if (tokColor) {
@@ -843,8 +823,6 @@ async function initAiDb(db) {
 }
 __name(initAiDb, "initAiDb");
 __name2(initAiDb, "initAiDb");
-__name22(initAiDb, "initAiDb");
-__name222(initAiDb, "initAiDb");
 async function loadAiFromDb(db) {
   try {
     const result = await db.prepare("SELECT weights, stats FROM ai_weights WHERE id = 1").first();
@@ -877,8 +855,6 @@ async function loadAiFromDb(db) {
 }
 __name(loadAiFromDb, "loadAiFromDb");
 __name2(loadAiFromDb, "loadAiFromDb");
-__name22(loadAiFromDb, "loadAiFromDb");
-__name222(loadAiFromDb, "loadAiFromDb");
 async function saveAiToDb(db) {
   try {
     await db.exec(`CREATE TABLE IF NOT EXISTS ai_weights (id INTEGER PRIMARY KEY, weights TEXT, stats TEXT, updated_at INTEGER)`);
@@ -891,8 +867,6 @@ async function saveAiToDb(db) {
 }
 __name(saveAiToDb, "saveAiToDb");
 __name2(saveAiToDb, "saveAiToDb");
-__name22(saveAiToDb, "saveAiToDb");
-__name222(saveAiToDb, "saveAiToDb");
 async function handleApiRequest(request, env) {
   const url = new URL(request.url);
   const path = url.pathname;
@@ -1007,8 +981,6 @@ async function handleApiRequest(request, env) {
 }
 __name(handleApiRequest, "handleApiRequest");
 __name2(handleApiRequest, "handleApiRequest");
-__name22(handleApiRequest, "handleApiRequest");
-__name222(handleApiRequest, "handleApiRequest");
 var index_default = {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -1048,17 +1020,13 @@ var index_default = {
           status: 200,
           headers: {
             "Content-Type": "text/html; charset=utf-8",
-            "Access-Control-Allow-Origin": "*",
             "Cache-Control": "no-store, no-cache, must-revalidate",
             "Pragma": "no-cache",
             "Expires": "0"
           }
         });
       }
-      const ar = await env.ASSETS.fetch(request);
-      const nr = new Response(ar.body, ar);
-      nr.headers.set("Access-Control-Allow-Origin", "*");
-      return nr;
+      return env.ASSETS.fetch(request);
     }
     return new Response("Not found", { status: 404 });
   }
@@ -1069,7 +1037,15 @@ async function handleWebSocket(ws, env) {
   onlineCount++;
   activeConnections.add(ws);
   ws._xqCounted = true;
-  const sendRealCount = /* @__PURE__ */ __name22(async () => {
+  try {
+    if (env.CHESS_DB) {
+      await env.CHESS_DB.exec("CREATE TABLE IF NOT EXISTS online_now (cid TEXT PRIMARY KEY, ts INTEGER)");
+      await env.CHESS_DB.prepare("INSERT OR REPLACE INTO online_now (cid, ts) VALUES (?1, ?2)").bind(cid, Date.now()).run();
+      dbTouched = Date.now();
+    }
+  } catch (e) {
+  }
+  const sendRealCount = /* @__PURE__ */ __name(async () => {
     let n = onlineCount;
     try {
       if (env.CHESS_DB) {
@@ -1086,18 +1062,7 @@ async function handleWebSocket(ws, env) {
       }
     }
   }, "sendRealCount");
-  const _dropConn = /* @__PURE__ */ __name22(() => {
-    if (!ws._xqCounted) return;
-    ws._xqCounted = false;
-    onlineCount--;
-    activeConnections.delete(ws);
-    try {
-      if (env.CHESS_DB) env.CHESS_DB.prepare("DELETE FROM online_now WHERE cid = ?1").bind(cid).run().catch(() => {
-      });
-    } catch (e) {
-    }
-    sendRealCount();
-  }, "_dropConn");
+  await sendRealCount();
   let socketData = { roomId: null, color: null, spectator: false };
   ws.onmessage = async (event) => {
     try {
@@ -1139,31 +1104,29 @@ async function handleWebSocket(ws, env) {
       console.error("WebSocket message error:", e);
     }
   };
+  const _dropConn = /* @__PURE__ */ __name(() => {
+    if (!ws._xqCounted) return;
+    ws._xqCounted = false;
+    onlineCount--;
+    activeConnections.delete(ws);
+    try {
+      if (env.CHESS_DB) env.CHESS_DB.prepare("DELETE FROM online_now WHERE cid = ?1").bind(cid).run().catch(() => {
+      });
+    } catch (e) {
+    }
+    sendRealCount();
+  }, "_dropConn");
   ws.onclose = () => {
     _dropConn();
   };
   ws.onerror = () => {
     _dropConn();
   };
-  try {
-    if (env.CHESS_DB) {
-      env.CHESS_DB.exec("CREATE TABLE IF NOT EXISTS online_now (cid TEXT PRIMARY KEY, ts INTEGER)").then(() => {
-        return env.CHESS_DB.prepare("INSERT OR REPLACE INTO online_now (cid, ts) VALUES (?1, ?2)").bind(cid, Date.now()).run();
-      }).then(() => {
-        dbTouched = Date.now();
-      }).catch(() => {
-      });
-    }
-  } catch (e) {
-  }
-  sendRealCount();
 }
 __name(handleWebSocket, "handleWebSocket");
 __name2(handleWebSocket, "handleWebSocket");
-__name22(handleWebSocket, "handleWebSocket");
-__name222(handleWebSocket, "handleWebSocket");
 export {
   ChessRoom,
   index_default as default
 };
-//# sourceMappingURL=cf-chess.js.map
+//# sourceMappingURL=index.js.map
