@@ -27,9 +27,16 @@ npx wrangler deploy     # 成功标志: Total Upload ≈35.62 KiB 且列出全�
 
 ## 部署后验证
 1. `GET /` 含 `startPikafishGame`、`_wMerged`，cloudai=0
-2. `HEAD /pikafish.nnue.part0` = 17,737,647B；`/js/pikafish.js`=76,457B
+2. `HEAD /pikafish.nnue.part0` = 17,737,647B（sha256 前缀 `fd3def42d27f9c82`，完整文件 sha256 `c4026370…d5f77`）；`/js/pikafish.js`=76,457B
 3. `/api/train/status`、`/api/online` 200；`/ws` 可升级
 4. 浏览器：Pikafish 对局出现 `bestmove g3g4` 类日志；在线对战创建房间正常
+5. (v169) 首页含 `pikafish_nnue_v11` / `pikafish_wasm_v3` / `NNUE_EXPECT_SHA256`；`/sw.js` 为 `xq-sw-v3`（引擎分片不进 SW Cache，页面侧 IndexedDB+SHA256 校验）
+
+> v169 (2026-10) 修复记录：部分浏览器 IndexedDB 中残留同尺寸(53212941B)但内容不同/损坏的 NNUE，
+> 引擎报 "Network evaluation parameters compatible..." 自杀退出并回退本地AI。
+> 修复 = NNUE 缓存键 v10→v11 + WASM 键 v2→v3 + 页面 SHA-256 完整性校验（坏缓存自动弃用重下）。
+> 本地验证：Node 跑 wasm+当前网络 → readyok 且 `bestmove h9g7`（tmp-pika/harness.cjs）。
+> 注意：x.696919.xyz 经 F 账号 xq-hao 代理回源本 Worker；x.meaigo.eu.org 与 xb.meaigo.eu.org 直连本 Worker，三站同步生效。
 
 ## 回滚
 仪表板 → cf-chess → Deployments → 回退；或重新 deploy 本目录（git 版本 xq-cloudflare-pikafish 有完整镜像）。
