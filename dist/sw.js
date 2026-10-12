@@ -1,5 +1,6 @@
 /* 中国象棋 SW: 主域挂时从备胎域名回源, 地址栏不变; 网络优先保证页面最新 */
-const CACHE = 'xq-sw-v2' // v2: 升版即全端清缓存自愈;
+// v3: 升版清缓存，清除可能残留的引擎分片条目；引擎大分片不再进 SW Cache（页面侧 IndexedDB+SHA256 负责）
+const CACHE = 'xq-sw-v3'
 const FALLBACK_ORIGINS = ['https://x.meaigo.eu.org', 'https://xb.meaigo.eu.org'];
 const T_PRIMARY = 8000 // 手机WiFi首字节常超3.5s, 3500会误进备用流程;
 const T_FALLBACK = 6000;
@@ -23,6 +24,9 @@ async function cachePut(req, resp) {
   try {
     if (!resp || !resp.ok || req.method !== 'GET') return;
     const u = new URL(req.url);
+    // v3: 引擎大分片不进 SW Cache（NNUE 17MB×3 太大且 NNUE 带 Date.now() 查询永不会命中；
+    //     wasm 固定 URL 的旧条目会跨部署残留——内容一致性由页面侧 IndexedDB+SHA256 校验负责）
+    if (u.pathname.startsWith('/pikafish.nnue.part') || u.pathname.startsWith('/js/pikafish.wasm.part')) return;
     const key = (u.pathname === '/' || u.pathname === '/index.html') ? self.location.origin + '/' : req.url;
     const c = await caches.open(CACHE);
     await c.put(key, resp);
