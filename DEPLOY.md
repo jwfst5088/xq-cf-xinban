@@ -46,3 +46,9 @@ npx wrangler deploy     # 成功标志: Total Upload ≈35.62 KiB 且列出全�
 - 修复: player_disconnected恢复完整60s倒计时; room_state gameOver分支 等待对手加入→棋局已结束; 服务端 18e4→60e3 + 183e3→63e3 (对齐xq线与客户端提示); sw v3→v4
 - 取证: GitHub历史(10-09/10-10/10-11/10-12)从无60e3/63e3, 客户端倒计时从未在此仓库存在; dcbef82c(10-11)明确写明X线断线宽限180s保留不变
 - 验证: 线上index.html含倒计时+棋局已结束; WS冒烟13/13; 版本 2b214a27
+
+## 2026-10-13 深夜 重大修复: index.js整体回退到dcbef82c好版+仅叠阈值60s/63s
+- 根因(已证实): 10-12 NNUE部署误将陈旧index.js覆盖上线, 冲掉dcbef82c的 _roomId/_roomReady 异步初始化修复(刷新后reconnect_room读this.room.id在null上抛异常被吞→重连静默失败→对方卡死退出)、静态资源CORS、在线人数上报结构
+- 修复: index.js逐字节还原dcbef82c(10-11好版), 仅叠两处阈值 18e4→60e3 / 183e3→63e3; 与好版差异自证恰2行; NNUE改动全在dist(客户端)不受影响
+- 教训: 部署前必须先diff线上源与本地源; 任何部署不得携带未经确认的文件回退
+- 验证: 语法OK; WS冒烟13/13; 部署版本见CF仪表板
