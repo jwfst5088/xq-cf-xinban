@@ -40,3 +40,9 @@ npx wrangler deploy     # 成功标志: Total Upload ≈35.62 KiB 且列出全�
 
 ## 回滚
 仪表板 → cf-chess → Deployments → 回退；或重新 deploy 本目录（git 版本 xq-cloudflare-pikafish 有完整镜像）。
+
+## 2026-10-13 晚 热修: 断线判负生命周期补齐(客户端部分) + 阈值对齐60s
+- 现状: X线此前缺客户端60s倒计时(player_disconnected被截断为仅hideOverlay)与结束态文案,服务端阈值180s/183s
+- 修复: player_disconnected恢复完整60s倒计时; room_state gameOver分支 等待对手加入→棋局已结束; 服务端 18e4→60e3 + 183e3→63e3 (对齐xq线与客户端提示); sw v3→v4
+- 取证: GitHub历史(10-09/10-10/10-11/10-12)从无60e3/63e3, 客户端倒计时从未在此仓库存在; dcbef82c(10-11)明确写明X线断线宽限180s保留不变
+- 验证: 线上index.html含倒计时+棋局已结束; WS冒烟13/13; 版本 2b214a27
