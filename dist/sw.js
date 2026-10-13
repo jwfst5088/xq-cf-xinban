@@ -1,6 +1,6 @@
 /* 中国象棋 SW: 主域挂时从备胎域名回源, 地址栏不变; 网络优先保证页面最新 */
-// v3: 升版清缓存，清除可能残留的引擎分片条目；引擎大分片不再进 SW Cache（页面侧 IndexedDB+SHA256 负责）
-const CACHE = 'xq-sw-v3'
+// v4: 升版清缓存，确保断线判负倒计时+结束态结果面板修复到达所有客户端
+const CACHE = 'xq-sw-v4'
 const FALLBACK_ORIGINS = ['https://x.meaigo.eu.org', 'https://xb.meaigo.eu.org'];
 const T_PRIMARY = 8000 // 手机WiFi首字节常超3.5s, 3500会误进备用流程;
 const T_FALLBACK = 6000;
