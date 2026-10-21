@@ -1339,6 +1339,7 @@ sndStart();
 
 function startAiGame(userColor){
 if(aiThinking)return;
+window._pfEpoch=(window._pfEpoch||0)+1;
 userColor=userColor||(Math.random()<0.5?'red':'black');
 soundEnabled=true;gameOverSoundPlayed=false;undoUsed=false;aiThinking=false;
 gm='ai';myCl=userColor;myRm=null;boardFlip=(userColor==='black');
@@ -1359,6 +1360,7 @@ if(aiCl==='red'&&!engine.gameOver){startAiThink();}
 function retryAiGame(){
 hideOverlay();
 stopAi();
+window._pfEpoch=(window._pfEpoch||0)+1;
 soundEnabled=true;gameOverSoundPlayed=false;undoUsed=false;aiThinking=false;
 // 变更日志：重试时也随机分配红黑方（原硬编码用户执红）
 gm='ai';
@@ -1556,7 +1558,7 @@ showOverlay('<h2>退出对局</h2><p>确认退出当前对局？</p><div class="
 function returnToLobby(){
 soundEnabled=false;gameOverSoundPlayed=false;
 if(audioCtx){try{audioCtx.close();}catch(e){}audioCtx=null;}
-stopTimer();stopAi();gameStarted=false;selected=null;validMoves=[];capRed=[];capBlk=[];lastMove=null;engine.initBoard();
+stopTimer();stopAi();window._pfEpoch=(window._pfEpoch||0)+1;gameStarted=false;selected=null;validMoves=[];capRed=[];capBlk=[];lastMove=null;engine.initBoard();
 gm='local';myCl=null;myRm=null;boardFlip=false;D('drawBtn').style.display='none';
 D('game').classList.remove('show');D('lobby').classList.remove('hide');
 D('redName').textContent='红方';D('blackName').textContent='黑方';
@@ -1570,7 +1572,7 @@ else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
 }
 soundEnabled=false;gameOverSoundPlayed=false;
 if(audioCtx){try{audioCtx.close();}catch(e){}audioCtx=null;}
-stopTimer();stopAi();gameStarted=false;selected=null;validMoves=[];capRed=[];capBlk=[];lastMove=null;engine.initBoard();
+stopTimer();stopAi();window._pfEpoch=(window._pfEpoch||0)+1;gameStarted=false;selected=null;validMoves=[];capRed=[];capBlk=[];lastMove=null;engine.initBoard();
 if(gm==='online'&&sockOk){try{socket.emit('leave_room');}catch(e){}}
 if(socket){try{socket.disconnect();}catch(e){}socket=null;sockOk=false;}
 gm='local';myCl=null;myRm=null;boardFlip=false;D('drawBtn').style.display='none';
@@ -1587,7 +1589,7 @@ else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
 }
 soundEnabled=false;gameOverSoundPlayed=false;
 if(audioCtx){try{audioCtx.close();}catch(e){}audioCtx=null;}
-stopTimer();stopAi();gameStarted=false;selected=null;validMoves=[];capRed=[];capBlk=[];lastMove=null;engine.initBoard();
+stopTimer();stopAi();window._pfEpoch=(window._pfEpoch||0)+1;gameStarted=false;selected=null;validMoves=[];capRed=[];capBlk=[];lastMove=null;engine.initBoard();
 if(gm==='online'&&sockOk){try{socket.emit('leave_room');}catch(e){}}
 if(socket){try{socket.disconnect();}catch(e){}socket=null;sockOk=false;}
 gm='local';myCl=null;myRm=null;boardFlip=false;D('drawBtn').style.display='none';
@@ -1967,7 +1969,7 @@ reconnectRetryCount=0;
 function forceExitGame(){
 hideReconnecting();
 if(window._dcTimer){clearInterval(window._dcTimer);window._dcTimer=null;}
-stopTimer();stopAi();gameStarted=false;selected=null;validMoves=[];capRed=[];capBlk=[];lastMove=null;engine.initBoard();
+stopTimer();stopAi();window._pfEpoch=(window._pfEpoch||0)+1;gameStarted=false;selected=null;validMoves=[];capRed=[];capBlk=[];lastMove=null;engine.initBoard();
 if(socket){try{socket.disconnect();}catch(e){}socket=null;sockOk=false;}
 gm='local';myCl=null;myRm=null;boardFlip=false;D('drawBtn').style.display='none';
 D('game').classList.remove('show');D('lobby').classList.remove('hide');
@@ -5782,6 +5784,9 @@ aiMaxTime = savedAiMaxTime;
 function doAiMove(move){
 if(window._aiGuardTimer){clearTimeout(window._aiGuardTimer);window._aiGuardTimer=null;}
 if(!move){aiThinking=false;return;}
+// [ai-epoch修复] 统一防线: 过期/跨局AI走法在此丢弃(上一局晚到的引擎回调不得落到新局)
+if(gm!=='ai'&&gm!=='pikafish'){aiThinking=false;console.warn('doAiMove: 非AI模式,丢弃过期走法');return;}
+if(engine.gameOver||engine.currentTurn!==aiCl){aiThinking=false;console.warn('doAiMove: 丢弃过期AI走法(局已结束/非AI回合)');return;}
 if(move.fromRow===undefined||move.fromCol===undefined||move.toRow===undefined||move.toCol===undefined){aiThinking=false;console.error('AI返回无效走法:',move);return;}
 var mr=engine.move(move.fromRow,move.fromCol,move.toRow,move.toCol);
 if(!mr){
@@ -6079,6 +6084,7 @@ function applyCloudMove(moveStr){
 // 人机对弈AI入口：优先使用高级AI云库（开局库+残局库），无结果/超时/失败时回退本地AI引擎
 function startAiThink(){
 if(aiThinking||engine.gameOver||engine.currentTurn!==aiCl)return;
+var _aiMyEpoch=window._pfEpoch||0;
 aiThinking=true;
 D('turnText').textContent='云端AI思考中...';
 var fen=boardToFen(engine.board,engine.currentTurn);
@@ -6092,15 +6098,18 @@ var useLocal=function(){
 setTimeout(function(){ if(aiThinking&&!settled){ console.log('云库查询超时，回退本地AI'); useLocal(); } },6000);
 cloudQueryBest(fen,false,function(mv1,rp1){
 	if(settled||!aiThinking)return;
+	if(_aiMyEpoch!==(window._pfEpoch||0))return;
 	if(mv1&&mv1.length>=4){ settled=true; aiThinking=false; applyCloudMove(mv1); return; }
 	// 策略2: 仅查残局库 (endgame=1)
 	if(rp1==='nobestmove'||rp1==='unknown'||rp1==='error'){
 		cloudQueryBest(fen,true,function(mv2,rp2){
 			if(settled||!aiThinking)return;
+	if(_aiMyEpoch!==(window._pfEpoch||0))return;
 			if(mv2&&mv2.length>=4){ settled=true; aiThinking=false; applyCloudMove(mv2); return; }
 			// 策略3: queryall 获取所有已知着法随机选一步
 			cloudQueryAllPick(fen,function(mv3){
 				if(settled||!aiThinking)return;
+	if(_aiMyEpoch!==(window._pfEpoch||0))return;
 				if(mv3){ settled=true; aiThinking=false; applyCloudMove(mv3); return; }
 				useLocal();
 			});
@@ -6226,6 +6235,7 @@ aiThinking=false;
 // ========== Pikafish 深度引擎 ==========
 function startPikafishGame(userColor){
 	if(aiThinking) return;
+	window._pfEpoch = (window._pfEpoch || 0) + 1;
 	userColor = userColor || (Math.random() < 0.5 ? 'red' : 'black');
 	soundEnabled = true; gameOverSoundPlayed = false; undoUsed = false; aiThinking = false;
 	gm = 'pikafish'; myCl = userColor; myRm = null; boardFlip = (userColor === 'black');
@@ -6248,6 +6258,7 @@ async function pikafishDeepThink(){
 		console.log('[pikafishDeepThink] SKIP: condition not met');
 		return;
 	}
+	var _pfMyEpoch = window._pfEpoch || 0;
 	aiThinking = true;
 	D('turnText').textContent = 'Pikafish 深度思考中...';
 	console.log('=== Pikafish Deep AI thinking (depth 15) ===');
@@ -6270,6 +6281,7 @@ async function pikafishDeepThink(){
 	_pfEnsureLoading('wasm'); _pfEnsureLoading('nnue');
 	var pfMove = null;
 	for (var _pfAttempt = 0; _pfAttempt < 2 && !pfMove; _pfAttempt++) {
+		if ((window._pfEpoch || 0) !== _pfMyEpoch) { aiThinking = false; console.log('[pikafishDeepThink] 局已更换,停止过期思考'); return; }
 		try {
 			// 等待 WASM/NNUE 二进制就位（首轮最多120秒配合预载/重载；重试轮再给90秒）
 			var _pfWaitStart = Date.now();
@@ -6284,6 +6296,7 @@ async function pikafishDeepThink(){
 			var pfEngine = await getPikafishEngine();
 			console.log('[pikafishDeepThink] pfEngine ready=' + pfEngine.ready);
 			var move = await pfEngine.findBestMove(engine.board, engine.currentTurn, 3, 3000);
+			if ((window._pfEpoch || 0) !== _pfMyEpoch) { aiThinking = false; console.log('[pikafishDeepThink] 丢弃过期走法(局已更换)'); return; }
 			console.log('[pikafishDeepThink] findBestMove returned:', JSON.stringify(move));
 			if(move){
 				// Pikafish 返回 UCI 格式走法 (如 "b2e2")，需转换为内部格式 {fromRow,fromCol,toRow,toCol}
@@ -6315,6 +6328,7 @@ async function pikafishDeepThink(){
 		}
 	}
 	if (pfMove) {
+		if ((window._pfEpoch || 0) !== _pfMyEpoch) { aiThinking = false; console.log('[pikafishDeepThink] 丢弃过期走法(局已更换)'); return; }
 		doAiMove(pfMove);
 		return;
 	}
@@ -6323,6 +6337,7 @@ async function pikafishDeepThink(){
 	// 回退到本地AI
 	aiThinking = false;
 	setTimeout(function(){
+		if ((window._pfEpoch || 0) !== _pfMyEpoch) { return; }
 		var fb = aiFindBestMove(undefined, aiCl, engine.moveHistory.slice());
 		if(fb){ try{ doAiMove(fb); } catch(ex){ console.error('doAiMove异常:',ex); aiThinking = false; D('turnText').textContent = (aiCl === 'black') ? '红方走棋' : '黑方走棋'; } }
 		else { aiThinking = false; D('turnText').textContent = (aiCl === 'black') ? '红方走棋' : '黑方走棋'; }
@@ -6332,6 +6347,7 @@ async function pikafishDeepThink(){
 function retryPikafishGame(){
 	hideOverlay();
 	stopAi();
+	window._pfEpoch = (window._pfEpoch || 0) + 1;
 	soundEnabled = true; gameOverSoundPlayed = false; undoUsed = false; aiThinking = false;
 	gm = 'pikafish';
 	var uc = Math.random() < 0.5 ? 'red' : 'black';
