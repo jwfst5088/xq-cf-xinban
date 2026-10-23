@@ -13,8 +13,8 @@ class SocketClient {
     this.connected = false;
     this.connecting = false;
     this.connectTimeout = options.timeout || 3000;
-    this.pingInterval = options.pingInterval || 4000;
-    this.pingTimeout = options.pingTimeout || 8000;
+    this.pingInterval = options.pingInterval || 25000;
+    this.pingTimeout = options.pingTimeout || 50000;
     this._connectTimer = null;
     this._pingTimer = null;
     this._pongTimer = null;
