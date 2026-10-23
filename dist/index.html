@@ -6434,14 +6434,13 @@ document.addEventListener('webkitfullscreenchange',onFsChange);
 window.addEventListener('load',function(){setTimeout(function(){window.scrollTo(0,1);},100);});
 
 (function(){
-function _xqShowAiResumeBanner(){try{var b=document.createElement('div');b.id='xqResumeBanner';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:70px;z-index:99999;background:#241409;border:1px solid #3d2117;border-radius:10px;padding:10px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 4px 16px rgba(0,0,0,.4)';var s=document.createElement('span');s.style.cssText='font-size:12px;color:#f0c674';s.textContent='有未完成的人机对弈';var r=document.createElement('button');r.style.cssText='width:auto;padding:4px 12px;font-size:12px;background:#2ecc71;color:#1a0f08;border:none;border-radius:6px;font-weight:700;cursor:pointer';r.textContent='继续对局';r.onclick=function(){try{sessionStorage.setItem('xq_resume_ai','1');}catch(e){}location.reload();};var d=document.createElement('button');d.style.cssText='width:auto;padding:4px 12px;font-size:12px;background:transparent;color:#8a7a68;border:1px solid #3d2117;border-radius:6px;cursor:pointer';d.textContent='放弃';d.onclick=function(){try{localStorage.removeItem('xq_game');sessionStorage.removeItem('xq_game');sessionStorage.removeItem('xq_resume_ai');}catch(e){}b.remove();};b.appendChild(s);b.appendChild(r);b.appendChild(d);document.body.appendChild(b);}catch(e){}}
 var urlParams=new URLSearchParams(window.location.search);
 if(urlParams.get('start')==='pikafish'){
 setTimeout(function(){startPikafishGame(urlParams.get('color')||null);},500);
 return;
 }
 try{var s=localStorage.getItem('xq_game');if(s){var g=JSON.parse(s);
-if(g.gm==='ai'||g.gm==='pikafish'){if(!g.ts||Date.now()-g.ts>1800000){try{localStorage.removeItem('xq_game');sessionStorage.removeItem('xq_game');}catch(e0g){}return;}var _rOK=false;try{_rOK=sessionStorage.getItem('xq_resume_ai')==='1';}catch(e9r){}if(!_rOK){try{_xqShowAiResumeBanner();}catch(e9b){}return;}try{sessionStorage.removeItem('xq_resume_ai');}catch(e9c){}
+if(g.gm==='ai'||g.gm==='pikafish'){if(!g.ts||Date.now()-g.ts>1800000){try{localStorage.removeItem('xq_game');sessionStorage.removeItem('xq_game');}catch(e0g){}return;}
 _xqSeatLog('页面载入恢复: gm='+g.gm+' myCl='+g.myCl+' hist='+((g.moveHistory||[]).length)+' pid='+(g.pid?'有':'无'));gm=g.gm;myCl=g.myCl||'red';aiCl=g.aiCl||'black';boardFlip=(myCl==='black');soundEnabled=true;gameOverSoundPlayed=false;
 D('lobby').classList.add('hide');D('game').classList.add('show');
 D('modeBadge').textContent=(g.gm==='pikafish')?'Pikafish深度AI':'人机对弈';
