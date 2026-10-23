@@ -1023,6 +1023,13 @@ var ChessRoom = class {
               }
             } catch (eQili) { }
           }
+          // ===== v23-qili 预警: 第2次重复局面 → rule_warning 广播双方(warn()模块已有, 此前未挂线) =====
+          if (this.env.RULES_OFF !== "1" && globalThis.XiangQiLi && !this.room.gameOver) {
+            try {
+              const wq = globalThis.XiangQiLi.warn(this.room.moveHistory);
+              if (wq && wq.text) this.broadcastToRoom(JSON.stringify({ event: "rule_warning", data: { level: wq.level, side: wq.side || null, name: wq.name || null, text: wq.text } }));
+            } catch (eWarn) { }
+          }
           if (move.gameOver) {
             this.room.gameOver = true;
             this.room._gameEndedAt = Date.now();
