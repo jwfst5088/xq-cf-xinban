@@ -1685,6 +1685,7 @@ socket.on('ping',function(){socket.emit('pong');});
 socket.on('connect_error',function(){sockOk=false;D('lobbyStatus').textContent='○ 连接失败（本地模式可用）';});
 socket.on('online_count',function(count){D('onlineCount').textContent='当前在线: '+count+' 人';});
 socket.on('room_created',function(d){
+if(gm==='online'&&myRm===d.roomId&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){_xqSeatLog('对局中收到room_created,拒绝重置,转重连(本色'+myCl+')');try{console.warn('[seat-guard] 对局中room_created,转重连');}catch(e0){}try{socket.emit('reconnect_room',{roomId:myRm,color:myCl});}catch(e2){}return;}
 myRm=d.roomId;myCl=d.color;gm='online';
 try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 记录本盘颜色，下一盘轮换先手
@@ -1697,6 +1698,7 @@ window._pendingRoomAction=d;
 socket.reconnectToRoom(d.roomId);
 });
 socket.on('room_joined',function(d){
+if(gm==='online'&&myRm===d.roomId&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){_xqSeatLog('对局中收到room_joined,拒绝重置,转重连(本色'+myCl+')');try{console.warn('[seat-guard] 对局中room_joined,转重连');}catch(e0){}try{socket.emit('reconnect_room',{roomId:myRm,color:myCl});}catch(e2){}return;}
 myRm=d.roomId;myCl=d.color;gm='online';D('lobbyStatus').textContent='';
 try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 记录本盘颜色，下一盘轮换先手
@@ -1773,7 +1775,7 @@ else if(engine.iic&&engine.iic(engine.currentTurn))sndCheck();
 saveGameState();
 }
 });
-socket.on('game_over',function(d){
+socket.on('rule_warning',function(d){try{if(d&&d.text)toast(d.text,3500);}catch(e0){}});socket.on('game_over',function(d){
 pendingMove=null;if(pendingRetryTimer){clearTimeout(pendingRetryTimer);pendingRetryTimer=null;}
 sndGameOver();stopTimer();engine.gameOver=true;engine.winner=d.winner;showGameOver(d.winner==='draw'?'和棋':(d.winner==='red'?'红方':'黑方'));clearGameState();
 });
@@ -1802,7 +1804,7 @@ socket.on('player_reconnected',function(d){
 	hideOverlay();hideReconnecting();
 });
 socket.on('room_state',function(d){
-myRm=d.roomId;myCl=d.color;gm='online';
+myRm=d.roomId;if(d.color&&gm==='online'&&myCl&&d.color!==myCl&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){window._xqColorFight=(window._xqColorFight||0)+1;_xqSeatLog('对局中换色拒绝#'+window._xqColorFight+':'+myCl+'->'+d.color);try{console.warn('[seat-guard] 对局中拒绝换色 '+myCl+'->'+d.color);}catch(e1){}if(window._xqColorFight<=1){try{socket.emit('reconnect_room',{roomId:myRm,color:myCl});}catch(e2){}}}else{if(d.color){myCl=d.color;window._xqColorFight=0;}else{try{console.warn('[seat-guard] room_state无color,维持本地座位='+myCl);}catch(e){}}}gm='online';
 try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 重连/换先后同步本盘颜色
 D('lobby').classList.add('hide');D('game').classList.add('show');
@@ -1810,7 +1812,7 @@ D('modeBadge').textContent='房间: '+d.roomId;
 D('redName').textContent=myCl==='red'?'你（红方）':'对手（红方）';
 D('blackName').textContent=myCl==='black'?'你（黑方）':'对手（黑方）';
 D('drawBtn').style.display='inline-flex';
-boardFlip=(myCl==='black');
+if(d.color){boardFlip=(myCl==='black');}else{try{console.warn('[seat-guard] room_state无color,不翻转棋盘');}catch(e){}}
 var isPageReload=window._isPageReload;window._isPageReload=false;
 // 本地领先保护：本地恰好比服务端多1步且正是 pendingMove（未确认走棋）时，
 // 全量同步不应覆盖本地（防止"刚走的棋回退"），等待 move_ack 或自动补发
@@ -6439,7 +6441,7 @@ return;
 }
 try{var s=localStorage.getItem('xq_game');if(s){var g=JSON.parse(s);
 if(g.gm==='ai'||g.gm==='pikafish'){
-gm=g.gm;myCl=g.myCl||'red';aiCl=g.aiCl||'black';boardFlip=(myCl==='black');soundEnabled=true;gameOverSoundPlayed=false;
+_xqSeatLog('页面载入恢复: gm='+g.gm+' myCl='+g.myCl+' hist='+((g.moveHistory||[]).length)+' pid='+(g.pid?'有':'无'));gm=g.gm;myCl=g.myCl||'red';aiCl=g.aiCl||'black';boardFlip=(myCl==='black');soundEnabled=true;gameOverSoundPlayed=false;
 D('lobby').classList.add('hide');D('game').classList.add('show');
 D('modeBadge').textContent=(g.gm==='pikafish')?'Pikafish深度AI':'人机对弈';
 D('drawBtn').style.display='none';
@@ -6588,6 +6590,7 @@ D('drawBtn').style.display='inline-flex';
 boardFlip=false;
 if(gameStarted)D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
 }catch(e){}}
+function _xqSeatLog(m){try{var a=[];try{a=JSON.parse(localStorage.getItem('xq_seatlog')||'[]');}catch(e0){}a.push({t:new Date().toISOString().slice(11,19),m:m});while(a.length>60)a.shift();localStorage.setItem('xq_seatlog',JSON.stringify(a));}catch(e){}}
 function _xqRememberPid(d){try{if(d&&d.pid&&d.roomId){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){}}
 function _xqAttachRoomListListeners(){
 try{
