@@ -791,6 +791,18 @@ var ChessRoom = class {
             ws.send(JSON.stringify({ event: "pong" }));
           } catch (e) {
           }
+        } else if (eventName === "hb") {
+          if (this.room && socketData && socketData.color && !socketData.spectator && !socketData.replaced && !this.room.gameOver) {
+            let hb = null;
+            try { hb = await this.ctx.storage.get("hb"); } catch (e) { }
+            hb = hb || {};
+            const prev = hb[socketData.color] || 0;
+            if (Date.now() - prev > 2e4) {
+              hb[socketData.color] = Date.now();
+              try { await this.ctx.storage.put("hb", hb); } catch (e) { }
+              await this._scheduleAlarm();
+            }
+          }
         } else if (eventName === "create_room") {
           if (this._cleanupTimer) {
             clearTimeout(this._cleanupTimer);
@@ -1409,6 +1421,7 @@ var ChessRoom = class {
           try { this.ctx.storage.delete("regKAOn").catch(() => { }); } catch (e) { }
           try { this.ctx.storage.delete("teardownAt").catch(() => { }); } catch (e) { }
           try { this.ctx.storage.delete("disconnected").catch(() => { }); } catch (e) { }
+          try { this.ctx.storage.delete("hb").catch(() => { }); } catch (e) { }
           try { await this.ctx.storage.deleteAlarm(); } catch (e) { }
           try { await this.ctx.storage.put("dead", 1); } catch (e) { }
           if (room._timer) {
@@ -1529,6 +1542,29 @@ var ChessRoom = class {
           }
         }
       }
+      // 1.5) 半死连接检测: 应用层心跳停了(>105s)但socket还挂着 → 复用断线流程(广播player_disconnected; 判负仍走既有分支含零步豁免)
+      if (this.room && !this.room.gameOver) {
+        let hb = null;
+        try { hb = await this.ctx.storage.get("hb"); } catch (e) { }
+        if (hb) {
+          for (const color of ["red", "black"]) {
+            if (hb[color] && now - hb[color] > 105e3 && !this.disconnected[color]) {
+              let deadWs = null;
+              try { for (const p of this.room.players.keys()) { const sd = this._att(p); if (sd && sd.color === color && !sd.replaced) { deadWs = p; break; } } } catch (eHB) { }
+              if (deadWs) {
+                this.disconnected[color] = now;
+                try { await this.ctx.storage.put("disconnected", this.disconnected); } catch (e) { }
+                try { await this.ctx.storage.delete("hb").catch(() => { }); } catch (e2) { }
+                this.broadcastToOpponent(deadWs, JSON.stringify({ event: "player_disconnected", data: { color } }));
+                this.ctx.waitUntil(this._saveRoomState());
+                break;
+              } else {
+                try { await this.ctx.storage.delete("hb").catch(() => { }); } catch (e2) { }
+              }
+            }
+          }
+        }
+      }
       // 2) 棋钟超时(旗落)：回合截止时间到，当前行棋方判负（事件序列与原每秒timer完全一致）
       if (!this.room.gameOver && this.room._turnDeadline && now >= this.room._turnDeadline) {
         const loser = this.room.currentTurn;
@@ -1586,6 +1622,11 @@ var ChessRoom = class {
       let next = Infinity;
       if (this.room && !this.room.gameOver && this.room._turnDeadline) next = Math.min(next, this.room._turnDeadline);
       for (const c of ["red", "black"]) if (this.disconnected[c]) next = Math.min(next, this.disconnected[c] + 63e3);
+      if (this.room && !this.room.gameOver) {
+        let hb = null;
+        try { hb = await this.ctx.storage.get("hb"); } catch (e) { }
+        if (hb) for (const c of ["red", "black"]) if (hb[c]) next = Math.min(next, hb[c] + 108e3);
+      }
       let td = null;
       try { td = await this.ctx.storage.get("teardownAt"); } catch (e) { }
       if (td) next = Math.min(next, td);
