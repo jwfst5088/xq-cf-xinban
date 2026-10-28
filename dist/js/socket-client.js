@@ -67,6 +67,7 @@ class SocketClient {
     this._pingTimer = setInterval(() => {
       if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
       try { this.ws.send(JSON.stringify({ event: 'ping' })); this._pingSentAt = Date.now(); } catch (e) {}
+      if (this.roomId && Date.now() - (this._lastHbAt || 0) >= 45000) { this._lastHbAt = Date.now(); try { this.ws.send(JSON.stringify({ event: 'hb' })); } catch (e) {} }
       if (this._pongTimer) clearTimeout(this._pongTimer);
       this._pongTimer = setTimeout(() => {
         if (this.ws) {
@@ -126,6 +127,7 @@ class SocketClient {
       this.connecting = false;
       this.reconnectAttempts = 0;
       if (this._wasConnected) { this._fastUntil = Date.now() + 600000; }
+      this._lastHbAt = 0;
       this._wasConnected = true;
       this._lastPong = Date.now();
       this._startPing();
