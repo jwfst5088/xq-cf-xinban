@@ -14,7 +14,7 @@ class SocketClient {
     this.connecting = false;
     this.connectTimeout = options.timeout || 3000;
     this.pingInterval = options.pingInterval || 8000;
-    this.pingTimeout = options.pingTimeout || 12000;
+    this.pingTimeout = options.pingTimeout || 12000; this._tiers={idle:{p:15000,t:30000},base:{p:8000,t:12000},fast:{p:4000,t:8000}};this._fastUntil=0;this._pingSentAt=0;this._rttHigh=0;this._wasConnected=false;
     this._connectTimer = null;
     this._pingTimer = null;
     this._pongTimer = null;
@@ -60,16 +60,30 @@ class SocketClient {
 
   _startPing() {
     this._stopPing();
+    const tier = this._pickTier ? this._pickTier() : null;
+    const pi = tier ? tier.p : this.pingInterval;
+    const pt = tier ? tier.t : this.pingTimeout;
+    this.pingInterval = pi; this.pingTimeout = pt;
     this._pingTimer = setInterval(() => {
       if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
-      try { this.ws.send(JSON.stringify({ event: 'ping' })); } catch (e) {}
+      try { this.ws.send(JSON.stringify({ event: 'ping' })); this._pingSentAt = Date.now(); } catch (e) {}
       if (this._pongTimer) clearTimeout(this._pongTimer);
       this._pongTimer = setTimeout(() => {
         if (this.ws) {
           try { this.ws.close(); } catch (e) {}
+          this._fastUntil = Date.now() + 600000;
         }
-      }, this.pingTimeout);
-    }, this.pingInterval);
+      }, pt);
+    }, pi);
+  }
+
+  _pickTier() {
+    const now = Date.now();
+    if (typeof window !== 'undefined' && typeof window._xqHeartbeatTier === 'function') {
+      try { const q = window._xqHeartbeatTier(); if (q === 'idle') return this._tiers.idle; } catch (e) {}
+    }
+    if (this._tiers && now < this._fastUntil) return this._tiers.fast;
+    return this._tiers.base;
   }
 
   _stopPing() {
@@ -77,6 +91,8 @@ class SocketClient {
     if (this._pongTimer) { clearTimeout(this._pongTimer); this._pongTimer = null; }
     if (this._reconnectTimer) { clearTimeout(this._reconnectTimer); this._reconnectTimer = null; }
   }
+
+  markStress() { this._fastUntil = Date.now() + 600000; if (this.connected) this._startPing(); }
 
   connect() {
     if (this.ws) {
@@ -109,6 +125,8 @@ class SocketClient {
       this.connected = true;
       this.connecting = false;
       this.reconnectAttempts = 0;
+      if (this._wasConnected) { this._fastUntil = Date.now() + 600000; }
+      this._wasConnected = true;
       this._lastPong = Date.now();
       this._startPing();
       console.log('WebSocket connection opened');
@@ -120,7 +138,13 @@ class SocketClient {
         const data = JSON.parse(event.data);
         if (data.event === 'pong') {
           this._lastPong = Date.now();
+          if (this._pingSentAt) {
+            var _rtt = Date.now() - this._pingSentAt;
+            this._rttHigh = _rtt > 1500 ? (this._rttHigh + 1) : 0;
+            if (this._rttHigh >= 2) { this._fastUntil = Date.now() + 600000; this._rttHigh = 0; }
+          }
           if (this._pongTimer) { clearTimeout(this._pongTimer); this._pongTimer = null; }
+          if (this._pickTier) { var _nt = this._pickTier(); if (_nt && (this.pingInterval !== _nt.p || this.pingTimeout !== _nt.t)) this._startPing(); }
           return;
         }
         if (data.event === 'ping') {
