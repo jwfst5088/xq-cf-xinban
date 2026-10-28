@@ -1158,6 +1158,17 @@ var timerId=null,secs=0;
 var clickCount=0;
 var socket=null,sockOk=false,gm='local',myCl=null,myRm=null;
 var pendingMove=null,pendingRetryTimer=null; // 本地已走、待服务端确认的走棋（用于防止 room_state 全量同步覆盖）
+function startPendingRetry(){
+if(pendingRetryTimer)clearInterval(pendingRetryTimer);
+var n=0;
+pendingRetryTimer=setInterval(function(){
+var pm=pendingMove;
+if(!pm){clearInterval(pendingRetryTimer);pendingRetryTimer=null;return;}
+if(++n>600){clearInterval(pendingRetryTimer);pendingRetryTimer=null;pendingMove=null;try{if(gm==='online'&&myRm)socket.emit('reconnect_room',{roomId:myRm,color:myCl});}catch(e){}return;}
+if(sockOk&&socket&&socket.connected){try{socket.emit('make_move',{fromRow:pm.fromRow,fromCol:pm.fromCol,toRow:pm.toRow,toCol:pm.toCol,captured:pm.captured,pieceColor:pm.pieceColor,currentTurn:pm.currentTurn,gameOver:pm.gameOver,winner:pm.winner,redLeft:pm.redLeft,blkLeft:pm.blkLeft});}catch(e){}}
+},1000);
+}
+
 var aiThinking=false,aiTimeout=null,aiWorker=null;
 var aiCl='black'; // AI执棋颜色：'black'或'red'，与myCl相反
 var checkStreak=0,lastCheckColor=null; // 长将追踪：连续将军次数
@@ -1396,18 +1407,11 @@ if(rs.captured){sndCapture();if(rs.captured.color==='red')capRed.push(rs.capture
 else{sndMove();}
 selected=null;validMoves=[];lastMove={row:tr,col:tc};render();
 D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
-if(gm==='online'&&sockOk){
+if(gm==='online'){
 pendingMove={fromRow:fr,fromCol:fc,toRow:tr,toCol:tc,captured:rs.captured,pieceColor:mc,currentTurn:engine.currentTurn,gameOver:engine.gameOver,winner:engine.winner,redLeft:redLeft,blkLeft:blkLeft};
-socket.emit('make_move',pendingMove);
+try{socket.emit('make_move',pendingMove);}catch(e){}
 saveGameState();
-// 3秒内未收到 move_ack 则自动补发（防消息丢失导致回退），服务端有幂等判断不会重复走棋
-if(pendingRetryTimer)clearTimeout(pendingRetryTimer);
-pendingRetryTimer=setTimeout(function(){
-var pm=pendingMove;
-if(pm&&sockOk&&socket&&socket.connected){
-socket.emit('make_move',{fromRow:pm.fromRow,fromCol:pm.fromCol,toRow:pm.toRow,toCol:pm.toCol,captured:pm.captured,pieceColor:pm.pieceColor,currentTurn:pm.currentTurn,gameOver:pm.gameOver,winner:pm.winner,redLeft:pm.redLeft,blkLeft:pm.blkLeft});
-}
-},3000);
+startPendingRetry();
 }
 if(gm==='ai'||gm==='pikafish')saveGameState();
 if(engine.gameOver){
@@ -1678,6 +1682,7 @@ if(window._pendingRoomAction&&socket.roomId){var pa=window._pendingRoomAction;wi
 }
 else if(window._pendingReconnect){var pr=window._pendingReconnect;if(pr.redLeft!==undefined){redLeft=pr.redLeft;blkLeft=pr.blkLeft;}window._pendingReconnect=null;socket.emit('reconnect_room',{roomId:pr.myRm,color:pr.myCl});}
 else if(gm==='online'&&myRm){socket.emit('reconnect_room',{roomId:myRm,color:myCl});}
+if(pendingMove){setTimeout(function(){if(pendingMove&&sockOk&&socket&&socket.connected){try{socket.emit('make_move',{fromRow:pendingMove.fromRow,fromCol:pendingMove.fromCol,toRow:pendingMove.toRow,toCol:pendingMove.toCol,captured:pendingMove.captured,pieceColor:pendingMove.pieceColor,currentTurn:pendingMove.currentTurn,gameOver:pendingMove.gameOver,winner:pendingMove.winner,redLeft:pendingMove.redLeft,blkLeft:pendingMove.blkLeft});if(typeof startPendingRetry==='function')startPendingRetry();}catch(e){}}},1500);}
 window._isPageReload=isPageReload;
 });
 socket.on('disconnect',function(){sockOk=false;disconnectTime=Date.now();if(gm==='online'&&myRm){showReconnecting();}});
@@ -1819,7 +1824,7 @@ var isPageReload=window._isPageReload;window._isPageReload=false;
 var localPendingAhead=false;
 if(!isPageReload&&pendingMove&&engine.moveHistory.length===d.moveHistory.length+1){
 var _lp=engine.moveHistory[engine.moveHistory.length-1];
-if(_lp&&_lp.fromRow===pendingMove.fromRow&&_lp.fromCol===pendingMove.fromCol&&_lp.toRow===pendingMove.toRow&&_lp.toCol===pendingMove.toCol){localPendingAhead=true;}
+if(_lp&&_lp.fromRow===pendingMove.fromRow&&_lp.fromCol===pendingMove.fromCol&&_lp.toRow===pendingMove.toRow&&_lp.toCol===pendingMove.toCol){localPendingAhead=true;try{socket.emit('make_move',{fromRow:pendingMove.fromRow,fromCol:pendingMove.fromCol,toRow:pendingMove.toRow,toCol:pendingMove.toCol,captured:pendingMove.captured,pieceColor:pendingMove.pieceColor,currentTurn:pendingMove.currentTurn,gameOver:pendingMove.gameOver,winner:pendingMove.winner,redLeft:pendingMove.redLeft,blkLeft:pendingMove.blkLeft});}catch(e){}if(typeof startPendingRetry==='function')startPendingRetry();}
 }
 if(engine.gameOver&&!isPageReload){
 if(!localPendingAhead){
