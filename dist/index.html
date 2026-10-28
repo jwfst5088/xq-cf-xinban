@@ -1158,6 +1158,7 @@ var timerId=null,secs=0;
 var clickCount=0;
 var socket=null,sockOk=false,gm='local',myCl=null,myRm=null;
 var pendingMove=null,pendingRetryTimer=null; // 本地已走、待服务端确认的走棋（用于防止 room_state 全量同步覆盖）
+window._xqHeartbeatTier=function(){try{return (gm==='online'&&gameStarted&&!engine.gameOver&&myRm)?null:'idle';}catch(e){return null;}};
 function startPendingRetry(){
 if(pendingRetryTimer)clearInterval(pendingRetryTimer);
 var n=0;
@@ -1165,6 +1166,7 @@ pendingRetryTimer=setInterval(function(){
 var pm=pendingMove;
 if(!pm){clearInterval(pendingRetryTimer);pendingRetryTimer=null;return;}
 if(++n>600){clearInterval(pendingRetryTimer);pendingRetryTimer=null;pendingMove=null;try{if(gm==='online'&&myRm)socket.emit('reconnect_room',{roomId:myRm,color:myCl});}catch(e){}return;}
+if(n===1&&socket&&socket.markStress){try{socket.markStress();}catch(e){}}
 if(sockOk&&socket&&socket.connected){try{socket.emit('make_move',{fromRow:pm.fromRow,fromCol:pm.fromCol,toRow:pm.toRow,toCol:pm.toCol,captured:pm.captured,pieceColor:pm.pieceColor,currentTurn:pm.currentTurn,gameOver:pm.gameOver,winner:pm.winner,redLeft:pm.redLeft,blkLeft:pm.blkLeft});}catch(e){}}
 },1000);
 }
