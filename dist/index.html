@@ -1729,6 +1729,7 @@ acked=true;
 if(acked){
 pendingMove=null;
 if(pendingRetryTimer){clearTimeout(pendingRetryTimer);pendingRetryTimer=null;}
+if(window._xqDeferredSync){window._xqDeferredSync=null;if(gm==='online'&&myRm&&sockOk&&!engine.gameOver){try{undoLastMoveHelper();lastMove=engine.moveHistory.length>0?{row:engine.moveHistory[engine.moveHistory.length-1].toRow,col:engine.moveHistory[engine.moveHistory.length-1].toCol}:null;socket.emit('reconnect_room',{roomId:myRm,color:myCl});}catch(e5){}}}
 }
 }
 });
@@ -1747,12 +1748,11 @@ undoLastMoveHelper();
 selected=null;validMoves=[];
 if(engine.moveHistory.length>0){var lm2=engine.moveHistory[engine.moveHistory.length-1];lastMove={row:lm2.toRow,col:lm2.toCol};}else{lastMove=null;}
 D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
-render();
 }
 }
-// 拉取服务端全量状态，确保两端一致（防分叉）
+// 静默原子纠正: 不即时渲染不提示, 全量同步到达后单次渲染
+window._xqDeferredSync=null;
 if(gm==='online'&&myRm&&sockOk){socket.emit('reconnect_room',{roomId:myRm,color:myCl});}
-toast((d&&d.reason==='not_your_turn')?'状态已同步，请重新走棋':'走棋未生效，已同步状态',1800);
 saveGameState();
 });
 socket.on('opponent_move',function(d){
@@ -1828,6 +1828,7 @@ if(!isPageReload&&pendingMove&&engine.moveHistory.length===d.moveHistory.length+
 var _lp=engine.moveHistory[engine.moveHistory.length-1];
 if(_lp&&_lp.fromRow===pendingMove.fromRow&&_lp.fromCol===pendingMove.fromCol&&_lp.toRow===pendingMove.toRow&&_lp.toCol===pendingMove.toCol){localPendingAhead=true;try{socket.emit('make_move',{fromRow:pendingMove.fromRow,fromCol:pendingMove.fromCol,toRow:pendingMove.toRow,toCol:pendingMove.toCol,captured:pendingMove.captured,pieceColor:pendingMove.pieceColor,currentTurn:pendingMove.currentTurn,gameOver:pendingMove.gameOver,winner:pendingMove.winner,redLeft:pendingMove.redLeft,blkLeft:pendingMove.blkLeft});}catch(e){}if(typeof startPendingRetry==='function')startPendingRetry();}
 }
+if(!localPendingAhead&&pendingMove&&!isPageReload&&!d.gameOver&&!engine.gameOver&&d.moveHistory.length===engine.moveHistory.length&&d.moveHistory.length>0){var _sl=d.moveHistory[d.moveHistory.length-1],_ll=engine.moveHistory[engine.moveHistory.length-1];if(!(_sl&&_ll&&_sl.fromRow===_ll.fromRow&&_sl.fromCol===_ll.fromCol&&_sl.toRow===_ll.toRow&&_sl.toCol===_ll.toCol)){window._xqDeferredSync=d;return;}}
 if(engine.gameOver&&!isPageReload){
 if(!localPendingAhead){
 engine.gameOver=d.gameOver;engine.winner=d.winner;
