@@ -1794,13 +1794,13 @@ socket.on('player_disconnected',function(d){
 	if(gm==='online'&&myRm){
 		hideOverlay();
 		try{
-			if(engine.gameOver)return;
+			if(engine.gameOver)return;var _gs=gameStarted&&engine.moveHistory&&engine.moveHistory.length>0;if(!_gs){try{var t1=D('turnText');if(t1)t1.textContent='对手已断线（未开局），等待其重连…';}catch(e1){}return;}
 			var tt=D('turnText');if(tt)tt.textContent='对手断线，60秒后判你获胜';
 			if(window._dcTimer)clearInterval(window._dcTimer);
 			var _dc=60;
 			window._dcTimer=setInterval(function(){
 				_dc--;
-				if(_dc<=0){clearInterval(window._dcTimer);window._dcTimer=null;return;}
+				if(_dc<=0){clearInterval(window._dcTimer);window._dcTimer=null;try{var t4=D('turnText');if(t4&&!engine.gameOver)t4.textContent='等待结算…';}catch(e4){}return;}
 				try{var t2=D('turnText');if(t2&&!engine.gameOver)t2.textContent='对手断线，'+_dc+'秒后判你获胜';}catch(e){}
 			},1000);
 		}catch(e){}

@@ -932,6 +932,26 @@ var ChessRoom = class {
             this._regKeepAlive();
             return;
           }
+          // 手动重进回收: 同色座位被半开连接占用时, pid/设备指纹/断线标记任一证明 → 回收入座而非观战
+          if (this.room.players.size >= 2) {
+            const _liveJR = this._liveSids();
+            for (const [hws, seat] of [...this.room.players]) {
+              const attJR = this._att(hws);
+              if (attJR.replaced) continue;
+              if (!_liveJR.has(attJR.sid)) continue;
+              const cJR = seat.color;
+              if (!cJR) continue;
+              const pidJR = !!(payload.pid && this.room.playerTokens && this.room.playerTokens[cJR] === payload.pid);
+              const devJR = !!(payload.deviceId && this.room.seatIdentity && this.room.seatIdentity[cJR] && this.room.seatIdentity[cJR].dev != null && String(this.room.seatIdentity[cJR].dev) === String(payload.deviceId));
+              const preJR = !!(this.disconnected && this.disconnected[cJR] && seat.assignedAt && this.disconnected[cJR] > seat.assignedAt);
+              if (pidJR || devJR || preJR) {
+                this.room.players.delete(hws);
+                try { hws.close(); } catch (eJR) { }
+                if (this.disconnected[cJR]) { delete this.disconnected[cJR]; try { await this.ctx.storage.put("disconnected", this.disconnected); } catch (eJR2) { } }
+                break;
+              }
+            }
+          }
           if (this.room.players.size >= 2) {
             this.room.spectators.add(ws);
             socketData.spectator = true;
