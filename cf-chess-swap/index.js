@@ -946,6 +946,7 @@ var ChessRoom = class {
               const preJR = !!(this.disconnected && this.disconnected[cJR] && seat.assignedAt && this.disconnected[cJR] > seat.assignedAt);
               if (pidJR || devJR || preJR) {
                 this.room.players.delete(hws);
+                try { const gaJR = this._att(hws); gaJR.replaced = true; try { hws.serializeAttachment(gaJR); } catch (eSR) { } } catch (eGA) { }
                 try { hws.close(); } catch (eJR) { }
                 if (this.disconnected[cJR]) { delete this.disconnected[cJR]; try { await this.ctx.storage.put("disconnected", this.disconnected); } catch (eJR2) { } }
                 break;
@@ -1522,6 +1523,16 @@ var ChessRoom = class {
     if (!this.room || !socketData.color) return;
     if (socketData.replaced) return;
     this._syncSockets();
+    // 幽灵连接守卫: 该色座位已由其他活连接接管(重连/回收换新) → 本次close是陈旧连接关闭, 不登记断线不判负
+    let _otherLive = false;
+    try {
+      for (const _x of this.ctx.getWebSockets()) {
+        if (this._same(_x, ws)) continue;
+        const _a = this._att(_x);
+        if (_a && _a.color === socketData.color && !_a.replaced) { _otherLive = true; break; }
+      }
+    } catch (eG) { }
+    if (_otherLive) return;
     this.room.players.delete(ws);
     this.disconnected[socketData.color] = Date.now();
     try { await this.ctx.storage.put("disconnected", this.disconnected); } catch (e) { }
