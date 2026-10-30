@@ -748,7 +748,20 @@ var ChessRoom = class {
         }
       }
     } catch (e) { }
-    for (const pws of [...this.room.players.keys()]) { if (!live.has(pws)) this.room.players.delete(pws); }
+    for (const pws of [...this.room.players.keys()]) {
+      if (!live.has(pws)) {
+        const lostAtt = this._att(pws);
+        const lost = this.room.players.get(pws);
+        this.room.players.delete(pws);
+        let liveHolder = false;
+        try { for (const x of live) { const a2 = this._att(x); if (a2 && a2.color === lost.color && !a2.replaced) { liveHolder = true; break; } } } catch (eLH) { }
+        if (lost && lost.color && !lostAtt.replaced && !liveHolder && !this.room.gameOver && !this.disconnected[lost.color]) {
+          this.disconnected[lost.color] = Date.now();
+          try { this.broadcastToOpponent(pws, JSON.stringify({ event: "player_disconnected", data: { color: lost.color } })); } catch (ePD) { }
+          this.ctx.waitUntil((async () => { try { await this.ctx.storage.put("disconnected", this.disconnected); } catch (e) { } try { await this._scheduleAlarm(); } catch (e) { } })());
+        }
+      }
+    }
     for (const sws of [...this.room.spectators]) { if (!live.has(sws)) this.room.spectators.delete(sws); }
   }
   async _ensureLive() {
@@ -1521,6 +1534,14 @@ var ChessRoom = class {
     if (this.room) {
       // 1) 断线判负(60s)：webSocketClose 登记 disconnected，闹钟到期执行
       if (!this.room.gameOver) {
+        // 兜底: 座位无人但对局已开下(close事件丢失如部署重启) → 补登记断线, 走既有60s判负流程
+        for (const _mc of ["red", "black"]) {
+          const _hasHolder = [...this.room.players.values()].some((p) => p.color === _mc);
+          if (!_hasHolder && !this.disconnected[_mc] && this.room.moveHistory && this.room.moveHistory.length > 0) {
+            this.disconnected[_mc] = Date.now();
+            try { await this.ctx.storage.put("disconnected", this.disconnected); } catch (e) { }
+          }
+        }
         // 修复D: 对局未开始(0步)不断线判负——只保持离线标记等人回座
         // （客户端倒计时到期自停不判负，player_reconnected 会清零；与离开不扣分哲学一致）
         const zeroMoves = !this.room.moveHistory || this.room.moveHistory.length === 0;
@@ -1620,12 +1641,13 @@ var ChessRoom = class {
     try {
       const now = Date.now();
       let next = Infinity;
+      let stale = false;
       if (this.room && !this.room.gameOver && this.room._turnDeadline) next = Math.min(next, this.room._turnDeadline);
-      for (const c of ["red", "black"]) if (this.disconnected[c]) next = Math.min(next, this.disconnected[c] + 63e3);
+      for (const c of ["red", "black"]) if (this.disconnected[c]) { const _dDl = this.disconnected[c] + 63e3; if (_dDl > now) next = Math.min(next, _dDl); else stale = true; }
       if (this.room && !this.room.gameOver) {
         let hb = null;
         try { hb = await this.ctx.storage.get("hb"); } catch (e) { }
-        if (hb) for (const c of ["red", "black"]) if (hb[c]) next = Math.min(next, hb[c] + 108e3);
+        if (hb) for (const c of ["red", "black"]) if (hb[c]) { const _hDl = hb[c] + 108e3; if (_hDl > now) next = Math.min(next, _hDl); else stale = true; }
       }
       let td = null;
       try { td = await this.ctx.storage.get("teardownAt"); } catch (e) { }
@@ -1640,6 +1662,7 @@ var ChessRoom = class {
           if (anyLive) next = Math.min(next, now + 60e3);
         }
       }
+      if (stale) next = Math.min(next, now + 60e3);
       if (next !== Infinity) {
         const at = Math.max(now + 1e3, next);
         try { await this.ctx.storage.setAlarm(at); } catch (e) { }
@@ -1982,7 +2005,7 @@ const sorted = [...this.queue].sort((a, b) => a.elo - b.elo);
   async _scheduleSweep() {
     if (this.queue.length > 0) {
       try {
-        await this.ctx.storage.setAlarm(Date.now() + 2e3);
+        await this.ctx.storage.setAlarm(Date.now() + 10e3);
       } catch (e) {
       }
     }
@@ -2234,8 +2257,12 @@ async function handleApiRequest(request, env) {
     }
   }
   if (path === "/api/online") {
-    const pT3 = await presenceSync(env, { get: true });
-    if (typeof pT3 === "number") onlineCount = pT3;
+    const _onlNow = Date.now();
+    if (typeof globalThis.__xqPres === "undefined") globalThis.__xqPres = { t: 0, v: null };
+    if (_onlNow - globalThis.__xqPres.t >= 30e3) {
+      const pT3 = await presenceSync(env, { get: true });
+      if (typeof pT3 === "number") { globalThis.__xqPres = { t: _onlNow, v: pT3 }; onlineCount = pT3; } else if (globalThis.__xqPres.v != null) onlineCount = globalThis.__xqPres.v;
+    } else if (globalThis.__xqPres.v != null) onlineCount = globalThis.__xqPres.v;
     return json({ online: onlineCount, count: onlineCount });
   }
   if (path === "/api/history/save" && env.CHESS_DB) {
