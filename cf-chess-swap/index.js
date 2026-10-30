@@ -1109,6 +1109,8 @@ var ChessRoom = class {
           this.ctx.waitUntil(this._regTouch());
         } else if (eventName === "resign") {
           if (!this.room) return;
+          // 认输身份校验: 拒绝观战者/空色/被顶替连接的伪造resign (附件颜色为服务端入座时写入, 玩家本人不受影响)
+          if (!socketData.color || socketData.spectator || socketData.replaced) return;
           this.room.gameOver = true;
           this.room._gameEndedAt = Date.now();
           this.room.winner = socketData.color === "red" ? "black" : "red";
