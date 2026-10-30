@@ -639,10 +639,16 @@ var ChessRoom = class {
               this.room._restoredFromDb = true;
               // 休眠架构: 恢复回合截止时间，并把当前行棋方剩余时间校正到真实值
               if (!this.room.gameOver && s._turnDeadline) {
-                this.room._turnDeadline = s._turnDeadline;
-                const remS = Math.max(0, Math.round((s._turnDeadline - Date.now()) / 1e3));
-                if (this.room.currentTurn === "red") this.room.redTime = Math.min(this.room.redTime, remS);
-                else this.room.blkTime = Math.min(this.room.blkTime, remS);
+                // 存档恢复宽限: 截止已过(重启窗口耗尽行棋方时钟) → 还给剩余时钟, 不立即判超时
+                if (s._turnDeadline <= Date.now()) {
+                  const _remG = this.room.currentTurn === "red" ? this.room.redTime : this.room.blkTime;
+                  this.room._turnDeadline = Date.now() + Math.max(1, _remG) * 1e3;
+                } else {
+                  this.room._turnDeadline = s._turnDeadline;
+                  const remS = Math.max(0, Math.round((s._turnDeadline - Date.now()) / 1e3));
+                  if (this.room.currentTurn === "red") this.room.redTime = Math.min(this.room.redTime, remS);
+                  else this.room.blkTime = Math.min(this.room.blkTime, remS);
+                }
               }
               this.ctx.waitUntil(this._enrichSeatNames().then((ch) => {
                 if (ch) {
