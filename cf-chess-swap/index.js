@@ -1392,6 +1392,22 @@ var ChessRoom = class {
           socketData.cv = (payload && payload.cv) || socketData.cv || null;
           await this._setSeatIdentity(color, payload);
           if (this.room.players.size >= 2 && !this.room.gameOver) this.room.gameStarted = true;
+          // 断线判负自动撤销: 被判负方在5分钟内回连接管座位 → 撤销判负从当前局面续下
+          try {
+            if (this.room.gameOver && this.room.endReason === "disconnect_timeout" && color && this.room.winner && this.room.winner !== color && (!this.room._gameEndedAt || Date.now() - this.room._gameEndedAt <= 300e3)) {
+              this.room.gameOver = false;
+              this.room.winner = null;
+              this.room.endReason = null;
+              this.room._gameEndedAt = null;
+              const _remR = this.room.currentTurn === "red" ? this.room.redTime : this.room.blkTime;
+              this.room._turnDeadline = Date.now() + Math.max(1, _remR) * 1e3;
+              try { await this.ctx.storage.delete("teardownAt"); } catch (eT2) {}
+              try { await this.ctx.storage.delete("dead"); } catch (eD2) {}
+              this.broadcastToRoom(JSON.stringify({ event: "game_resumed", data: { color } }));
+              try { await this._scheduleAlarm(); } catch (eA3) {}
+              this.ctx.waitUntil(this._saveRoomState());
+            }
+          } catch (eRes) { }
           this.ctx.waitUntil(this._enrichSeatNames().then((ch) => {
             if (ch) {
               try {

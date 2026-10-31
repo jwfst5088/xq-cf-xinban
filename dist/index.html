@@ -1674,7 +1674,7 @@ try{
 if(typeof io==='undefined'){D('lobbyStatus').textContent='○ 服务器离线（本地模式可用）';sockOk=false;return;}
 if(socket){try{socket.disconnect();}catch(e){}socket=null;}
 socket=io({transports:['websocket','polling'],reconnection:true,reconnectionAttempts:Infinity,reconnectionDelay:1000,timeout:8000,pingTimeout:50000,pingInterval:25000,randomizationFactor:0});
-socket.on('connect',function(){sockOk=true;D('lobbyStatus').textContent='● 服务器已连接';D('footerText').textContent='人机对弈需联网 | 在线模式两人对战';
+socket.on('connect',function(){window._xqConnAt=Date.now();sockOk=true;D('lobbyStatus').textContent='● 服务器已连接';D('footerText').textContent='人机对弈需联网 | 在线模式两人对战';
 hideReconnecting();
 var isPageReload=!!window._pendingReconnect;
 if(window._pendingRoomAction&&socket.roomId){var pa=window._pendingRoomAction;window._pendingRoomAction=null;
@@ -1692,7 +1692,7 @@ socket.on('ping',function(){socket.emit('pong');});
 socket.on('connect_error',function(){sockOk=false;D('lobbyStatus').textContent='○ 连接失败（本地模式可用）';});
 socket.on('online_count',function(count){D('onlineCount').textContent='当前在线: '+count+' 人';});
 socket.on('room_created',function(d){
-if(gm==='online'&&myRm===d.roomId&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){_xqSeatLog('对局中收到room_created,拒绝重置,转重连(本色'+myCl+')');try{console.warn('[seat-guard] 对局中room_created,转重连');}catch(e0){}try{socket.emit('reconnect_room',{roomId:myRm,color:myCl});}catch(e2){}return;}
+window._xqDeferredSync=null;if(gm==='online'&&myRm===d.roomId&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){_xqSeatLog('对局中收到room_created,拒绝重置,转重连(本色'+myCl+')');try{console.warn('[seat-guard] 对局中room_created,转重连');}catch(e0){}try{socket.emit('reconnect_room',{roomId:myRm,color:myCl});}catch(e2){}return;}
 myRm=d.roomId;myCl=d.color;gm='online';
 try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 记录本盘颜色，下一盘轮换先手
@@ -1783,7 +1783,7 @@ saveGameState();
 }
 });
 socket.on('rule_warning',function(d){try{if(d&&d.text)toast(d.text,3500);}catch(e0){}});socket.on('game_over',function(d){
-pendingMove=null;if(pendingRetryTimer){clearTimeout(pendingRetryTimer);pendingRetryTimer=null;}
+window._xqDeferredSync=null;pendingMove=null;if(pendingRetryTimer){clearTimeout(pendingRetryTimer);pendingRetryTimer=null;}
 sndGameOver();stopTimer();engine.gameOver=true;engine.winner=d.winner;showGameOver(d.winner==='draw'?'和棋':(d.winner==='red'?'红方':'黑方'));clearGameState();
 });
 socket.on('timeout',function(d){
@@ -1828,7 +1828,7 @@ if(!isPageReload&&pendingMove&&engine.moveHistory.length===d.moveHistory.length+
 var _lp=engine.moveHistory[engine.moveHistory.length-1];
 if(_lp&&_lp.fromRow===pendingMove.fromRow&&_lp.fromCol===pendingMove.fromCol&&_lp.toRow===pendingMove.toRow&&_lp.toCol===pendingMove.toCol){localPendingAhead=true;try{socket.emit('make_move',{fromRow:pendingMove.fromRow,fromCol:pendingMove.fromCol,toRow:pendingMove.toRow,toCol:pendingMove.toCol,captured:pendingMove.captured,pieceColor:pendingMove.pieceColor,currentTurn:pendingMove.currentTurn,gameOver:pendingMove.gameOver,winner:pendingMove.winner,redLeft:pendingMove.redLeft,blkLeft:pendingMove.blkLeft});}catch(e){}if(typeof startPendingRetry==='function')startPendingRetry();}
 }
-if(!localPendingAhead&&pendingMove&&!isPageReload&&!d.gameOver&&!engine.gameOver&&d.moveHistory.length===engine.moveHistory.length&&d.moveHistory.length>0){var _sl=d.moveHistory[d.moveHistory.length-1],_ll=engine.moveHistory[engine.moveHistory.length-1];if(!(_sl&&_ll&&_sl.fromRow===_ll.fromRow&&_sl.fromCol===_ll.fromCol&&_sl.toRow===_ll.toRow&&_sl.toCol===_ll.toCol)){window._xqDeferredSync=d;return;}}
+if(Date.now()-(window._xqConnAt||0)>5000&&!localPendingAhead&&pendingMove&&!isPageReload&&!d.gameOver&&!engine.gameOver&&d.moveHistory.length===engine.moveHistory.length&&d.moveHistory.length>0){var _sl=d.moveHistory[d.moveHistory.length-1],_ll=engine.moveHistory[engine.moveHistory.length-1];if(!(_sl&&_ll&&_sl.fromRow===_ll.fromRow&&_sl.fromCol===_ll.fromCol&&_sl.toRow===_ll.toRow&&_sl.toCol===_ll.toCol)){window._xqDeferredSync=d;return;}}
 if(engine.gameOver&&!isPageReload){
 if(!localPendingAhead){
 engine.gameOver=d.gameOver;engine.winner=d.winner;
