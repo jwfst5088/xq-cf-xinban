@@ -1165,7 +1165,7 @@ var n=0;
 pendingRetryTimer=setInterval(function(){
 var pm=pendingMove;
 if(!pm){clearInterval(pendingRetryTimer);pendingRetryTimer=null;return;}
-if(++n>600){clearInterval(pendingRetryTimer);pendingRetryTimer=null;pendingMove=null;try{if(gm==='online'&&myRm)socket.emit('reconnect_room',{roomId:myRm,color:myCl});}catch(e){}return;}
+if(++n>600){clearInterval(pendingRetryTimer);pendingRetryTimer=null;pendingMove=null;try{if(gm==='online'&&myRm)socket.emit('reconnect_room',{roomId:myRm,color:myCl,pid:_xqPidFor(myRm)});}catch(e){}return;}
 if(n===1&&socket&&socket.markStress){try{socket.markStress();}catch(e){}}
 if(sockOk&&socket&&socket.connected){try{socket.emit('make_move',{fromRow:pm.fromRow,fromCol:pm.fromCol,toRow:pm.toRow,toCol:pm.toCol,captured:pm.captured,pieceColor:pm.pieceColor,currentTurn:pm.currentTurn,gameOver:pm.gameOver,winner:pm.winner,redLeft:pm.redLeft,blkLeft:pm.blkLeft});}catch(e){}}
 },1000);
@@ -1674,16 +1674,17 @@ try{
 if(typeof io==='undefined'){D('lobbyStatus').textContent='○ 服务器离线（本地模式可用）';sockOk=false;return;}
 if(socket){try{socket.disconnect();}catch(e){}socket=null;}
 socket=io({transports:['websocket','polling'],reconnection:true,reconnectionAttempts:Infinity,reconnectionDelay:1000,timeout:8000,pingTimeout:50000,pingInterval:25000,randomizationFactor:0});
+function _xqPidFor(rm){try{if(window._xqPid&&window._xqPid.rm===rm)return window._xqPid.pid;var _s=JSON.parse(localStorage.getItem("xq_pid")||"null");if(_s&&_s.rm===rm)return _s.pid;}catch(e){}return null;}
 socket.on('connect',function(){window._xqConnAt=Date.now();sockOk=true;D('lobbyStatus').textContent='● 服务器已连接';D('footerText').textContent='人机对弈需联网 | 在线模式两人对战';
 hideReconnecting();
 var isPageReload=!!window._pendingReconnect;
 if(window._pendingRoomAction&&socket.roomId){var pa=window._pendingRoomAction;window._pendingRoomAction=null;
- if(pa.action==='reconnect'){socket.emit('reconnect_room',{roomId:pa.roomId,color:pa.color});}
+ if(pa.action==='reconnect'){socket.emit('reconnect_room',{roomId:pa.roomId,color:pa.color,pid:_xqPidFor(pa.roomId)});}
  else if(pa.action==='create'){socket.emit('create_room',{roomId:pa.roomId,lastColor:pa.lastColor||null});}
  else{socket.emit(pa.action+'_room',pa.roomId);}
 }
-else if(window._pendingReconnect){var pr=window._pendingReconnect;if(pr.redLeft!==undefined){redLeft=pr.redLeft;blkLeft=pr.blkLeft;}window._pendingReconnect=null;socket.emit('reconnect_room',{roomId:pr.myRm,color:pr.myCl});}
-else if(gm==='online'&&myRm){socket.emit('reconnect_room',{roomId:myRm,color:myCl});}
+else if(window._pendingReconnect){var pr=window._pendingReconnect;if(pr.redLeft!==undefined){redLeft=pr.redLeft;blkLeft=pr.blkLeft;}window._pendingReconnect=null;socket.emit('reconnect_room',{roomId:pr.myRm,color:pr.myCl,pid:_xqPidFor(pr.myRm)});}
+else if(gm==='online'&&myRm){socket.emit('reconnect_room',{roomId:myRm,color:myCl,pid:_xqPidFor(myRm)});}
 if(pendingMove){setTimeout(function(){if(pendingMove&&sockOk&&socket&&socket.connected){try{socket.emit('make_move',{fromRow:pendingMove.fromRow,fromCol:pendingMove.fromCol,toRow:pendingMove.toRow,toCol:pendingMove.toCol,captured:pendingMove.captured,pieceColor:pendingMove.pieceColor,currentTurn:pendingMove.currentTurn,gameOver:pendingMove.gameOver,winner:pendingMove.winner,redLeft:pendingMove.redLeft,blkLeft:pendingMove.blkLeft});if(typeof startPendingRetry==='function')startPendingRetry();}catch(e){}}},1500);}
 window._isPageReload=isPageReload;
 });
@@ -1692,7 +1693,7 @@ socket.on('ping',function(){socket.emit('pong');});
 socket.on('connect_error',function(){sockOk=false;D('lobbyStatus').textContent='○ 连接失败（本地模式可用）';});
 socket.on('online_count',function(count){D('onlineCount').textContent='当前在线: '+count+' 人';});
 socket.on('room_created',function(d){
-window._xqDeferredSync=null;if(gm==='online'&&myRm===d.roomId&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){_xqSeatLog('对局中收到room_created,拒绝重置,转重连(本色'+myCl+')');try{console.warn('[seat-guard] 对局中room_created,转重连');}catch(e0){}try{socket.emit('reconnect_room',{roomId:myRm,color:myCl});}catch(e2){}return;}
+window._xqDeferredSync=null;if(gm==='online'&&myRm===d.roomId&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){_xqSeatLog('对局中收到room_created,拒绝重置,转重连(本色'+myCl+')');try{console.warn('[seat-guard] 对局中room_created,转重连');}catch(e0){}try{socket.emit('reconnect_room',{roomId:myRm,color:myCl,pid:_xqPidFor(myRm)});}catch(e2){}return;}
 myRm=d.roomId;myCl=d.color;gm='online';
 try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 记录本盘颜色，下一盘轮换先手
@@ -1705,7 +1706,7 @@ window._pendingRoomAction=d;
 socket.reconnectToRoom(d.roomId);
 });
 socket.on('room_joined',function(d){
-if(gm==='online'&&myRm===d.roomId&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){_xqSeatLog('对局中收到room_joined,拒绝重置,转重连(本色'+myCl+')');try{console.warn('[seat-guard] 对局中room_joined,转重连');}catch(e0){}try{socket.emit('reconnect_room',{roomId:myRm,color:myCl});}catch(e2){}return;}
+if(gm==='online'&&myRm===d.roomId&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){_xqSeatLog('对局中收到room_joined,拒绝重置,转重连(本色'+myCl+')');try{console.warn('[seat-guard] 对局中room_joined,转重连');}catch(e0){}try{socket.emit('reconnect_room',{roomId:myRm,color:myCl,pid:_xqPidFor(myRm)});}catch(e2){}return;}
 myRm=d.roomId;myCl=d.color;gm='online';D('lobbyStatus').textContent='';
 try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 记录本盘颜色，下一盘轮换先手
@@ -1729,7 +1730,7 @@ acked=true;
 if(acked){
 pendingMove=null;
 if(pendingRetryTimer){clearTimeout(pendingRetryTimer);pendingRetryTimer=null;}
-if(window._xqDeferredSync){window._xqDeferredSync=null;if(gm==='online'&&myRm&&sockOk&&!engine.gameOver){try{undoLastMoveHelper();lastMove=engine.moveHistory.length>0?{row:engine.moveHistory[engine.moveHistory.length-1].toRow,col:engine.moveHistory[engine.moveHistory.length-1].toCol}:null;socket.emit('reconnect_room',{roomId:myRm,color:myCl});}catch(e5){}}}
+if(window._xqDeferredSync){window._xqDeferredSync=null;if(gm==='online'&&myRm&&sockOk&&!engine.gameOver){try{undoLastMoveHelper();lastMove=engine.moveHistory.length>0?{row:engine.moveHistory[engine.moveHistory.length-1].toRow,col:engine.moveHistory[engine.moveHistory.length-1].toCol}:null;socket.emit('reconnect_room',{roomId:myRm,color:myCl,pid:_xqPidFor(myRm)});}catch(e5){}}}
 }
 }
 });
@@ -1752,7 +1753,7 @@ D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走�
 }
 // 静默原子纠正: 不即时渲染不提示, 全量同步到达后单次渲染
 window._xqDeferredSync=null;
-if(gm==='online'&&myRm&&sockOk){socket.emit('reconnect_room',{roomId:myRm,color:myCl});}
+if(gm==='online'&&myRm&&sockOk){socket.emit('reconnect_room',{roomId:myRm,color:myCl,pid:_xqPidFor(myRm)});}
 saveGameState();
 });
 socket.on('opponent_move',function(d){
@@ -1811,7 +1812,7 @@ socket.on('player_reconnected',function(d){
 	hideOverlay();hideReconnecting();
 });
 socket.on('room_state',function(d){
-myRm=d.roomId;if(d.color&&gm==='online'&&myCl&&d.color!==myCl&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){window._xqColorFight=(window._xqColorFight||0)+1;_xqSeatLog('对局中换色拒绝#'+window._xqColorFight+':'+myCl+'->'+d.color);try{console.warn('[seat-guard] 对局中拒绝换色 '+myCl+'->'+d.color);}catch(e1){}if(window._xqColorFight<=1){try{socket.emit('reconnect_room',{roomId:myRm,color:myCl});}catch(e2){}}}else{if(d.color){myCl=d.color;window._xqColorFight=0;}else{try{console.warn('[seat-guard] room_state无color,维持本地座位='+myCl);}catch(e){}}}gm='online';
+myRm=d.roomId;if(d.color&&gm==='online'&&myCl&&d.color!==myCl&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){window._xqColorFight=(window._xqColorFight||0)+1;_xqSeatLog('对局中换色拒绝#'+window._xqColorFight+':'+myCl+'->'+d.color);try{console.warn('[seat-guard] 对局中拒绝换色 '+myCl+'->'+d.color);}catch(e1){}if(window._xqColorFight<=1){try{socket.emit('reconnect_room',{roomId:myRm,color:myCl,pid:_xqPidFor(myRm)});}catch(e2){}}}else{if(d.color){myCl=d.color;window._xqColorFight=0;}else{try{console.warn('[seat-guard] room_state无color,维持本地座位='+myCl);}catch(e){}}}gm='online';
 try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 重连/换先后同步本盘颜色
 D('lobby').classList.add('hide');D('game').classList.add('show');
@@ -1966,7 +1967,7 @@ setTimeout(function(){forceExitGame();},5000);
 return;
 }
 if(sockOk&&gm==='online'&&myRm){
-socket.emit('reconnect_room',{roomId:myRm,color:myCl});
+socket.emit('reconnect_room',{roomId:myRm,color:myCl,pid:_xqPidFor(myRm)});
 }
 },500);
 }
@@ -6639,7 +6640,12 @@ try{setInterval(function(){try{if(socket&&socket.connected)_xqLoadRooms();}catch
 /* --- SW: 首次访问后注册; 该域名打不开时 SW 自动从备胎域名回源(x.meaigo/xb.meaigo), 地址栏不变 --- */
 try{if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('/sw.js').catch(function(){});}}catch(e){}
 </script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"0a4ff2af697e451c85fdf620787d507c","r":1}' crossorigin="anonymous"></script>
+
+
+
+<!--xq:rb1793850651127--><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"e04b29517dec41f8ae94bca4c63dc082","r":1,"spa":2}' crossorigin="anonymous"></script>
+<!--xq:ai1793852129451--><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"e04b29517dec41f8ae94bca4c63dc082","r":1,"spa":2}' crossorigin="anonymous"></script>
+<!--xq:ai1793852210533--><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"0a4ff2af697e451c85fdf620787d507c","r":1,"spa":2}' crossorigin="anonymous"></script>
 <script>
 
 (function(){
@@ -6667,5 +6673,8 @@ document.addEventListener('click',function(e){if(swallowClick){swallowClick=fals
 document.addEventListener('contextmenu',function(e){if(!arrows.length||!inBoard(e))return;e.preventDefault();clearAll();},true);
 window.addEventListener('resize',function(){setTimeout(drawAll,60);});
 })();
-</script></body>
+</script><!--xq:1793852349153--><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"0a4ff2af697e451c85fdf620787d507c","r":1,"spa":2}' crossorigin="anonymous"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"0a4ff2af697e451c85fdf620787d507c","r":1,"spa":2}' crossorigin="anonymous"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"0a4ff2af697e451c85fdf620787d507c","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
 </html>
