@@ -1055,7 +1055,14 @@ var ChessRoom = class {
         });
       } catch (eAL) {
       }
-      if (!anyLiveSeated && (this.room.gameOver || this.room.gameStarted || this.room.moveHistory && this.room.moveHistory.length > 0)) {
+      const inProgress = !this.room.gameOver && (this.room.gameStarted || this.room.moveHistory && this.room.moveHistory.length > 0);
+      const _lastMv = this.room.moveHistory && this.room.moveHistory.length ? this.room.moveHistory[this.room.moveHistory.length - 1] : null;
+      const _recent = !!(_lastMv && _lastMv.timestamp && Date.now() - _lastMv.timestamp < 600e3);
+      if (!anyLiveSeated && inProgress && _recent) {
+        try { ws.send(JSON.stringify({ event: "error", data: "\u5BF9\u5C40\u8FDB\u884C\u4E2D\uFF0C\u65E0\u6CD5\u91CD\u8FDE" })); } catch (e) { }
+        return;
+      }
+      if (!anyLiveSeated && this.room.gameOver) {
         this.room.gameOver = false;
         this.room.winner = null;
         this.room.endReason = null;
@@ -1103,6 +1110,7 @@ var ChessRoom = class {
         socketData.cv = payload && payload.cv || socketData.cv || null;
         await this._setSeatIdentity(myColor, payload);
         ws.send(JSON.stringify({ event: "room_created", data: { roomId: this.room.id, color: myColor, pid: myPid, seatInfo: this.getRoomState().seatInfo } }));
+        ws.send(JSON.stringify({ event: "room_state", data: { ...this.getRoomState(), color: myColor } }));
         this.ctx.waitUntil(this._enrichSeatNames().then(() => this._regUpdate(this.room.players.size >= 2 ? "playing" : "waiting")).catch(() => {
         }));
         this._regKeepAlive();
@@ -1123,6 +1131,7 @@ var ChessRoom = class {
         socketData.cv = payload && payload.cv || socketData.cv || null;
         await this._setSeatIdentity(myColor, payload);
         ws.send(JSON.stringify({ event: "room_created", data: { roomId: this.room.id, color: myColor, pid: myPid, seatInfo: this.getRoomState().seatInfo } }));
+        ws.send(JSON.stringify({ event: "room_state", data: { ...this.getRoomState(), color: myColor } }));
         this.ctx.waitUntil(this._enrichSeatNames().then(() => this._regUpdate(this.room.players.size >= 2 ? "playing" : "waiting")).catch(() => {
         }));
         this._regKeepAlive();
@@ -1565,9 +1574,16 @@ var ChessRoom = class {
             const [hws, seat] = sameColorEntry;
             const pidMatches2 = !!(payload.pid && this.room.playerTokens && this.room.playerTokens[color] === payload.pid);
             const holderDead = !liveSids.has(this._att(hws).sid) || !!this._att(hws).replaced || this._staleSid(this._att(hws).sid);
-            const holderIdle = false;
+            let holderIdle = false;
             const preDiscSeat = !!(this.disconnected && this.disconnected[color] && seat.assignedAt && this.disconnected[color] > seat.assignedAt);
             const devPinned = !!(payload.deviceId && this.room.seatIdentity && this.room.seatIdentity[color] && this.room.seatIdentity[color].dev != null && String(this.room.seatIdentity[color].dev) === String(payload.deviceId));
+            if (!pidMatches2 && !devPinned && !holderDead && !preDiscSeat) {
+              try {
+                const hbAll = await this.ctx.storage.get("hb");
+                const hbT = hbAll && hbAll[color] ? hbAll[color] : 0;
+                holderIdle = !!(hbT && Date.now() - hbT > 75e3);
+              } catch (eHb) { }
+            }
             if (!pidMatches2 && !devPinned && !holderDead && !holderIdle && !preDiscSeat) {
               const alt2 = color === "red" ? "black" : "red";
               if (isFree(alt2) || isReplaceable(alt2)) {
@@ -1696,6 +1712,11 @@ var ChessRoom = class {
       if (!this.room.gameOver && this.room.players.size >= 2) {
         this.startRoomTimer();
       }
+      try {
+        const _hbNext = (await this.ctx.storage.get("hb")) || {};
+        _hbNext[color] = Date.now();
+        await this.ctx.storage.put("hb", _hbNext);
+      } catch (eHb2) { }
       this.broadcastToOpponent(ws, JSON.stringify({ event: "player_reconnected", data: { color } }));
     } else if (eventName === "leave_room") {
       if (!this.room) return;
@@ -3710,4 +3731,3 @@ export {
   index_default as default
 };
 //# sourceMappingURL=cf-chess.js.map
-
