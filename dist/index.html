@@ -1875,6 +1875,7 @@ engine.currentTurn=d.currentTurn;
 }}else{
 // 历史一致时仅更新lastMove
 if(d.moveHistory.length>0){var lm=d.moveHistory[d.moveHistory.length-1];lastMove={row:lm.toRow,col:lm.toCol};}
+engine.currentTurn=d.currentTurn;
 }
 if(!localPendingAhead){engine.gameOver=d.gameOver;engine.winner=d.winner;}
 if(!localPendingAhead){
