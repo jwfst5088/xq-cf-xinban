@@ -1055,13 +1055,6 @@ var ChessRoom = class {
         });
       } catch (eAL) {
       }
-      const inProgress = !this.room.gameOver && (this.room.gameStarted || this.room.moveHistory && this.room.moveHistory.length > 0);
-      const _lastMv = this.room.moveHistory && this.room.moveHistory.length ? this.room.moveHistory[this.room.moveHistory.length - 1] : null;
-      const _recent = !!(_lastMv && _lastMv.timestamp && Date.now() - _lastMv.timestamp < 600e3);
-      if (!anyLiveSeated && inProgress && _recent) {
-        try { ws.send(JSON.stringify({ event: "error", data: "\u5BF9\u5C40\u8FDB\u884C\u4E2D\uFF0C\u65E0\u6CD5\u91CD\u8FDE" })); } catch (e) { }
-        return;
-      }
       if (!anyLiveSeated && this.room.gameOver) {
         this.room.gameOver = false;
         this.room.winner = null;
@@ -1914,7 +1907,7 @@ var ChessRoom = class {
         }
         const zeroMoves = !this.room.moveHistory || this.room.moveHistory.length === 0;
         for (const color of ["red", "black"]) {
-          if (this.disconnected[color] && now - this.disconnected[color] > 6e4) {
+          if (this.disconnected[color] && now - this.disconnected[color] > 18e4) {
             if (zeroMoves) {
               let anyLive = false;
               try {
@@ -2072,7 +2065,7 @@ var ChessRoom = class {
       let stale = false;
       if (this.room && !this.room.gameOver && this.room._turnDeadline) next = Math.min(next, this.room._turnDeadline);
       for (const c of ["red", "black"]) if (this.disconnected[c]) {
-        const _dDl = this.disconnected[c] + 63e3;
+        const _dDl = this.disconnected[c] + 183e3;
         if (_dDl > now) next = Math.min(next, _dDl);
         else stale = true;
       }
