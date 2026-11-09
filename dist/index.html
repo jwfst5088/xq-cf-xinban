@@ -1796,9 +1796,9 @@ socket.on('player_disconnected',function(d){
 		hideOverlay();
 		try{
 			if(engine.gameOver)return;var _gs=gameStarted&&engine.moveHistory&&engine.moveHistory.length>0;if(!_gs){try{var t1=D('turnText');if(t1)t1.textContent='对手已断线（未开局），等待其重连…';}catch(e1){}return;}
-			var tt=D('turnText');if(tt)tt.textContent='对手断线，60秒后判你获胜';
+			var tt=D('turnText');if(tt)tt.textContent='对手断线，180秒后判你获胜';
 			if(window._dcTimer)clearInterval(window._dcTimer);
-			var _dc=60;
+			var _dc=180;
 			window._dcTimer=setInterval(function(){
 				_dc--;
 				if(_dc<=0){clearInterval(window._dcTimer);window._dcTimer=null;try{var t4=D('turnText');if(t4&&!engine.gameOver)t4.textContent='等待结算…';}catch(e4){}return;}
@@ -6642,7 +6642,7 @@ try{if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.ser
 </script>
 
 
-
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"0a4ff2af697e451c85fdf620787d507c","r":1,"spa":2}' crossorigin="anonymous"></script>
 <!--xq:rb1793850651127--><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"e04b29517dec41f8ae94bca4c63dc082","r":1,"spa":2}' crossorigin="anonymous"></script>
 <!--xq:ai1793852129451--><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"e04b29517dec41f8ae94bca4c63dc082","r":1,"spa":2}' crossorigin="anonymous"></script>
 <!--xq:ai1793852210533--><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"0a4ff2af697e451c85fdf620787d507c","r":1,"spa":2}' crossorigin="anonymous"></script>
@@ -6674,7 +6674,6 @@ document.addEventListener('contextmenu',function(e){if(!arrows.length||!inBoard(
 window.addEventListener('resize',function(){setTimeout(drawAll,60);});
 })();
 </script><!--xq:1793852349153--><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"0a4ff2af697e451c85fdf620787d507c","r":1,"spa":2}' crossorigin="anonymous"></script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"0a4ff2af697e451c85fdf620787d507c","r":1,"spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"0a4ff2af697e451c85fdf620787d507c","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
