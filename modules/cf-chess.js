@@ -1055,6 +1055,7 @@ var ChessRoom = class {
         });
       } catch (eAL) {
       }
+      this._diag("create", anyLiveSeated ? "live" : "nolive", "mv=" + this.room.moveHistory.length + " over=" + (this.room.gameOver ? 1 : 0) + " started=" + (this.room.gameStarted ? 1 : 0));
       if (!anyLiveSeated && this.room.gameOver) {
         this.room.gameOver = false;
         this.room.winner = null;
@@ -1279,6 +1280,7 @@ var ChessRoom = class {
         return;
       }
       if (this.room.currentTurn !== socketData.color) {
+        this._diag("desync", "not_your_turn", "srv=" + this.room.currentTurn + " cli=" + (payload && payload.currentTurn), "srvLen=" + this.room.moveHistory.length + " cliLen=" + (payload && payload.moveHistoryLen));
         ws.send(JSON.stringify({ event: "move_rejected", data: { reason: "not_your_turn", yourColor: socketData.color || null, currentTurn: this.room.currentTurn, histLen: this.room.moveHistory.length } }));
         try {
           let _pcol = null;
@@ -1577,6 +1579,7 @@ var ChessRoom = class {
                 holderIdle = !!(hbT && Date.now() - hbT > 75e3);
               } catch (eHb) { }
             }
+            if (!pidMatches2 && !devPinned && !holderDead && !holderIdle && !preDiscSeat) this._diag("reconn", "reject", color, "dead=" + holderDead + " idle=" + holderIdle + " pre=" + preDiscSeat);
             if (!pidMatches2 && !devPinned && !holderDead && !holderIdle && !preDiscSeat) {
               const alt2 = color === "red" ? "black" : "red";
               if (isFree(alt2) || isReplaceable(alt2)) {
@@ -1705,6 +1708,7 @@ var ChessRoom = class {
       if (!this.room.gameOver && this.room.players.size >= 2) {
         this.startRoomTimer();
       }
+      this._diag("reconn", "ok", color, "mv=" + this.room.moveHistory.length);
       try {
         const _hbNext = (await this.ctx.storage.get("hb")) || {};
         _hbNext[color] = Date.now();
@@ -1817,6 +1821,7 @@ var ChessRoom = class {
   }
   async webSocketClose(ws, code, reason, wasClean) {
     let deadFlag = null;
+    this._diag("close", (this._att(ws) || {}).color || "-", this.room ? ("mv=" + this.room.moveHistory.length + " turn=" + this.room.currentTurn) : "noroom");
     try {
       deadFlag = await this.ctx.storage.get("dead");
     } catch (e) {
@@ -1861,6 +1866,7 @@ var ChessRoom = class {
     }
   }
   async _doForfeit(color, now) {
+    this._diag("forfeit", String(color), this.room ? ("mv=" + this.room.moveHistory.length) : "");
     this.room.gameOver = true;
     this.room._gameEndedAt = now;
     this.room.winner = color === "red" ? "black" : "red";
@@ -2119,6 +2125,15 @@ var ChessRoom = class {
       }
     } catch (e) {
     }
+  }
+  _diag(ev, a, b, c) {
+    try {
+      if (!this.env || !this.env.CHESS_DB) return;
+      const rid = this.room ? String(this.room.id) : "";
+      const run = this._diagInit ? Promise.resolve() : this.env.CHESS_DB.prepare("CREATE TABLE IF NOT EXISTS diag_log (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, room_id TEXT, ev TEXT, a TEXT, b TEXT, c TEXT)").run().catch(() => { });
+      this._diagInit = 1;
+      this.ctx.waitUntil(run.then(() => this.env.CHESS_DB.prepare("INSERT INTO diag_log (ts, room_id, ev, a, b, c) VALUES (?,?,?,?,?,?)").bind(Date.now(), rid, String(ev), String(a == null ? "" : a), String(b == null ? "" : b), String(c == null ? "" : c)).run()).catch(() => { }));
+    } catch (e) { }
   }
   broadcastToRoom(msg) {
     if (!this.room) return;
