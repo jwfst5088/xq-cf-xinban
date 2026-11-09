@@ -2132,6 +2132,7 @@ var ChessRoom = class {
       const rid = this.room ? String(this.room.id) : "";
       const run = this._diagInit ? Promise.resolve() : this.env.CHESS_DB.prepare("CREATE TABLE IF NOT EXISTS diag_log (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, room_id TEXT, ev TEXT, a TEXT, b TEXT, c TEXT)").run().catch(() => { });
       this._diagInit = 1;
+      if (Math.random() < 0.01) this.ctx.waitUntil(this.env.CHESS_DB.prepare("DELETE FROM diag_log WHERE ts < ?").bind(Date.now() - 14 * 864e5).run().catch(() => { }));
       this.ctx.waitUntil(run.then(() => this.env.CHESS_DB.prepare("INSERT INTO diag_log (ts, room_id, ev, a, b, c) VALUES (?,?,?,?,?,?)").bind(Date.now(), rid, String(ev), String(a == null ? "" : a), String(b == null ? "" : b), String(c == null ? "" : c)).run()).catch(() => { }));
     } catch (e) { }
   }
