@@ -780,6 +780,7 @@ var ChessRoom = class {
               this.room.capturedRed = s.capturedRed || [];
               this.room.capturedBlack = s.capturedBlack || [];
               this.room.createdAt = s.createdAt;
+              this.room.rematchSeq = s.rematchSeq || 0;
               this.room.playerTokens = s.playerTokens || null;
               this.room.gameStarted = !!s.gameStarted;
               this.room.seatIdentity = s.seatIdentity || {};
@@ -832,7 +833,8 @@ var ChessRoom = class {
         seatIdentity: this.room.seatIdentity || {},
         _ratedRecorded: !!this.room._ratedRecorded,
         _turnDeadline: this.room._turnDeadline || null,
-        createdAt: this.room.createdAt
+        createdAt: this.room.createdAt,
+        rematchSeq: this.room.rematchSeq || 0
       });
       await this.env.CHESS_DB.prepare(
         "INSERT OR REPLACE INTO room_state (room_id, state, updated_at) VALUES (?, ?, ?)"
@@ -1475,6 +1477,7 @@ var ChessRoom = class {
       this.room.capturedRed = [];
       this.room.capturedBlack = [];
       this.room.createdAt = Date.now();
+      this.room.rematchSeq = (this.room.rematchSeq || 0) + 1;
       try {
         await this.ctx.storage.delete("teardownAt");
       } catch (e) {
@@ -2213,6 +2216,7 @@ var ChessRoom = class {
     const si = this.room.seatIdentity || {};
     return {
       roomId: this.room.id,
+      mx: this.room.rematchSeq || 0,
       playerCount: this.room.players.size,
       currentTurn: this.room.currentTurn,
       gameOver: this.room.gameOver,
