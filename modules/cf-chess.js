@@ -1396,6 +1396,7 @@ var ChessRoom = class {
       this.broadcastToOpponent(ws, JSON.stringify({ event: "draw_requested", data: { from: socketData.color } }));
     } else if (eventName === "accept_draw") {
       if (!this.room) return;
+      this._diag("draw", String(socketData.color), "mv=" + this.room.moveHistory.length);
       this.room.gameOver = true;
       this.room._gameEndedAt = Date.now();
       this.room.winner = "draw";
@@ -2312,6 +2313,7 @@ var ChessRoom = class {
     };
   }
   async _recordGameEnd(reason) {
+    this._diag("end", String(reason), "winner=" + (this.room ? String(this.room.winner) : ""), "mv=" + (this.room && this.room.moveHistory ? this.room.moveHistory.length : 0));
     if (!this.room || !this.env.CHESS_DB || this.room._ratedRecorded) return;
     const si = this.room.seatIdentity || {};
     const red = si.red;
