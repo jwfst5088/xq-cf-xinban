@@ -1753,6 +1753,7 @@ D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走�
 }
 // 静默原子纠正: 不即时渲染不提示, 全量同步到达后单次渲染
 window._xqDeferredSync=null;
+window._xqForceSync=true;   // 被拒后强制下一次 room_state 走全量同步
 if(gm==='online'&&myRm&&sockOk){socket.emit('reconnect_room',{roomId:myRm,color:myCl,pid:_xqPidFor(myRm)});}
 saveGameState();
 });
@@ -1822,6 +1823,8 @@ D('blackName').textContent=myCl==='black'?'你（黑方）':'对手（黑方）'
 D('drawBtn').style.display='inline-flex';
 if(d.color){boardFlip=(myCl==='black');}else{try{console.warn('[seat-guard] room_state无color,不翻转棋盘');}catch(e){}}
 var isPageReload=window._isPageReload;window._isPageReload=false;
+var _xqForceSyncNow=!!window._xqForceSync;window._xqForceSync=false;
+if(_xqForceSyncNow){isPageReload=true;}   // 借“页面重载”路径强制全量重放
 // 本地领先保护：本地恰好比服务端多1步且正是 pendingMove（未确认走棋）时，
 // 全量同步不应覆盖本地（防止"刚走的棋回退"），等待 move_ack 或自动补发
 var localPendingAhead=false;
