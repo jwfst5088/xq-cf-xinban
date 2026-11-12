@@ -1825,6 +1825,9 @@ if(d.color){boardFlip=(myCl==='black');}else{try{console.warn('[seat-guard] room
 var isPageReload=window._isPageReload;window._isPageReload=false;
 var _xqForceSyncNow=!!window._xqForceSync;window._xqForceSync=false;
 if(_xqForceSyncNow){isPageReload=true;}   // 借“页面重载”路径强制全量重放
+var _xqMxNow=(typeof d.mx==='number')?d.mx:null;
+if(_xqMxNow!==null&&window._xqMx!==undefined&&_xqMxNow!==window._xqMx){isPageReload=true;}
+if(_xqMxNow!==null){window._xqMx=_xqMxNow;}   // 借“页面重载”路径强制全量重放
 // 本地领先保护：本地恰好比服务端多1步且正是 pendingMove（未确认走棋）时，
 // 全量同步不应覆盖本地（防止"刚走的棋回退"），等待 move_ack 或自动补发
 var localPendingAhead=false;
