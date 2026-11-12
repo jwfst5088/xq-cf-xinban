@@ -1070,6 +1070,7 @@ var ChessRoom = class {
         this.room.blkTime = 900;
         this.room.moveHistory = [];
         this.room.capturedRed = [];
+        try { this._midRing = []; this._midSet = new Set(); } catch (eMidW) { }
         this.room.capturedBlack = [];
         this.room.playerTokens = {};
         this.room.seatIdentity = {};
@@ -1298,6 +1299,17 @@ var ChessRoom = class {
         return;
       }
       const move = { ...payload, timestamp: Date.now() };
+      if (payload && payload.mid) {
+        const _mid = String(payload.mid);
+        if (!this._midRing) { this._midRing = []; this._midSet = new Set(); }
+        if (this._midSet.has(_mid)) {
+          try { ws.send(JSON.stringify({ event: "move_ack", data: { moveHistoryLen: this.room.moveHistory.length, lastMove: { fromRow: payload.fromRow, fromCol: payload.fromCol, toRow: payload.toRow, toCol: payload.toCol }, currentTurn: this.room.currentTurn, applied: false, dedupe: true } })); } catch (eMid) { }
+          return;
+        }
+        this._midSet.add(_mid);
+        this._midRing.push(_mid);
+        if (this._midRing.length > 50) { const _oldMid = this._midRing.shift(); this._midSet.delete(_oldMid); }
+      }
       this.room.moveHistory.push(move);
       if (move.captured) {
         if (!this.room.capturedRed) this.room.capturedRed = [];
@@ -1475,6 +1487,7 @@ var ChessRoom = class {
       this.room.blkTime = 900;
       this.room.moveHistory = [];
       this.room.capturedRed = [];
+      try { this._midRing = []; this._midSet = new Set(); } catch (eMidR) { }
       this.room.capturedBlack = [];
       this.room.createdAt = Date.now();
       this.room.rematchSeq = (this.room.rematchSeq || 0) + 1;
@@ -1501,6 +1514,7 @@ var ChessRoom = class {
     } else if (eventName === "accept_undo") {
       if (!this.room || this.room.moveHistory.length === 0) return;
       const lastMove = this.room.moveHistory.pop();
+      if (lastMove && lastMove.mid && this._midSet) { try { this._midSet.delete(String(lastMove.mid)); const _mi = this._midRing ? this._midRing.indexOf(String(lastMove.mid)) : -1; if (_mi >= 0) this._midRing.splice(_mi, 1); } catch (eMidU) { } }
       this.room.gameOver = false;
       this.room.winner = null;
       this.room.currentTurn = lastMove.currentTurn === "red" ? "black" : "red";
