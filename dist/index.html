@@ -1824,7 +1824,7 @@ D('drawBtn').style.display='inline-flex';
 if(d.color){boardFlip=(myCl==='black');}else{try{console.warn('[seat-guard] room_state无color,不翻转棋盘');}catch(e){}}
 var isPageReload=window._isPageReload;window._isPageReload=false;
 var _xqForceSyncNow=!!window._xqForceSync;window._xqForceSync=false;
-if(_xqForceSyncNow){isPageReload=true;}   // 借“页面重载”路径强制全量重放
+if(_xqForceSyncNow&&(d.moveHistory.length>0||engine.moveHistory.length===0)){isPageReload=true;}   // 借“页面重载”路径强制全量重放
 var _xqMxNow=(typeof d.mx==='number')?d.mx:null;
 if(_xqMxNow!==null&&window._xqMx!==undefined&&_xqMxNow!==window._xqMx){isPageReload=true;}
 if(_xqMxNow!==null){window._xqMx=_xqMxNow;}   // 借“页面重载”路径强制全量重放
