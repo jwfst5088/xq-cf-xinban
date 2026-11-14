@@ -1507,6 +1507,21 @@ var ChessRoom = class {
     if (!this.room || !socketData.color) return;
     if (socketData.replaced) return;
     this._syncSockets();
+    // 假断线守卫(以线上 bundle e3a4368e 为准回写): 同一座位若还有另一条活连接(旧 socket 的 close 晚到、
+    // 多标签页、快速重连), 不标记断线、不广播 player_disconnected、不排 180s 判负闹钟
+    let _otherLive = false;
+    try {
+      for (const _x of this.ctx.getWebSockets()) {
+        if (this._same(_x, ws)) continue;
+        const _a = this._att(_x);
+        if (_a && _a.color === socketData.color && !_a.replaced) {
+          _otherLive = true;
+          break;
+        }
+      }
+    } catch (eG) {
+    }
+    if (_otherLive) return;
     this.room.players.delete(ws);
     this.disconnected[socketData.color] = Date.now();
     try { await this.ctx.storage.put("disconnected", this.disconnected); } catch (e) { }
