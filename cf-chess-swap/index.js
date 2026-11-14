@@ -639,16 +639,10 @@ var ChessRoom = class {
               this.room._restoredFromDb = true;
               // 休眠架构: 恢复回合截止时间，并把当前行棋方剩余时间校正到真实值
               if (!this.room.gameOver && s._turnDeadline) {
-                // 存档恢复宽限: 截止已过(重启窗口耗尽行棋方时钟) → 还给剩余时钟, 不立即判超时
-                if (s._turnDeadline <= Date.now()) {
-                  const _remG = this.room.currentTurn === "red" ? this.room.redTime : this.room.blkTime;
-                  this.room._turnDeadline = Date.now() + Math.max(1, _remG) * 1e3;
-                } else {
-                  this.room._turnDeadline = s._turnDeadline;
-                  const remS = Math.max(0, Math.round((s._turnDeadline - Date.now()) / 1e3));
-                  if (this.room.currentTurn === "red") this.room.redTime = Math.min(this.room.redTime, remS);
-                  else this.room.blkTime = Math.min(this.room.blkTime, remS);
-                }
+                this.room._turnDeadline = s._turnDeadline;
+                const remS = Math.max(0, Math.round((s._turnDeadline - Date.now()) / 1e3));
+                if (this.room.currentTurn === "red") this.room.redTime = Math.min(this.room.redTime, remS);
+                else this.room.blkTime = Math.min(this.room.blkTime, remS);
               }
               this.ctx.waitUntil(this._enrichSeatNames().then((ch) => {
                 if (ch) {
@@ -704,7 +698,7 @@ var ChessRoom = class {
       try { await this.ctx.storage.put("roomId", roomId2); } catch (e) { }
       const sid = Math.random().toString(36).slice(2) + Date.now().toString(36);
       this.ctx.acceptWebSocket(server, [sid]);
-      server.serializeAttachment({ sid, color: null, spectator: false, replaced: false, assignedAt: Date.now() });
+      server.serializeAttachment({ sid, color: null, spectator: false, replaced: false, assignedAt: Date.now(), pid: null });
       return new Response(null, { status: 101, webSocket: client });
     }
     const roomId = url.searchParams.get("roomId") || this.ctx.id.toString().split("-").pop();
@@ -728,7 +722,7 @@ var ChessRoom = class {
     return new Response("Not found", { status: 404 });
   }
   _att(ws) {
-    try { return ws.deserializeAttachment() || { sid: "", color: null, spectator: false, replaced: false, assignedAt: 0 }; } catch (e) { return { sid: "", color: null, spectator: false, replaced: false, assignedAt: 0 }; }
+    try { return ws.deserializeAttachment() || { sid: "", color: null, spectator: false, replaced: false, assignedAt: 0, pid: null }; } catch (e) { return { sid: "", color: null, spectator: false, replaced: false, assignedAt: 0, pid: null }; }
   }
   _same(a, b) {
     if (a === b) return true;
@@ -751,23 +745,15 @@ var ChessRoom = class {
         if (a.spectator) { if (!this.room.spectators.has(x)) this.room.spectators.add(x); }
         else if (a.color && !a.replaced) {
           if (![...this.room.players.keys()].some((k) => this._same(k, x))) this.room.players.set(x, { id: a.sid, color: a.color, assignedAt: a.assignedAt || Date.now() });
+          // 凭证自愈: 连接上带着 pid 就补回缺失的座位 token(颜色与凭证必须成对)
+          if (a.pid) {
+            if (!this.room.playerTokens) this.room.playerTokens = {};
+            if (!this.room.playerTokens[a.color]) this.room.playerTokens[a.color] = a.pid;
+          }
         }
       }
     } catch (e) { }
-    for (const pws of [...this.room.players.keys()]) {
-      if (!live.has(pws)) {
-        const lostAtt = this._att(pws);
-        const lost = this.room.players.get(pws);
-        this.room.players.delete(pws);
-        let liveHolder = false;
-        try { for (const x of live) { const a2 = this._att(x); if (a2 && a2.color === lost.color && !a2.replaced) { liveHolder = true; break; } } } catch (eLH) { }
-        if (lost && lost.color && !lostAtt.replaced && !liveHolder && !this.room.gameOver && !this.disconnected[lost.color]) {
-          this.disconnected[lost.color] = Date.now();
-          try { this.broadcastToOpponent(pws, JSON.stringify({ event: "player_disconnected", data: { color: lost.color } })); } catch (ePD) { }
-          this.ctx.waitUntil((async () => { try { await this.ctx.storage.put("disconnected", this.disconnected); } catch (e) { } try { await this._scheduleAlarm(); } catch (e) { } })());
-        }
-      }
-    }
+    for (const pws of [...this.room.players.keys()]) { if (!live.has(pws)) this.room.players.delete(pws); }
     for (const sws of [...this.room.spectators]) { if (!live.has(sws)) this.room.spectators.delete(sws); }
   }
   async _ensureLive() {
@@ -796,6 +782,11 @@ var ChessRoom = class {
       await this._onMessage(ws, socketData, eventName, payload);
     } catch (e) {
       console.error("Room WebSocket message error:", e);
+    }
+    // 出口统一对齐: 座位颜色对应的 token 才是权威凭证, 防止两本账
+    try {
+      if (this.room && socketData && socketData.color && !socketData.replaced && this.room.playerTokens && this.room.playerTokens[socketData.color]) socketData.pid = this.room.playerTokens[socketData.color];
+    } catch (ePidSync) {
     }
     try { ws.serializeAttachment(socketData); } catch (e) { }
   }
@@ -937,27 +928,6 @@ var ChessRoom = class {
             this.ctx.waitUntil(this._enrichSeatNames().then(() => this._regUpdate("waiting")).catch(() => {}));
             this._regKeepAlive();
             return;
-          }
-          // 手动重进回收: 同色座位被半开连接占用时, pid/设备指纹/断线标记任一证明 → 回收入座而非观战
-          if (this.room.players.size >= 2) {
-            const _liveJR = this._liveSids();
-            for (const [hws, seat] of [...this.room.players]) {
-              const attJR = this._att(hws);
-              if (attJR.replaced) continue;
-              if (!_liveJR.has(attJR.sid)) continue;
-              const cJR = seat.color;
-              if (!cJR) continue;
-              const pidJR = !!(payload.pid && this.room.playerTokens && this.room.playerTokens[cJR] === payload.pid);
-              const devJR = !!(payload.deviceId && this.room.seatIdentity && this.room.seatIdentity[cJR] && this.room.seatIdentity[cJR].dev != null && String(this.room.seatIdentity[cJR].dev) === String(payload.deviceId));
-              const preJR = !!(this.disconnected && this.disconnected[cJR] && seat.assignedAt && this.disconnected[cJR] > seat.assignedAt);
-              if (pidJR || devJR || preJR) {
-                this.room.players.delete(hws);
-                try { const gaJR = this._att(hws); gaJR.replaced = true; try { hws.serializeAttachment(gaJR); } catch (eSR) { } } catch (eGA) { }
-                try { hws.close(); } catch (eJR) { }
-                if (this.disconnected[cJR]) { delete this.disconnected[cJR]; try { await this.ctx.storage.put("disconnected", this.disconnected); } catch (eJR2) { } }
-                break;
-              }
-            }
           }
           if (this.room.players.size >= 2) {
             this.room.spectators.add(ws);
@@ -1115,8 +1085,6 @@ var ChessRoom = class {
           this.ctx.waitUntil(this._regTouch());
         } else if (eventName === "resign") {
           if (!this.room) return;
-          // 认输身份校验: 拒绝观战者/空色/被顶替连接的伪造resign (附件颜色为服务端入座时写入, 玩家本人不受影响)
-          if (!socketData.color || socketData.spectator || socketData.replaced) return;
           this.room.gameOver = true;
           this.room._gameEndedAt = Date.now();
           this.room.winner = socketData.color === "red" ? "black" : "red";
@@ -1183,6 +1151,14 @@ var ChessRoom = class {
                 const attA = this._att(wsA); attA.color = dataA.color; try { wsA.serializeAttachment(attA); } catch (e) { }
                 socketData.color = dataB.color;
               }
+            }
+          }
+          // 补齐缺失的座位 token: 否则换色被 if(red&&black) 挡住, 造成"颜色换了、凭证没换"
+          if (this.room.playerTokens) {
+            for (const [pwsBF, pBF] of this.room.players) {
+              if (!pBF.color || this.room.playerTokens[pBF.color]) continue;
+              const aBF = this._att(pwsBF);
+              this.room.playerTokens[pBF.color] = aBF.pid || (Math.random().toString(36).slice(2) + Date.now().toString(36));
             }
           }
           if (this.room.playerTokens && this.room.playerTokens.red && this.room.playerTokens.black) {
@@ -1392,22 +1368,6 @@ var ChessRoom = class {
           socketData.cv = (payload && payload.cv) || socketData.cv || null;
           await this._setSeatIdentity(color, payload);
           if (this.room.players.size >= 2 && !this.room.gameOver) this.room.gameStarted = true;
-          // 断线判负自动撤销: 被判负方在5分钟内回连接管座位 → 撤销判负从当前局面续下
-          try {
-            if (this.room.gameOver && this.room.endReason === "disconnect_timeout" && color && this.room.winner && this.room.winner !== color && (!this.room._gameEndedAt || Date.now() - this.room._gameEndedAt <= 300e3)) {
-              this.room.gameOver = false;
-              this.room.winner = null;
-              this.room.endReason = null;
-              this.room._gameEndedAt = null;
-              const _remR = this.room.currentTurn === "red" ? this.room.redTime : this.room.blkTime;
-              this.room._turnDeadline = Date.now() + Math.max(1, _remR) * 1e3;
-              try { await this.ctx.storage.delete("teardownAt"); } catch (eT2) {}
-              try { await this.ctx.storage.delete("dead"); } catch (eD2) {}
-              this.broadcastToRoom(JSON.stringify({ event: "game_resumed", data: { color } }));
-              try { await this._scheduleAlarm(); } catch (eA3) {}
-              this.ctx.waitUntil(this._saveRoomState());
-            }
-          } catch (eRes) { }
           this.ctx.waitUntil(this._enrichSeatNames().then((ch) => {
             if (ch) {
               try {
@@ -1547,16 +1507,6 @@ var ChessRoom = class {
     if (!this.room || !socketData.color) return;
     if (socketData.replaced) return;
     this._syncSockets();
-    // 幽灵连接守卫: 该色座位已由其他活连接接管(重连/回收换新) → 本次close是陈旧连接关闭, 不登记断线不判负
-    let _otherLive = false;
-    try {
-      for (const _x of this.ctx.getWebSockets()) {
-        if (this._same(_x, ws)) continue;
-        const _a = this._att(_x);
-        if (_a && _a.color === socketData.color && !_a.replaced) { _otherLive = true; break; }
-      }
-    } catch (eG) { }
-    if (_otherLive) return;
     this.room.players.delete(ws);
     this.disconnected[socketData.color] = Date.now();
     try { await this.ctx.storage.put("disconnected", this.disconnected); } catch (e) { }
@@ -1589,14 +1539,6 @@ var ChessRoom = class {
     if (this.room) {
       // 1) 断线判负(60s)：webSocketClose 登记 disconnected，闹钟到期执行
       if (!this.room.gameOver) {
-        // 兜底: 座位无人但对局已开下(close事件丢失如部署重启) → 补登记断线, 走既有60s判负流程
-        for (const _mc of ["red", "black"]) {
-          const _hasHolder = [...this.room.players.values()].some((p) => p.color === _mc);
-          if (!_hasHolder && !this.disconnected[_mc] && this.room.moveHistory && this.room.moveHistory.length > 0) {
-            this.disconnected[_mc] = Date.now();
-            try { await this.ctx.storage.put("disconnected", this.disconnected); } catch (e) { }
-          }
-        }
         // 修复D: 对局未开始(0步)不断线判负——只保持离线标记等人回座
         // （客户端倒计时到期自停不判负，player_reconnected 会清零；与离开不扣分哲学一致）
         const zeroMoves = !this.room.moveHistory || this.room.moveHistory.length === 0;
@@ -1696,13 +1638,12 @@ var ChessRoom = class {
     try {
       const now = Date.now();
       let next = Infinity;
-      let stale = false;
       if (this.room && !this.room.gameOver && this.room._turnDeadline) next = Math.min(next, this.room._turnDeadline);
-      for (const c of ["red", "black"]) if (this.disconnected[c]) { const _dDl = this.disconnected[c] + 63e3; if (_dDl > now) next = Math.min(next, _dDl); else stale = true; }
+      for (const c of ["red", "black"]) if (this.disconnected[c]) next = Math.min(next, this.disconnected[c] + 63e3);
       if (this.room && !this.room.gameOver) {
         let hb = null;
         try { hb = await this.ctx.storage.get("hb"); } catch (e) { }
-        if (hb) for (const c of ["red", "black"]) if (hb[c]) { const _hDl = hb[c] + 108e3; if (_hDl > now) next = Math.min(next, _hDl); else stale = true; }
+        if (hb) for (const c of ["red", "black"]) if (hb[c]) next = Math.min(next, hb[c] + 108e3);
       }
       let td = null;
       try { td = await this.ctx.storage.get("teardownAt"); } catch (e) { }
@@ -1717,7 +1658,6 @@ var ChessRoom = class {
           if (anyLive) next = Math.min(next, now + 60e3);
         }
       }
-      if (stale) next = Math.min(next, now + 60e3);
       if (next !== Infinity) {
         const at = Math.max(now + 1e3, next);
         try { await this.ctx.storage.setAlarm(at); } catch (e) { }
@@ -1747,7 +1687,7 @@ var ChessRoom = class {
     const baseState = this.getRoomState();
     for (const [ws, player] of this.room.players) {
       try {
-        ws.send(JSON.stringify({ event: "room_state", data: { ...baseState, color: player.color } }));
+        ws.send(JSON.stringify({ event: "room_state", data: { ...baseState, color: player.color, pid: (this.room.playerTokens || {})[player.color] || null } }));
       } catch (e) {
       }
     }
@@ -1793,7 +1733,7 @@ var ChessRoom = class {
     for (const [pws, player] of this.room.players) {
       if (!this._same(pws, ws)) {
         try {
-          pws.send(JSON.stringify({ event: "room_state", data: { ...baseState, color: player.color } }));
+          pws.send(JSON.stringify({ event: "room_state", data: { ...baseState, color: player.color, pid: (this.room.playerTokens || {})[player.color] || null } }));
         } catch (e) {
         }
       }
@@ -2060,7 +2000,7 @@ const sorted = [...this.queue].sort((a, b) => a.elo - b.elo);
   async _scheduleSweep() {
     if (this.queue.length > 0) {
       try {
-        await this.ctx.storage.setAlarm(Date.now() + 10e3);
+        await this.ctx.storage.setAlarm(Date.now() + 2e3);
       } catch (e) {
       }
     }
@@ -2312,12 +2252,8 @@ async function handleApiRequest(request, env) {
     }
   }
   if (path === "/api/online") {
-    const _onlNow = Date.now();
-    if (typeof globalThis.__xqPres === "undefined") globalThis.__xqPres = { t: 0, v: null };
-    if (_onlNow - globalThis.__xqPres.t >= 30e3) {
-      const pT3 = await presenceSync(env, { get: true });
-      if (typeof pT3 === "number") { globalThis.__xqPres = { t: _onlNow, v: pT3 }; onlineCount = pT3; } else if (globalThis.__xqPres.v != null) onlineCount = globalThis.__xqPres.v;
-    } else if (globalThis.__xqPres.v != null) onlineCount = globalThis.__xqPres.v;
+    const pT3 = await presenceSync(env, { get: true });
+    if (typeof pT3 === "number") onlineCount = pT3;
     return json({ online: onlineCount, count: onlineCount });
   }
   if (path === "/api/history/save" && env.CHESS_DB) {
