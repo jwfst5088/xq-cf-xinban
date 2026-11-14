@@ -1519,8 +1519,23 @@ var ChessRoom = class {
     this.room._gameEndedAt = now;
     this.room.winner = color === "red" ? "black" : "red";
     this.room.endReason = "disconnect_timeout";
-    this.broadcastToRoom(JSON.stringify({ event: "game_over", data: { winner: this.room.winner, reason: "disconnect_timeout" } }));
-    this.broadcastToRoom(JSON.stringify({ event: "room_timeout", data: { } }));
+    const _endMsg = JSON.stringify({ event: "game_over", data: { winner: this.room.winner, reason: "disconnect_timeout" } });
+    const _toMsg = JSON.stringify({ event: "room_timeout", data: { } });
+    this.broadcastToRoom(_endMsg);
+    this.broadcastToRoom(_toMsg);
+    // 断线方 socket 已被移出 room.players，broadcastToRoom 发不到它 → 对"连着但未入座"的连接补发终局
+    try {
+      const _endSent = new Set([...this.room.players.keys(), ...this.room.spectators]);
+      for (const _endWs of this.ctx.getWebSockets()) {
+        if (_endSent.has(_endWs)) continue;
+        try {
+          _endWs.send(_endMsg);
+          _endWs.send(_toMsg);
+        } catch (eEnd) {
+        }
+      }
+    } catch (eEndAll) {
+    }
     this.ctx.waitUntil(this._recordGameEnd("disconnect_timeout"));
     this._saveRoomState();
     this.ctx.waitUntil(this._regUpdate(null));
