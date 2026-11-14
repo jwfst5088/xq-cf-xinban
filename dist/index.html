@@ -1813,6 +1813,7 @@ socket.on('player_reconnected',function(d){
 	hideOverlay();hideReconnecting();
 });
 socket.on('room_state',function(d){
+var _wasOver=engine.gameOver;
 myRm=d.roomId;if(d.color&&gm==='online'&&myCl&&d.color!==myCl&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){window._xqColorFight=(window._xqColorFight||0)+1;_xqSeatLog('对局中换色拒绝#'+window._xqColorFight+':'+myCl+'->'+d.color);try{console.warn('[seat-guard] 对局中拒绝换色 '+myCl+'->'+d.color);}catch(e1){}if(window._xqColorFight<=1){try{socket.emit('reconnect_room',{roomId:myRm,color:myCl,pid:_xqPidFor(myRm)});}catch(e2){}}}else{if(d.color){myCl=d.color;window._xqColorFight=0;}else{try{console.warn('[seat-guard] room_state无color,维持本地座位='+myCl);}catch(e){}}}gm='online';
 try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 重连/换先后同步本盘颜色
@@ -1898,6 +1899,7 @@ if(gameStarted){stopTimer();if(redLeft<=0||blkLeft<=0){redLeft=900;blkLeft=900;}
 requestAnimationFrame(function(){drawBoardBg();render();});
 hideOverlay();hideReconnecting();
 
+if(d.gameOver&&!_wasOver&&!window._xqSpectator&&myCl&&d.color===myCl){sndGameOver();stopTimer();showGameOver(d.winner==='draw'?'和棋':(d.winner==='red'?'红方':'黑方'));}
 saveGameState();
 });
 socket.on('opponent_left',function(){hideReconnecting();toast('棋局已结束',5000);setTimeout(function(){leaveGameSilent();},5000);});
@@ -6383,8 +6385,14 @@ function retryPikafishGame(){
 
 function discSocket(){if(socket){try{socket.disconnect();}catch(e){}socket=null;}}
 window.addEventListener('beforeunload',discSocket);
-window.addEventListener('pagehide',discSocket);
+window.addEventListener('pagehide',function(){try{saveGameState();}catch(e){}}); // 切后台/锁屏不销毁socket：原 discSocket 会把 reconnection 永久置 false，回来后再也不重连
 window.addEventListener('unload',discSocket);
+// 回到前台/网络恢复：socket 还在但已断开时立刻重连（补座由 connect 链按 pid 完成，不改对局逻辑）
+window._xqResumeAt=0;
+function _xqResumeSocket(){try{if(document.hidden)return;if(!socket||socket.connected||socket.connecting)return;if(Date.now()-window._xqResumeAt<1000)return;window._xqResumeAt=Date.now();socket.reconnection=true;socket.connect();}catch(e){}} 
+document.addEventListener('visibilitychange',function(){if(!document.hidden)_xqResumeSocket();});
+window.addEventListener('pageshow',function(){_xqResumeSocket();});
+window.addEventListener('online',function(){_xqResumeSocket();});
 
 function updateBoardSize(){
 var wrap=document.querySelector('.board-wrap'),board=document.getElementById('board');
