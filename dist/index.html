@@ -394,6 +394,9 @@ body[data-xq-spec] .right-panel .actions button:not([onclick*="leaveGame"]):not(
 	<script src="/js/pikafish-engine.js?v=1787540000002"></script>
 <script src="/js/socket-client.js"></script>
 <script>
+function _xqReadCookie(n){try{var m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):null;}catch(e){return null;}}
+function _xqWriteCookie(n,v){try{document.cookie=n+'='+encodeURIComponent(v)+';path=/;max-age=31536000;SameSite=Lax';}catch(e){}}
+function _xqDelCookie(n){try{document.cookie=n+'=;path=/;max-age=0;SameSite=Lax';}catch(e){}}
 // ========== Pikafish WASM 加载 (IndexedDB 缓存 + 分片顺序加载) ==========
 var WASM_DB = 'pikafish_wasm_cache';
 // v169: 缓存键 v2→v3，强制旧客户端重新下载（防止 IndexedDB 中残留旧构建 wasm）
@@ -1674,7 +1677,7 @@ try{
 if(typeof io==='undefined'){D('lobbyStatus').textContent='○ 服务器离线（本地模式可用）';sockOk=false;return;}
 if(socket){try{socket.disconnect();}catch(e){}socket=null;}
 socket=io({transports:['websocket','polling'],reconnection:true,reconnectionAttempts:Infinity,reconnectionDelay:1000,timeout:8000,pingTimeout:50000,pingInterval:25000,randomizationFactor:0});
-function _xqPidFor(rm){try{if(window._xqPid&&window._xqPid.rm===rm)return window._xqPid.pid;var _s=JSON.parse(localStorage.getItem("xq_pid")||"null");if(_s&&_s.rm===rm)return _s.pid;}catch(e){}return null;}
+function _xqPidFor(rm){try{if(window._xqPid&&window._xqPid.rm===rm)return window._xqPid.pid;var _s=JSON.parse(localStorage.getItem("xq_pid")||"null");if(_s&&_s.rm===rm)return _s.pid;var _c=_xqReadCookie('xq_pid');if(_c){var _cj=JSON.parse(_c);if(_cj&&_cj.rm===rm)return _cj.pid;}}catch(e){}return null;}
 socket.on('connect',function(){window._xqConnAt=Date.now();sockOk=true;if(window._xqOffT){clearTimeout(window._xqOffT);window._xqOffT=null;}D('lobbyStatus').textContent='● 服务器已连接';D('footerText').textContent='人机对弈需联网 | 在线模式两人对战';
 hideReconnecting();
 var isPageReload=!!window._pendingReconnect;
@@ -1695,7 +1698,7 @@ socket.on('online_count',function(count){D('onlineCount').textContent='当前在
 socket.on('room_created',function(d){
 window._xqDeferredSync=null;if(gm==='online'&&myRm===d.roomId&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){_xqSeatLog('对局中收到room_created,拒绝重置,转重连(本色'+myCl+')');try{console.warn('[seat-guard] 对局中room_created,转重连');}catch(e0){}try{socket.emit('reconnect_room',{roomId:myRm,color:myCl,pid:_xqPidFor(myRm)});}catch(e2){}return;}
 myRm=d.roomId;myCl=d.color;gm='online';
-try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
+try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));try{_xqWriteCookie('xq_pid',JSON.stringify(window._xqPid));}catch(e){}}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 记录本盘颜色，下一盘轮换先手
 D('lobbyStatus').innerHTML='房间号: <strong style="font-size:20px;color:#d4a843;letter-spacing:3px;">'+d.roomId+'</strong>';
 enterOnlineGame(d.roomId,d.color);
@@ -1708,7 +1711,7 @@ socket.reconnectToRoom(d.roomId);
 socket.on('room_joined',function(d){
 if(gm==='online'&&myRm===d.roomId&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){_xqSeatLog('对局中收到room_joined,拒绝重置,转重连(本色'+myCl+')');try{console.warn('[seat-guard] 对局中room_joined,转重连');}catch(e0){}try{socket.emit('reconnect_room',{roomId:myRm,color:myCl,pid:_xqPidFor(myRm)});}catch(e2){}return;}
 myRm=d.roomId;myCl=d.color;gm='online';D('lobbyStatus').textContent='';
-try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
+try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));try{_xqWriteCookie('xq_pid',JSON.stringify(window._xqPid));}catch(e){}}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 记录本盘颜色，下一盘轮换先手
 enterOnlineGame(d.roomId,d.color);
 });
@@ -1815,7 +1818,7 @@ socket.on('player_reconnected',function(d){
 socket.on('room_state',function(d){
 var _wasOver=engine.gameOver;
 myRm=d.roomId;if(d.color&&gm==='online'&&myCl&&d.color!==myCl&&gameStarted&&!engine.gameOver&&engine.moveHistory.length>0){window._xqColorFight=(window._xqColorFight||0)+1;_xqSeatLog('对局中换色拒绝#'+window._xqColorFight+':'+myCl+'->'+d.color);try{console.warn('[seat-guard] 对局中拒绝换色 '+myCl+'->'+d.color);}catch(e1){}if(window._xqColorFight<=1){try{socket.emit('reconnect_room',{roomId:myRm,color:myCl,pid:_xqPidFor(myRm)});}catch(e2){}}}else{if(d.color){myCl=d.color;window._xqColorFight=0;}else{try{console.warn('[seat-guard] room_state无color,维持本地座位='+myCl);}catch(e){}}}gm='online';
-try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
+try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));try{_xqWriteCookie('xq_pid',JSON.stringify(window._xqPid));}catch(e){}}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 重连/换先后同步本盘颜色
 D('lobby').classList.add('hide');D('game').classList.add('show');
 D('modeBadge').textContent='房间: '+d.roomId;
@@ -1943,12 +1946,14 @@ try{
 var st={ts:Date.now(),gm:'online',myRm:myRm,myCl:myCl,pid:(window._xqPid&&window._xqPid.rm===myRm&&window._xqPid.pid)?window._xqPid.pid:null,currentTurn:engine.currentTurn,gameOver:engine.gameOver,winner:engine.winner,moveHistory:engine.moveHistory.slice(),capRed:capRed.slice(),capBlk:capBlk.slice(),redLeft:redLeft,blkLeft:blkLeft};
 localStorage.setItem('xq_game',JSON.stringify(st));
 sessionStorage.setItem('xq_game','1');
+try{var _rp=window._xqPid&&window._xqPid.pid?window._xqPid.pid:(window._xqPid&&typeof window._xqPid==='string'?window._xqPid:'');_xqWriteCookie('xq_resume',JSON.stringify({rm:myRm,cl:myCl,pid:_rp,ts:Date.now()}));}catch(e){}
 }catch(e){}
 }
 }
 
 function clearGameState(){
 try{localStorage.removeItem('xq_game');sessionStorage.removeItem('xq_game');}catch(e){}
+try{_xqDelCookie('xq_resume');}catch(e){}
 }
 
 function loadGameState(){
@@ -6463,7 +6468,9 @@ if(urlParams.get('start')==='pikafish'){
 setTimeout(function(){startPikafishGame(urlParams.get('color')||null);},500);
 return;
 }
-try{var s=localStorage.getItem('xq_game');if(s){var g=JSON.parse(s);
+try{var s=localStorage.getItem('xq_game');
+if(!s){try{var _rc=_xqReadCookie('xq_resume');if(_rc){var _rj=JSON.parse(_rc);if(_rj&&_rj.rm&&_rj.cl&&Date.now()-(_rj.ts||0)<1800000){s=JSON.stringify({ts:_rj.ts||Date.now(),gm:'online',myRm:_rj.rm,myCl:_rj.cl,pid:_rj.pid||null,currentTurn:'red',gameOver:false,winner:null,moveHistory:[],capRed:[],capBlk:[],redLeft:null,blkLeft:null});}}}catch(e){}}
+if(s){var g=JSON.parse(s);
 if(g.gm==='ai'||g.gm==='pikafish'){if(!g.ts||Date.now()-g.ts>1800000){try{localStorage.removeItem('xq_game');sessionStorage.removeItem('xq_game');}catch(e0g){}return;}
 _xqSeatLog('页面载入恢复: gm='+g.gm+' myCl='+g.myCl+' hist='+((g.moveHistory||[]).length)+' pid='+(g.pid?'有':'无'));gm=g.gm;myCl=g.myCl||'red';aiCl=g.aiCl||'black';boardFlip=(myCl==='black');soundEnabled=true;gameOverSoundPlayed=false;
 D('lobby').classList.add('hide');D('game').classList.add('show');
@@ -6489,7 +6496,7 @@ if(g.gm==='pikafish')pikafishDeepThink();else startAiThink();
 }else if(g.gm==='online'&&g.myRm){
 window._pendingReconnect=g;
 gm='online';myRm=g.myRm;myCl=g.myCl;
-try{if(g.pid){window._xqPid={rm:g.myRm,pid:g.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){} // 恢复pid: 刷新后凭pid秒接管座位
+try{if(g.pid){window._xqPid={rm:g.myRm,pid:g.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));try{_xqWriteCookie('xq_pid',JSON.stringify(window._xqPid));}catch(e){}}}catch(e){} // 恢复pid: 刷新后凭pid秒接管座位
 boardFlip=(myCl==='black');
 D('lobby').classList.add('hide');D('game').classList.add('show');
 D('modeBadge').textContent='房间: '+g.myRm;
@@ -6615,7 +6622,7 @@ boardFlip=false;
 if(gameStarted)D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
 }catch(e){}}
 function _xqSeatLog(m){try{var a=[];try{a=JSON.parse(localStorage.getItem('xq_seatlog')||'[]');}catch(e0){}a.push({t:new Date().toISOString().slice(11,19),m:m});while(a.length>60)a.shift();localStorage.setItem('xq_seatlog',JSON.stringify(a));}catch(e){}}
-function _xqRememberPid(d){try{if(d&&d.pid&&d.roomId){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));}}catch(e){}}
+function _xqRememberPid(d){try{if(d&&d.pid&&d.roomId){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));try{_xqWriteCookie('xq_pid',JSON.stringify(window._xqPid));}catch(e){}}}catch(e){}}
 function _xqAttachRoomListListeners(){
 try{
 if(!socket||typeof socket.on!=='function'||socket._xqRoomListHooked)return;
