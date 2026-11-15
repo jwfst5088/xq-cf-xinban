@@ -780,7 +780,6 @@ var ChessRoom = class {
               this.room.capturedRed = s.capturedRed || [];
               this.room.capturedBlack = s.capturedBlack || [];
               this.room.createdAt = s.createdAt;
-              this.room.rematchSeq = s.rematchSeq || 0;
               this.room.playerTokens = s.playerTokens || null;
               this.room.gameStarted = !!s.gameStarted;
               this.room.seatIdentity = s.seatIdentity || {};
@@ -815,6 +814,10 @@ var ChessRoom = class {
   async _saveRoomState() {
     if (!this.room || !this.env.CHESS_DB) return;
     try {
+      if (this.room.gameOver) {
+        await this.env.CHESS_DB.prepare("DELETE FROM room_state WHERE room_id = ?").bind(this.room.id).run();
+        return;
+      }
       await this.env.CHESS_DB.exec(
         "CREATE TABLE IF NOT EXISTS room_state (room_id TEXT PRIMARY KEY, state TEXT, updated_at INTEGER)"
       );
@@ -833,8 +836,7 @@ var ChessRoom = class {
         seatIdentity: this.room.seatIdentity || {},
         _ratedRecorded: !!this.room._ratedRecorded,
         _turnDeadline: this.room._turnDeadline || null,
-        createdAt: this.room.createdAt,
-        rematchSeq: this.room.rematchSeq || 0
+        createdAt: this.room.createdAt
       });
       await this.env.CHESS_DB.prepare(
         "INSERT OR REPLACE INTO room_state (room_id, state, updated_at) VALUES (?, ?, ?)"
@@ -1057,8 +1059,7 @@ var ChessRoom = class {
         });
       } catch (eAL) {
       }
-      this._diag("create", anyLiveSeated ? "live" : "nolive", "mv=" + this.room.moveHistory.length + " over=" + (this.room.gameOver ? 1 : 0) + " started=" + (this.room.gameStarted ? 1 : 0));
-      if (!anyLiveSeated && this.room.gameOver) {
+      if (!anyLiveSeated && (this.room.gameOver || this.room.gameStarted || this.room.moveHistory && this.room.moveHistory.length > 0)) {
         this.room.gameOver = false;
         this.room.winner = null;
         this.room.endReason = null;
@@ -1070,7 +1071,6 @@ var ChessRoom = class {
         this.room.blkTime = 900;
         this.room.moveHistory = [];
         this.room.capturedRed = [];
-        try { this._midRing = []; this._midSet = new Set(); } catch (eMidW) { }
         this.room.capturedBlack = [];
         this.room.playerTokens = {};
         this.room.seatIdentity = {};
@@ -1107,7 +1107,6 @@ var ChessRoom = class {
         socketData.cv = payload && payload.cv || socketData.cv || null;
         await this._setSeatIdentity(myColor, payload);
         ws.send(JSON.stringify({ event: "room_created", data: { roomId: this.room.id, color: myColor, pid: myPid, seatInfo: this.getRoomState().seatInfo } }));
-        ws.send(JSON.stringify({ event: "room_state", data: { ...this.getRoomState(), color: myColor } }));
         this.ctx.waitUntil(this._enrichSeatNames().then(() => this._regUpdate(this.room.players.size >= 2 ? "playing" : "waiting")).catch(() => {
         }));
         this._regKeepAlive();
@@ -1128,7 +1127,6 @@ var ChessRoom = class {
         socketData.cv = payload && payload.cv || socketData.cv || null;
         await this._setSeatIdentity(myColor, payload);
         ws.send(JSON.stringify({ event: "room_created", data: { roomId: this.room.id, color: myColor, pid: myPid, seatInfo: this.getRoomState().seatInfo } }));
-        ws.send(JSON.stringify({ event: "room_state", data: { ...this.getRoomState(), color: myColor } }));
         this.ctx.waitUntil(this._enrichSeatNames().then(() => this._regUpdate(this.room.players.size >= 2 ? "playing" : "waiting")).catch(() => {
         }));
         this._regKeepAlive();
@@ -1283,7 +1281,6 @@ var ChessRoom = class {
         return;
       }
       if (this.room.currentTurn !== socketData.color) {
-        this._diag("desync", "not_your_turn", "srv=" + this.room.currentTurn + " cli=" + (payload && payload.currentTurn), "srvLen=" + this.room.moveHistory.length + " cliLen=" + (payload && payload.moveHistoryLen));
         ws.send(JSON.stringify({ event: "move_rejected", data: { reason: "not_your_turn", yourColor: socketData.color || null, currentTurn: this.room.currentTurn, histLen: this.room.moveHistory.length } }));
         try {
           let _pcol = null;
@@ -1299,17 +1296,6 @@ var ChessRoom = class {
         return;
       }
       const move = { ...payload, timestamp: Date.now() };
-      if (payload && payload.mid) {
-        const _mid = String(payload.mid);
-        if (!this._midRing) { this._midRing = []; this._midSet = new Set(); }
-        if (this._midSet.has(_mid)) {
-          try { ws.send(JSON.stringify({ event: "move_ack", data: { moveHistoryLen: this.room.moveHistory.length, lastMove: { fromRow: payload.fromRow, fromCol: payload.fromCol, toRow: payload.toRow, toCol: payload.toCol }, currentTurn: this.room.currentTurn, applied: false, dedupe: true } })); } catch (eMid) { }
-          return;
-        }
-        this._midSet.add(_mid);
-        this._midRing.push(_mid);
-        if (this._midRing.length > 50) { const _oldMid = this._midRing.shift(); this._midSet.delete(_oldMid); }
-      }
       this.room.moveHistory.push(move);
       if (move.captured) {
         if (!this.room.capturedRed) this.room.capturedRed = [];
@@ -1410,7 +1396,6 @@ var ChessRoom = class {
       this.broadcastToOpponent(ws, JSON.stringify({ event: "draw_requested", data: { from: socketData.color } }));
     } else if (eventName === "accept_draw") {
       if (!this.room) return;
-      this._diag("draw", String(socketData.color), "mv=" + this.room.moveHistory.length);
       this.room.gameOver = true;
       this.room._gameEndedAt = Date.now();
       this.room.winner = "draw";
@@ -1487,10 +1472,8 @@ var ChessRoom = class {
       this.room.blkTime = 900;
       this.room.moveHistory = [];
       this.room.capturedRed = [];
-      try { this._midRing = []; this._midSet = new Set(); } catch (eMidR) { }
       this.room.capturedBlack = [];
       this.room.createdAt = Date.now();
-      this.room.rematchSeq = (this.room.rematchSeq || 0) + 1;
       try {
         await this.ctx.storage.delete("teardownAt");
       } catch (e) {
@@ -1514,7 +1497,6 @@ var ChessRoom = class {
     } else if (eventName === "accept_undo") {
       if (!this.room || this.room.moveHistory.length === 0) return;
       const lastMove = this.room.moveHistory.pop();
-      if (lastMove && lastMove.mid && this._midSet) { try { this._midSet.delete(String(lastMove.mid)); const _mi = this._midRing ? this._midRing.indexOf(String(lastMove.mid)) : -1; if (_mi >= 0) this._midRing.splice(_mi, 1); } catch (eMidU) { } }
       this.room.gameOver = false;
       this.room.winner = null;
       this.room.currentTurn = lastMove.currentTurn === "red" ? "black" : "red";
@@ -1587,17 +1569,9 @@ var ChessRoom = class {
             const [hws, seat] = sameColorEntry;
             const pidMatches2 = !!(payload.pid && this.room.playerTokens && this.room.playerTokens[color] === payload.pid);
             const holderDead = !liveSids.has(this._att(hws).sid) || !!this._att(hws).replaced || this._staleSid(this._att(hws).sid);
-            let holderIdle = false;
+            const holderIdle = false;
             const preDiscSeat = !!(this.disconnected && this.disconnected[color] && seat.assignedAt && this.disconnected[color] > seat.assignedAt);
             const devPinned = !!(payload.deviceId && this.room.seatIdentity && this.room.seatIdentity[color] && this.room.seatIdentity[color].dev != null && String(this.room.seatIdentity[color].dev) === String(payload.deviceId));
-            if (!pidMatches2 && !devPinned && !holderDead && !preDiscSeat) {
-              try {
-                const hbAll = await this.ctx.storage.get("hb");
-                const hbT = hbAll && hbAll[color] ? hbAll[color] : 0;
-                holderIdle = !!(hbT && Date.now() - hbT > 75e3);
-              } catch (eHb) { }
-            }
-            if (!pidMatches2 && !devPinned && !holderDead && !holderIdle && !preDiscSeat) this._diag("reconn", "reject", color, "dead=" + holderDead + " idle=" + holderIdle + " pre=" + preDiscSeat);
             if (!pidMatches2 && !devPinned && !holderDead && !holderIdle && !preDiscSeat) {
               const alt2 = color === "red" ? "black" : "red";
               if (isFree(alt2) || isReplaceable(alt2)) {
@@ -1726,12 +1700,6 @@ var ChessRoom = class {
       if (!this.room.gameOver && this.room.players.size >= 2) {
         this.startRoomTimer();
       }
-      this._diag("reconn", "ok", color, "mv=" + this.room.moveHistory.length);
-      try {
-        const _hbNext = (await this.ctx.storage.get("hb")) || {};
-        _hbNext[color] = Date.now();
-        await this.ctx.storage.put("hb", _hbNext);
-      } catch (eHb2) { }
       this.broadcastToOpponent(ws, JSON.stringify({ event: "player_reconnected", data: { color } }));
     } else if (eventName === "leave_room") {
       if (!this.room) return;
@@ -1832,14 +1800,13 @@ var ChessRoom = class {
       } catch (e) {
       }
       try {
-        if (this.env.CHESS_DB && !room.gameOver) this.env.CHESS_DB.prepare("DELETE FROM room_state WHERE room_id = ?").bind(room.id).run();
+        if (this.env.CHESS_DB) this.env.CHESS_DB.prepare("DELETE FROM room_state WHERE room_id = ?").bind(room.id).run();
       } catch (e) {
       }
     }
   }
   async webSocketClose(ws, code, reason, wasClean) {
     let deadFlag = null;
-    this._diag("close", (this._att(ws) || {}).color || "-", this.room ? ("mv=" + this.room.moveHistory.length + " turn=" + this.room.currentTurn) : "noroom");
     try {
       deadFlag = await this.ctx.storage.get("dead");
     } catch (e) {
@@ -1884,7 +1851,6 @@ var ChessRoom = class {
     }
   }
   async _doForfeit(color, now) {
-    this._diag("forfeit", String(color), this.room ? ("mv=" + this.room.moveHistory.length) : "");
     this.room.gameOver = true;
     this.room._gameEndedAt = now;
     this.room.winner = color === "red" ? "black" : "red";
@@ -2144,16 +2110,6 @@ var ChessRoom = class {
     } catch (e) {
     }
   }
-  _diag(ev, a, b, c) {
-    try {
-      if (!this.env || !this.env.CHESS_DB) return;
-      const rid = this.room ? String(this.room.id) : "";
-      const run = this._diagInit ? Promise.resolve() : this.env.CHESS_DB.prepare("CREATE TABLE IF NOT EXISTS diag_log (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, room_id TEXT, ev TEXT, a TEXT, b TEXT, c TEXT)").run().catch(() => { });
-      this._diagInit = 1;
-      if (Math.random() < 0.01) this.ctx.waitUntil(this.env.CHESS_DB.prepare("DELETE FROM diag_log WHERE ts < ?").bind(Date.now() - 14 * 864e5).run().catch(() => { }));
-      this.ctx.waitUntil(run.then(() => this.env.CHESS_DB.prepare("INSERT INTO diag_log (ts, room_id, ev, a, b, c) VALUES (?,?,?,?,?,?)").bind(Date.now(), rid, String(ev), String(a == null ? "" : a), String(b == null ? "" : b), String(c == null ? "" : c)).run()).catch(() => { }));
-    } catch (e) { }
-  }
   broadcastToRoom(msg) {
     if (!this.room) return;
     for (const ws of this.room.players.keys()) {
@@ -2230,7 +2186,6 @@ var ChessRoom = class {
     const si = this.room.seatIdentity || {};
     return {
       roomId: this.room.id,
-      mx: this.room.rematchSeq || 0,
       playerCount: this.room.players.size,
       currentTurn: this.room.currentTurn,
       gameOver: this.room.gameOver,
@@ -2331,7 +2286,6 @@ var ChessRoom = class {
     };
   }
   async _recordGameEnd(reason) {
-    this._diag("end", String(reason), "winner=" + (this.room ? String(this.room.winner) : ""), "mv=" + (this.room && this.room.moveHistory ? this.room.moveHistory.length : 0));
     if (!this.room || !this.env.CHESS_DB || this.room._ratedRecorded) return;
     const si = this.room.seatIdentity || {};
     const red = si.red;
@@ -3760,3 +3714,4 @@ export {
   index_default as default
 };
 //# sourceMappingURL=cf-chess.js.map
+
