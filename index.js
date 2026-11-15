@@ -1,3 +1,8 @@
+// ===== ⚠ 过时副本，禁止部署 ⚠ =====
+// 本站点(x.696919.xyz)权威源码是 modules/cf-chess.js（与线上 worker bundle 逐字节一致）。
+// 本 index.js 是历史遗留的过时副本，缺失部分线上修复(如 _saveRoomState 的 gameOver→DELETE)。
+// 部署一律走 modules/cf-chess.js，勿用本文件。维护请改 modules/cf-chess.js。
+// ================================
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
@@ -669,7 +674,7 @@ var ChessRoom = class {
           if (!this.room || this.room.gameOver) return;
           const now = Date.now();
           for (const color of ["red", "black"]) {
-            if (this.disconnected[color] && now - this.disconnected[color] > 60e3) {
+            if (this.disconnected[color] && now - this.disconnected[color] > 18e4) {
               this.room.gameOver = true;
               this.room._gameEndedAt = now;
               this.room.winner = color === "red" ? "black" : "red";
@@ -697,7 +702,7 @@ var ChessRoom = class {
             }
           }
           this.room._disconnectTimer = null;
-        }, 63e3);
+        }, 183e3);
       }
     };
     ws.onerror = () => {
