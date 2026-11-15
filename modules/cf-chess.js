@@ -1746,6 +1746,7 @@ var ChessRoom = class {
         this.startRoomTimer();
       }
       this._diag("reconn", "ok", color, "mv=" + this.room.moveHistory.length);
+      this.ctx.waitUntil(this._enrichSeatNames().then(() => this._regUpdate("playing")).catch(() => {}));
       try {
         const _hbNext = (await this.ctx.storage.get("hb")) || {};
         _hbNext[color] = Date.now();
