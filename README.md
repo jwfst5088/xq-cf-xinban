@@ -17,7 +17,7 @@ x.696919.xyz 是**两层架构**：
 | 编译源 | `modules/cf-chess.js`（**权威源，与线上 worker bundle 逐字节一致**） |
 | 本仓库角色 | 代理源码（xq-hao/）+ 站点源码（dist/）+ worker 权威源（modules/cf-chess.js） |
 
-> ⚠ **根 `index.js` 和 `cf-chess-swap/index.js` 是历史遗留副本，禁止部署。** 权威源是 `modules/cf-chess.js`。维护只改 modules/cf-chess.js。
+> ⚠ **根 `index.js` 是历史遗留副本，禁止部署。** 权威源是 `modules/cf-chess.js`。维护只改 modules/cf-chess.js。（原 `cf-chess-swap/` 遗留副本已删除）
 
 ## 一、部署清单（dist/ 全树 14 文件，旧版家族无 admin/buy/qr）
 
