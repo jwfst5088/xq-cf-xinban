@@ -1573,6 +1573,7 @@ D('game').classList.remove('show');D('lobby').classList.remove('hide');
 D('redName').textContent='红方';D('blackName').textContent='黑方';
 D('lobbyStatus').textContent=sockOk?'● 服务器已连接':'○ 服务器离线（本地模式可用）';hideOverlay();hideReconnecting();
 try{localStorage.removeItem('xq_game');sessionStorage.removeItem('xq_game');}catch(e){}
+try{_xqDelCookie('xq_resume');}catch(e){}
 }
 function doLeaveGame(){
 if(document.fullscreenElement||document.webkitFullscreenElement){
@@ -1589,6 +1590,7 @@ D('game').classList.remove('show');D('lobby').classList.remove('hide');
 D('redName').textContent='红方';D('blackName').textContent='黑方';
 D('lobbyStatus').textContent='○ 服务器离线（本地模式可用）';hideOverlay();hideReconnecting();
 try{localStorage.removeItem('xq_game');sessionStorage.removeItem('xq_game');}catch(e){}
+try{_xqDelCookie('xq_resume');}catch(e){}
 connectSocket();
 }
 function leaveGameSilent(){
@@ -1606,6 +1608,7 @@ D('game').classList.remove('show');D('lobby').classList.remove('hide');
 D('redName').textContent='红方';D('blackName').textContent='黑方';
 D('lobbyStatus').textContent='○ 服务器离线（本地模式可用）';hideOverlay();hideReconnecting();
 try{localStorage.removeItem('xq_game');sessionStorage.removeItem('xq_game');}catch(e){}
+try{_xqDelCookie('xq_resume');}catch(e){}
 connectSocket();
 }
 
@@ -2001,6 +2004,7 @@ D('game').classList.remove('show');D('lobby').classList.remove('hide');
 D('redName').textContent='红方';D('blackName').textContent='黑方';
 D('lobbyStatus').textContent='';hideOverlay();
 try{localStorage.removeItem('xq_game');sessionStorage.removeItem('xq_game');}catch(e){}
+try{_xqDelCookie('xq_resume');}catch(e){}
 connectSocket();
 }
 
