@@ -780,6 +780,7 @@ var ChessRoom = class {
               this.room.capturedRed = s.capturedRed || [];
               this.room.capturedBlack = s.capturedBlack || [];
               this.room.createdAt = s.createdAt;
+              this.room.rematchSeq = s.rematchSeq || 0;
               this.room.playerTokens = s.playerTokens || null;
               this.room.gameStarted = !!s.gameStarted;
               this.room.seatIdentity = s.seatIdentity || {};
@@ -836,7 +837,8 @@ var ChessRoom = class {
         seatIdentity: this.room.seatIdentity || {},
         _ratedRecorded: !!this.room._ratedRecorded,
         _turnDeadline: this.room._turnDeadline || null,
-        createdAt: this.room.createdAt
+        createdAt: this.room.createdAt,
+        rematchSeq: this.room.rematchSeq || 0
       });
       await this.env.CHESS_DB.prepare(
         "INSERT OR REPLACE INTO room_state (room_id, state, updated_at) VALUES (?, ?, ?)"
@@ -857,7 +859,7 @@ var ChessRoom = class {
       }
       const sid = Math.random().toString(36).slice(2) + Date.now().toString(36);
       this.ctx.acceptWebSocket(server, [sid]);
-      server.serializeAttachment({ sid, color: null, spectator: false, replaced: false, assignedAt: Date.now() });
+      server.serializeAttachment({ sid, color: null, spectator: false, replaced: false, assignedAt: Date.now(), pid: null });
       return new Response(null, { status: 101, webSocket: client });
     }
     const roomId = url.searchParams.get("roomId") || this.ctx.id.toString().split("-").pop();
@@ -882,7 +884,7 @@ var ChessRoom = class {
   }
   _att(ws) {
     try {
-      return ws.deserializeAttachment() || { sid: "", color: null, spectator: false, replaced: false, assignedAt: 0 };
+      return ws.deserializeAttachment() || { sid: "", color: null, spectator: false, replaced: false, assignedAt: 0, pid: null };
     } catch (e) {
       return { sid: "", color: null, spectator: false, replaced: false, assignedAt: 0 };
     }
@@ -922,6 +924,10 @@ var ChessRoom = class {
           if (!this.room.spectators.has(x)) this.room.spectators.add(x);
         } else if (a.color && !a.replaced) {
           if (![...this.room.players.keys()].some((k) => this._same(k, x))) this.room.players.set(x, { id: a.sid, color: a.color, assignedAt: a.assignedAt || Date.now() });
+          if (a.pid) {
+            if (!this.room.playerTokens) this.room.playerTokens = {};
+            if (!this.room.playerTokens[a.color]) this.room.playerTokens[a.color] = a.pid;
+          }
         }
       }
     } catch (e) {
@@ -1008,6 +1014,10 @@ var ChessRoom = class {
       console.error("Room WebSocket message error:", e);
     }
     try {
+      if (this.room && socketData && socketData.color && !socketData.replaced && this.room.playerTokens && this.room.playerTokens[socketData.color]) socketData.pid = this.room.playerTokens[socketData.color];
+    } catch (ePidSync) {
+    }
+    try {
       ws.serializeAttachment(socketData);
     } catch (e) {
     }
@@ -1059,7 +1069,8 @@ var ChessRoom = class {
         });
       } catch (eAL) {
       }
-      if (!anyLiveSeated && (this.room.gameOver || this.room.gameStarted || this.room.moveHistory && this.room.moveHistory.length > 0)) {
+      this._diag("create", anyLiveSeated ? "live" : "nolive", "mv=" + this.room.moveHistory.length + " over=" + (this.room.gameOver ? 1 : 0) + " started=" + (this.room.gameStarted ? 1 : 0));
+      if (!anyLiveSeated && this.room.gameOver) {
         this.room.gameOver = false;
         this.room.winner = null;
         this.room.endReason = null;
@@ -1071,6 +1082,7 @@ var ChessRoom = class {
         this.room.blkTime = 900;
         this.room.moveHistory = [];
         this.room.capturedRed = [];
+        try { this._midRing = []; this._midSet = new Set(); } catch (eMidW) { }
         this.room.capturedBlack = [];
         this.room.playerTokens = {};
         this.room.seatIdentity = {};
@@ -1107,6 +1119,7 @@ var ChessRoom = class {
         socketData.cv = payload && payload.cv || socketData.cv || null;
         await this._setSeatIdentity(myColor, payload);
         ws.send(JSON.stringify({ event: "room_created", data: { roomId: this.room.id, color: myColor, pid: myPid, seatInfo: this.getRoomState().seatInfo } }));
+        ws.send(JSON.stringify({ event: "room_state", data: { ...this.getRoomState(), color: myColor, pid: myPid } }));
         this.ctx.waitUntil(this._enrichSeatNames().then(() => this._regUpdate(this.room.players.size >= 2 ? "playing" : "waiting")).catch(() => {
         }));
         this._regKeepAlive();
@@ -1127,6 +1140,7 @@ var ChessRoom = class {
         socketData.cv = payload && payload.cv || socketData.cv || null;
         await this._setSeatIdentity(myColor, payload);
         ws.send(JSON.stringify({ event: "room_created", data: { roomId: this.room.id, color: myColor, pid: myPid, seatInfo: this.getRoomState().seatInfo } }));
+        ws.send(JSON.stringify({ event: "room_state", data: { ...this.getRoomState(), color: myColor, pid: myPid } }));
         this.ctx.waitUntil(this._enrichSeatNames().then(() => this._regUpdate(this.room.players.size >= 2 ? "playing" : "waiting")).catch(() => {
         }));
         this._regKeepAlive();
@@ -1281,6 +1295,7 @@ var ChessRoom = class {
         return;
       }
       if (this.room.currentTurn !== socketData.color) {
+        this._diag("desync", "not_your_turn", "srv=" + this.room.currentTurn + " cli=" + (payload && payload.currentTurn), "srvLen=" + this.room.moveHistory.length + " cliLen=" + (payload && payload.moveHistoryLen));
         ws.send(JSON.stringify({ event: "move_rejected", data: { reason: "not_your_turn", yourColor: socketData.color || null, currentTurn: this.room.currentTurn, histLen: this.room.moveHistory.length } }));
         try {
           let _pcol = null;
@@ -1296,6 +1311,17 @@ var ChessRoom = class {
         return;
       }
       const move = { ...payload, timestamp: Date.now() };
+      if (payload && payload.mid) {
+        const _mid = String(payload.mid);
+        if (!this._midRing) { this._midRing = []; this._midSet = new Set(); }
+        if (this._midSet.has(_mid)) {
+          try { ws.send(JSON.stringify({ event: "move_ack", data: { moveHistoryLen: this.room.moveHistory.length, lastMove: { fromRow: payload.fromRow, fromCol: payload.fromCol, toRow: payload.toRow, toCol: payload.toCol }, currentTurn: this.room.currentTurn, applied: false, dedupe: true } })); } catch (eMid) { }
+          return;
+        }
+        this._midSet.add(_mid);
+        this._midRing.push(_mid);
+        if (this._midRing.length > 50) { const _oldMid = this._midRing.shift(); this._midSet.delete(_oldMid); }
+      }
       this.room.moveHistory.push(move);
       if (move.captured) {
         if (!this.room.capturedRed) this.room.capturedRed = [];
@@ -1396,6 +1422,7 @@ var ChessRoom = class {
       this.broadcastToOpponent(ws, JSON.stringify({ event: "draw_requested", data: { from: socketData.color } }));
     } else if (eventName === "accept_draw") {
       if (!this.room) return;
+      this._diag("draw", String(socketData.color), "mv=" + this.room.moveHistory.length);
       this.room.gameOver = true;
       this.room._gameEndedAt = Date.now();
       this.room.winner = "draw";
@@ -1453,6 +1480,13 @@ var ChessRoom = class {
           }
         }
       }
+      if (this.room.playerTokens) {
+        for (const [pwsBF, pBF] of this.room.players) {
+          if (!pBF.color || this.room.playerTokens[pBF.color]) continue;
+          const aBF = this._att(pwsBF);
+          this.room.playerTokens[pBF.color] = aBF.pid || (Math.random().toString(36).slice(2) + Date.now().toString(36));
+        }
+      }
       if (this.room.playerTokens && this.room.playerTokens.red && this.room.playerTokens.black) {
         const tmpTok = this.room.playerTokens.red;
         this.room.playerTokens.red = this.room.playerTokens.black;
@@ -1472,8 +1506,10 @@ var ChessRoom = class {
       this.room.blkTime = 900;
       this.room.moveHistory = [];
       this.room.capturedRed = [];
+      try { this._midRing = []; this._midSet = new Set(); } catch (eMidR) { }
       this.room.capturedBlack = [];
       this.room.createdAt = Date.now();
+      this.room.rematchSeq = (this.room.rematchSeq || 0) + 1;
       try {
         await this.ctx.storage.delete("teardownAt");
       } catch (e) {
@@ -1497,6 +1533,7 @@ var ChessRoom = class {
     } else if (eventName === "accept_undo") {
       if (!this.room || this.room.moveHistory.length === 0) return;
       const lastMove = this.room.moveHistory.pop();
+      if (lastMove && lastMove.mid && this._midSet) { try { this._midSet.delete(String(lastMove.mid)); const _mi = this._midRing ? this._midRing.indexOf(String(lastMove.mid)) : -1; if (_mi >= 0) this._midRing.splice(_mi, 1); } catch (eMidU) { } }
       this.room.gameOver = false;
       this.room.winner = null;
       this.room.currentTurn = lastMove.currentTurn === "red" ? "black" : "red";
@@ -1569,9 +1606,17 @@ var ChessRoom = class {
             const [hws, seat] = sameColorEntry;
             const pidMatches2 = !!(payload.pid && this.room.playerTokens && this.room.playerTokens[color] === payload.pid);
             const holderDead = !liveSids.has(this._att(hws).sid) || !!this._att(hws).replaced || this._staleSid(this._att(hws).sid);
-            const holderIdle = false;
+            let holderIdle = false;
             const preDiscSeat = !!(this.disconnected && this.disconnected[color] && seat.assignedAt && this.disconnected[color] > seat.assignedAt);
             const devPinned = !!(payload.deviceId && this.room.seatIdentity && this.room.seatIdentity[color] && this.room.seatIdentity[color].dev != null && String(this.room.seatIdentity[color].dev) === String(payload.deviceId));
+            if (!pidMatches2 && !devPinned && !holderDead && !preDiscSeat) {
+              try {
+                const hbAll = await this.ctx.storage.get("hb");
+                const hbT = hbAll && hbAll[color] ? hbAll[color] : 0;
+                holderIdle = !!(hbT && Date.now() - hbT > 75e3);
+              } catch (eHb) { }
+            }
+            if (!pidMatches2 && !devPinned && !holderDead && !holderIdle && !preDiscSeat) this._diag("reconn", "reject", color, "dead=" + holderDead + " idle=" + holderIdle + " pre=" + preDiscSeat);
             if (!pidMatches2 && !devPinned && !holderDead && !holderIdle && !preDiscSeat) {
               const alt2 = color === "red" ? "black" : "red";
               if (isFree(alt2) || isReplaceable(alt2)) {
@@ -1700,6 +1745,12 @@ var ChessRoom = class {
       if (!this.room.gameOver && this.room.players.size >= 2) {
         this.startRoomTimer();
       }
+      this._diag("reconn", "ok", color, "mv=" + this.room.moveHistory.length);
+      try {
+        const _hbNext = (await this.ctx.storage.get("hb")) || {};
+        _hbNext[color] = Date.now();
+        await this.ctx.storage.put("hb", _hbNext);
+      } catch (eHb2) { }
       this.broadcastToOpponent(ws, JSON.stringify({ event: "player_reconnected", data: { color } }));
     } else if (eventName === "leave_room") {
       if (!this.room) return;
@@ -1807,6 +1858,7 @@ var ChessRoom = class {
   }
   async webSocketClose(ws, code, reason, wasClean) {
     let deadFlag = null;
+    this._diag("close", (this._att(ws) || {}).color || "-", this.room ? ("mv=" + this.room.moveHistory.length + " turn=" + this.room.currentTurn) : "noroom");
     try {
       deadFlag = await this.ctx.storage.get("dead");
     } catch (e) {
@@ -1851,12 +1903,27 @@ var ChessRoom = class {
     }
   }
   async _doForfeit(color, now) {
+    this._diag("forfeit", String(color), this.room ? ("mv=" + this.room.moveHistory.length) : "");
     this.room.gameOver = true;
     this.room._gameEndedAt = now;
     this.room.winner = color === "red" ? "black" : "red";
     this.room.endReason = "disconnect_timeout";
-    this.broadcastToRoom(JSON.stringify({ event: "game_over", data: { winner: this.room.winner, reason: "disconnect_timeout" } }));
-    this.broadcastToRoom(JSON.stringify({ event: "room_timeout", data: {} }));
+    const _endMsg = JSON.stringify({ event: "game_over", data: { winner: this.room.winner, reason: "disconnect_timeout" } });
+    const _toMsg = JSON.stringify({ event: "room_timeout", data: {} });
+    this.broadcastToRoom(_endMsg);
+    this.broadcastToRoom(_toMsg);
+    try {
+      const _endSent = /* @__PURE__ */ new Set([...this.room.players.keys(), ...this.room.spectators]);
+      for (const _endWs of this.ctx.getWebSockets()) {
+        if (_endSent.has(_endWs)) continue;
+        try {
+          _endWs.send(_endMsg);
+          _endWs.send(_toMsg);
+        } catch (eEnd) {
+        }
+      }
+    } catch (eEndAll) {
+    }
     this.ctx.waitUntil(this._recordGameEnd("disconnect_timeout"));
     this._saveRoomState();
     this.ctx.waitUntil(this._regUpdate(null));
@@ -2013,6 +2080,11 @@ var ChessRoom = class {
         } catch (e) {
         }
         const roomTeardown = this.room;
+        if (roomTeardown && this.env.CHESS_DB) {
+          try {
+            this.ctx.waitUntil(this.env.CHESS_DB.prepare("DELETE FROM room_state WHERE room_id = ?").bind(roomTeardown.id).run().catch(() => {}));
+          } catch (eRS) {}
+        }
         this.room = null;
         this.disconnected = {};
         try {
@@ -2110,6 +2182,16 @@ var ChessRoom = class {
     } catch (e) {
     }
   }
+  _diag(ev, a, b, c) {
+    try {
+      if (!this.env || !this.env.CHESS_DB) return;
+      const rid = this.room ? String(this.room.id) : "";
+      const run = this._diagInit ? Promise.resolve() : this.env.CHESS_DB.prepare("CREATE TABLE IF NOT EXISTS diag_log (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, room_id TEXT, ev TEXT, a TEXT, b TEXT, c TEXT)").run().catch(() => { });
+      this._diagInit = 1;
+      if (Math.random() < 0.01) this.ctx.waitUntil(this.env.CHESS_DB.prepare("DELETE FROM diag_log WHERE ts < ?").bind(Date.now() - 14 * 864e5).run().catch(() => { }));
+      this.ctx.waitUntil(run.then(() => this.env.CHESS_DB.prepare("INSERT INTO diag_log (ts, room_id, ev, a, b, c) VALUES (?,?,?,?,?,?)").bind(Date.now(), rid, String(ev), String(a == null ? "" : a), String(b == null ? "" : b), String(c == null ? "" : c)).run()).catch(() => { }));
+    } catch (e) { }
+  }
   broadcastToRoom(msg) {
     if (!this.room) return;
     for (const ws of this.room.players.keys()) {
@@ -2130,7 +2212,7 @@ var ChessRoom = class {
     const baseState = this.getRoomState();
     for (const [ws, player] of this.room.players) {
       try {
-        ws.send(JSON.stringify({ event: "room_state", data: { ...baseState, color: player.color } }));
+        ws.send(JSON.stringify({ event: "room_state", data: { ...baseState, color: player.color, pid: (this.room.playerTokens || {})[player.color] || null } }));
       } catch (e) {
       }
     }
@@ -2176,7 +2258,7 @@ var ChessRoom = class {
     for (const [pws, player] of this.room.players) {
       if (!this._same(pws, ws)) {
         try {
-          pws.send(JSON.stringify({ event: "room_state", data: { ...baseState, color: player.color } }));
+          pws.send(JSON.stringify({ event: "room_state", data: { ...baseState, color: player.color, pid: (this.room.playerTokens || {})[player.color] || null } }));
         } catch (e) {
         }
       }
@@ -2186,6 +2268,7 @@ var ChessRoom = class {
     const si = this.room.seatIdentity || {};
     return {
       roomId: this.room.id,
+      mx: this.room.rematchSeq || 0,
       playerCount: this.room.players.size,
       currentTurn: this.room.currentTurn,
       gameOver: this.room.gameOver,
@@ -2286,6 +2369,7 @@ var ChessRoom = class {
     };
   }
   async _recordGameEnd(reason) {
+    this._diag("end", String(reason), "winner=" + (this.room ? String(this.room.winner) : ""), "mv=" + (this.room && this.room.moveHistory ? this.room.moveHistory.length : 0));
     if (!this.room || !this.env.CHESS_DB || this.room._ratedRecorded) return;
     const si = this.room.seatIdentity || {};
     const red = si.red;
@@ -3714,4 +3798,3 @@ export {
   index_default as default
 };
 //# sourceMappingURL=cf-chess.js.map
-
