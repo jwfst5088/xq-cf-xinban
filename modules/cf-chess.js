@@ -1155,6 +1155,15 @@ var ChessRoom = class {
         const dead = !this._liveSids().has(this._att(pws).sid);
         if (dead || rep) this.room.players.delete(pws);
       }
+      const _selfSeat = [...this.room.players.entries()].find(([pws]) => this._same(pws, ws));
+      if (_selfSeat) {
+        const _myColor = _selfSeat[1].color;
+        socketData.spectator = false;
+        socketData.color = _myColor;
+        const _myPid = (this.room.playerTokens && this.room.playerTokens[_myColor]) || null;
+        ws.send(JSON.stringify({ event: "room_joined", data: { roomId: this.room.id, color: _myColor, pid: _myPid, seatInfo: this.getRoomState().seatInfo, moveHistory: this.room.moveHistory, currentTurn: this.room.currentTurn, gameOver: this.room.gameOver, gameStarted: this.room.gameStarted, redTime: this.room.redTime, blkTime: this.room.blkTime } }));
+        return;
+      }
       if (this.room.players.size === 0) {
         if (!(payload && payload.via === "match")) {
           try {
