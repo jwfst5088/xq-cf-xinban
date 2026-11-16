@@ -1717,6 +1717,8 @@ myRm=d.roomId;myCl=d.color;gm='online';D('lobbyStatus').textContent='';
 try{if(d.pid){window._xqPid={rm:d.roomId,pid:d.pid};localStorage.setItem('xq_pid',JSON.stringify(window._xqPid));try{_xqWriteCookie('xq_pid',JSON.stringify(window._xqPid));}catch(e){}}}catch(e){} // 持久化pid: 刷新后凭pid秒接管座位
 try{localStorage.setItem('xq_last_color',d.color);}catch(e){} // 记录本盘颜色，下一盘轮换先手
 enterOnlineGame(d.roomId,d.color);
+// 2026-11-16 新增：room_joined 自带服务端棋谱，进房清盘后立即重放，避免等 room_state 期间停在初始盘（只补重放，不改原流程）
+try{if(d&&d.moveHistory&&d.moveHistory.length>0){for(var _i=0;_i<d.moveHistory.length;_i++){var _m=d.moveHistory[_i];var _rs=engine.move(_m.fromRow,_m.fromCol,_m.toRow,_m.toCol);if(_rs&&_rs.captured){if(_rs.captured.color==='red')capRed.push(_rs.captured);else capBlk.push(_rs.captured);}}var _lm=d.moveHistory[d.moveHistory.length-1];if(_lm)lastMove={row:_lm.toRow,col:_lm.toCol};if(d.currentTurn)engine.currentTurn=d.currentTurn;if(d.gameStarted!==undefined)gameStarted=!!d.gameStarted;if(gameStarted){D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';}try{render();saveGameState();}catch(eR){}}}catch(eRJ){}
 });
 socket.on('game_start',function(d){
 gameStarted=true;D('turnText').textContent=engine.currentTurn==='red'?'红方走棋':'黑方走棋';
@@ -1833,7 +1835,7 @@ var isPageReload=window._isPageReload;window._isPageReload=false;
 var _xqForceSyncNow=!!window._xqForceSync;window._xqForceSync=false;
 if(_xqForceSyncNow&&(d.moveHistory.length>0||engine.moveHistory.length===0)){isPageReload=true;}   // 借“页面重载”路径强制全量重放
 var _xqMxNow=(typeof d.mx==='number')?d.mx:null;
-if(_xqMxNow!==null&&window._xqMx!==undefined&&_xqMxNow!==window._xqMx){isPageReload=true;}
+var _xqMxUp=(_xqMxNow!==null&&window._xqMx!==undefined&&_xqMxNow>window._xqMx);if(_xqMxUp){isPageReload=true;}
 if(_xqMxNow!==null){window._xqMx=_xqMxNow;}   // 借“页面重载”路径强制全量重放
 // 本地领先保护：本地恰好比服务端多1步且正是 pendingMove（未确认走棋）时，
 // 全量同步不应覆盖本地（防止"刚走的棋回退"），等待 move_ack 或自动补发
@@ -1857,7 +1859,7 @@ return;
 // 全量同步：当本地历史与服务器不一致时重新初始化，确保两个终端状态完全一致
 // 防御性检查：如果服务器历史为空但本地有历史，不重置（防止DO冷启动后状态丢失）
 if(engine.moveHistory.length!==d.moveHistory.length||isPageReload){
-if(!(d.moveHistory.length===0&&engine.moveHistory.length>0&&!isPageReload)){
+if(!(d.moveHistory.length===0&&engine.moveHistory.length>0&&!(isPageReload&&_xqMxUp))){
 // 如果仅差1步且非页面重载，增量应用缺失的走棋（避免全量同步导致的视觉闪烁）
 if(d.moveHistory.length===engine.moveHistory.length+1&&!isPageReload){
 var newMove=d.moveHistory[d.moveHistory.length-1];
