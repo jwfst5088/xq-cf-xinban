@@ -1924,6 +1924,29 @@ socket.on('error', function(msg){
         toast(msg,2500);
     }
 });
+socket.on('room_error',function(d){
+    // 2026-11-16 修复：Worker 对"房间不存在/已解散"发的是 room_error（不是 error 事件），
+    // 原前端只监听 error，事件被丢弃 → 点了加入没有任何提示，界面停在"正在加入房间"。
+    var _xqRmMsg=(d&&d.msg)?String(d.msg):'房间不存在或已解散';
+    var _xqInGame=(gm==='online'&&myRm);
+    if(_xqInGame){
+        try{leaveGameSilent();}catch(e){}
+    }else{
+        // 当前连接还挂在 ?roomId=<死房> 上，必须重建大厅连接，否则后续大厅操作都发到那个死房实例
+        try{if(socket){socket.disconnect();}socket=null;sockOk=false;}catch(e){}
+        try{connectSocket();}catch(e){}
+    }
+    try{toast(_xqRmMsg,4000);}catch(e){}
+    try{D('lobbyStatus').textContent=_xqRmMsg;}catch(e){}
+    // connectSocket 的 connect 回调会异步把状态栏改回"● 服务器已连接"，稍后再落一次提示文案
+    setTimeout(function(){
+        try{
+            var _el=D('lobbyStatus');
+            var _t=_el?_el.textContent:'';
+            if(_t.indexOf('已连接')>=0||_t.indexOf('正在连接')>=0)_el.textContent=_xqRmMsg;
+        }catch(e){}
+    },1500);
+});
 socket.on('undo_requested',function(){toast('对手请求悔棋',2000);showOverlay('<h2>↩ 悔棋请求</h2><p>对手请求悔棋</p><div class="btns2"><button class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:13px" onclick="accUndo()">同意</button><button class="btn btn-red" onclick="rejUndo()">拒绝</button></div>');});
 socket.on('undo_accepted',function(){doUndoLocal();toast('悔棋成功',1500);});
 socket.on('undo_rejected',function(){toast('对方拒绝了悔棋',2000);});
